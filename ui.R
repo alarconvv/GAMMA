@@ -211,16 +211,16 @@ shinyUI(
                                                                                                                                                                     ),
                                                                                                                                                    textInput('samfreqDisBI','Sample frequencies',value = 10)
                                                                                                                                                    ),
-                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select'='select', 'fitzJohn' = 'fitzJohn', 'equal' = 'equal','Costumize' = 'costumPiDiscBI')),
+                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select' = 'select', 'fitzJohn' = 'fitzJohn', 'equal' = 'equal','Costumize' = 'costumPiDiscBI')),
                                                                                                                                   conditionalPanel("input.piBI == 'costumPiDiscBI'",
                                                                                                                                                    rHandsontableOutput("PiBI"),br(),
-                                                                                                                                                   actionButton('SubmpiBI','Submit')),br(),
+                                                                                                                                                   actionButton('SubmPiBI','Submit')),br(),
                                                                                                                                    textInput('nsimDisBI','nsim',value = 10000)
                                                                                                                                   )),
                                                                                                                column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot10'))),
                                                                                                                                  column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')))
                                                                                                                ),
-                                                                                                               wellPanel(fluidRow(column(4,selectInput('plotModelDisBI','Plot model',choices=NULL)),
+                                                                                                               wellPanel(fluidRow(column(4,selectInput('plotModelDisBI','Plot model',choices = NULL)),
                                                                                                                                   column(4,checkboxInput('bestStateBI', 'Plot the most likely state')),
                                                                                                                                   column(4,actionButton('PlotEditorDisBI', 'Plot Editor'))
                                                                                                                )
