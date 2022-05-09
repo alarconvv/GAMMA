@@ -16,7 +16,6 @@ library(paletteer)
 library(coda)
 library(shinyMatrix)
 library(corHMM)
-#library(shinyjs)
 library(shiny)
 library(phytools)
 library(reactable)
@@ -27,13 +26,20 @@ library(rhandsontable)
 
 # Define UI for application that draws a histogram
 shinyUI(
-  navbarPage("GAMMA",theme =bs_theme(version = 4, bootswatch = "minty"),
+  navbarPage("GAMMA",theme = bs_theme(version = 4, bootswatch = "minty"),
              
-             tabPanel("Home"),
+             tabPanel("Home",
+                      tags$style(HTML("
+              .tabbable > .nav > li > a {margin-top:0px;}")),
+                      
+                      includeHTML("www/home.html")
+                 
+                      ),
+             
              navbarMenu("Methods",
                         tabPanel("Independent Contrats"),
                         tabPanel("Ancestral States Reconstruction",
-                                 fluidPage(theme =bs_theme(version = 4, bootswatch = "minty"),
+                                 fluidPage(theme = bs_theme(version = 4, bootswatch = "minty"),
                                            tabsetPanel(type = "tabs",
                                                        tabPanel("Data",
                                                                 fluidRow(
