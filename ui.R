@@ -142,9 +142,9 @@ shinyUI(
                                                                                              tabPanel("Maxima Likelihood",
                                                                                                       fluidRow(column(3, wellPanel(selectInput("typeDisML", "Type of reconstruction",choices= c('joint'='joint', 'marginal'='marginal'),selected = 'marginal'),
                                                                                                                                    selectInput("ModelsDisML", "Set models",choices= NULL,multiple = TRUE),
-                                                                                                                                   uiOutput("addModel3States"),br(),
-                                                                                                                                   conditionalPanel("input.AddModelDisML > 0",
-                                                                                                                                                    rHandsontableOutput("w1"),br(),
+                                                                                                                                   uiOutput("addModel3States"),
+                                                                                                                                   conditionalPanel("input.AddModelDisML == 1",
+                                                                                                                                                    br(),rHandsontableOutput("w1"),br(),
                                                                                                                                                     actionButton('SubmAddModel','Submit')),br(),
                                                                                                                                    actionButton('RunAnalyDisML','Run'), hr(),
                                                                                                                                    checkboxInput("DisMLModAIC", "Model selection AIC"),
@@ -173,16 +173,15 @@ shinyUI(
                                                                                                                )
                                                                                                       ),
                                                                                              tabPanel("Stocastic State Mapping",
-                                                                                                      fluidRow(column(3,wellPanel(selectInput("ModelsDisBI", "Set model",choices= NULL,multiple = TRUE),
-                                                                                                                                  uiOutput("addModel3StatesBI"),br(),
-                                                                                                                                  conditionalPanel("input.AddModelDisBI > 0",
-                                                                                                                                                   rHandsontableOutput("modelBI"),br(),
-                                                                                                                                                   actionButton('SubmAddModelBI','Submit')),br(),
+                                                                                                      fluidRow(column(3,wellPanel(selectInput("ModelsDisBI", "Set model",choices = NULL,multiple = F),
+                                                                                                                                  conditionalPanel("input.ModelsDisBI == 'Costumize'",
+                                                                                                                                                   br(), rHandsontableOutput("costuModelBI"),br(),
+                                                                                                                                                   actionButton('SubmAddModelBI','Submit model')),br(),
 
-                                                                                                                                  selectInput("QmatrixBI", "Q matri: rates",choices= c('Select'='select', 'empirical' = 'empirical', 'mcmc' = 'mcmc','costumize'='costumQmDiscBI')),
+                                                                                                                                  selectInput("QmatrixBI", "Q matrix: rates",choices = c('Select'='select', 'empirical' = 'empirical', 'mcmc' = 'mcmc','costumize'='costumQmDiscBI')),
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'costumQmDiscBI'",
-                                                                                                                                                   rHandsontableOutput("QmatBI"),br(),
-                                                                                                                                                   actionButton('SubmQmatBI','Submit')),br(),
+                                                                                                                                                   br(),rHandsontableOutput(outputId = "QmatBI"),br(),
+                                                                                                                                                   actionButton('SubmQmatBI','Submit model')),br(),
                                                                                                                                   
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'mcmc'",
@@ -221,7 +220,8 @@ shinyUI(
                                                                                                                                   conditionalPanel("input.piBI == 'costumPiDiscBI'",
                                                                                                                                                    rHandsontableOutput("PiBI"),br(),
                                                                                                                                                    actionButton('SubmPiBI','Submit')),br(),
-                                                                                                                                   textInput('nsimDisBI','nsim',value = 10000)
+                                                                                                                                   textInput('nsimDisBI','nsim',value = 10000),
+                                                                                                                                  actionButton('RunAnalyDisBI','Run'), hr(),
                                                                                                                                   )),
                                                                                                                column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot10'))),
                                                                                                                                  column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')))

@@ -11,6 +11,7 @@ v$Models <- list()
 v$objectContinuousBI <- NULL
 v$counterModelDisML <- NULL
 v$objectDiscreteML <- NULL
+v$objectDiscreteBI <- NULL
 
 
 #Render print in Info panel: Data panel

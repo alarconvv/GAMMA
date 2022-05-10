@@ -7,6 +7,7 @@ output$infoPanelDiscreteML <- renderPrint({
 })
 
 # Vector to store models and outputs
+# 
 
 ModelsDiscret <- reactiveValues()
 
@@ -113,17 +114,11 @@ observeEvent(!is.null(input$ModelsDisML),{
 # if add model button is clicked
 observeEvent(input$AddModelDisML > 0 ,{
   
-  # star counter
-  ModelsDiscret$counter[1] <- ModelsDiscret$counter[1] + 1
-  
-  
+
   # add matrix for a new model
-  output$addModelTable <- renderUI(rHandsontableOutput("w1"))
-  
   output$w1 <- renderRHandsontable({
     ModelsDiscret$matrix0[lower.tri(ModelsDiscret$matrix0)] <- as.integer(1)
     ModelsDiscret$matrix0[upper.tri(ModelsDiscret$matrix0)] <- as.integer(1)
-    
     rhandsontable(ModelsDiscret$matrix0,readOnly = F)
   })
   
@@ -138,16 +133,20 @@ observeEvent(input$AddModelDisML > 0 ,{
 
 observeEvent(input$SubmAddModel > 0,{
   
+  # star counter
+  ModelsDiscret$counter[1] <- ModelsDiscret$counter[1] + 1
+
   ModelsDiscret$multiStatesModels$x <- hot_to_r(input$w1)
-  
   row.names(ModelsDiscret$multiStatesModels$x) <- levels(SelectedVarDisc())
   colnames(ModelsDiscret$multiStatesModels$x) <- levels(SelectedVarDisc())
   
-  names(ModelsDiscret$multiStatesModels)[length(ModelsDiscret$multiStatesModels)] <- paste('UserModel',as.character(ModelsDiscret$counter[1]-2),sep = '')
+  names(ModelsDiscret$multiStatesModels)[length(ModelsDiscret$multiStatesModels)] <- paste('UserModel',as.character(ModelsDiscret$counter[1] - 1),sep = '')
   
   updateSelectInput(session, "ModelsDisML",
-                    choices=names(ModelsDiscret$multiStatesModels),selected = names(ModelsDiscret$multiStatesModels))
-})
+                    choices = names(ModelsDiscret$multiStatesModels),selected = names(ModelsDiscret$multiStatesModels))
+
+  
+ })
 
 
 
