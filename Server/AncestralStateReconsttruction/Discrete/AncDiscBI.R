@@ -1,8 +1,8 @@
 #Render print in Info panel: ML Analysis
 #
 output$infoPanelDiscreteBI <- renderPrint({
-  if (!is.null(v$objectDiscreteBI)) {
-    print(v$objectDiscreteBI)
+  if (!is.null(AncDiscreteBI$objectDiscreteBI)) {
+    print(AncDiscreteBI$objectDiscreteBI)
   }
 })
 
@@ -10,7 +10,16 @@ output$infoPanelDiscreteBI <- renderPrint({
 # Vector to store matrices, vectors and output from Anc Discrete BI analysis
 # 
 AncDiscreteBI <- reactiveValues()
+AncDiscreteBI$objectDiscreteBI <- NULL
 AncDiscreteBI$modelMatrixBI <- NULL
+AncDiscreteBI$QmatrixPar <- NULL
+AncDiscreteBI$PiprobBI <- NULL
+AncDiscreteBI$nsim <- NULL
+AncDiscreteBI$outputDisBI <- NULL
+AncDiscreteBI$sampleFreq <- NULL
+AncDiscreteBI$burnin <- NULL
+AncDiscreteBI$Priorpar <- NULL
+AncDiscreteBI$vQ <- NULL
 
 
 # Count the number of states of the character to analyse
@@ -27,13 +36,13 @@ observeEvent(input$typeChar == 'Discrete', {
 if (nStates()[1] == 2) {
   # update model list
   updateSelectInput(session, "ModelsDisBI", 
-                    choices = c('ER' = 'ER', 'ARD' = 'ARD', 
+                    choices = c('Select' = 'Select','ER' = 'ER', 'ARD' = 'ARD', 
                                 'Ireversible01' = 'Ireversible01', 
                                 'Ireversible10' = 'Ireversible10'))
   } else {
     #update model list for 3 states
     updateSelectInput(session, "ModelsDisBI",
-                    choices = c('ER' = 'ER', 'ARD' = 'ARD', 'SYM' = 'SYM', 'Costumize' = 'Costumize'))
+                    choices = c('Select' = 'Select','ER' = 'ER', 'ARD' = 'ARD', 'SYM' = 'SYM', 'Costumize' = 'Costumize'))
   }
 
   }) 
@@ -113,16 +122,17 @@ observeEvent(!is.null(input$ModelsDisBI),{
     
 })
 
-
+# submit matrix with a new model
+# 
   observeEvent(input$SubmAddModelBI > 0, {
     # # Submit new model
     AncDiscreteBI$modelMatrixBI <- hot_to_r(input$costuModelBI) # get values from costumizable table
     row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
     colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
     # # Name new model
-     names(AncDiscreteBI$modelMatrixBI) <- 'UserName'
+     names(AncDiscreteBI$modelMatrixBI) <- 'UserModel'
      
-     v$objectDiscreteBI <- AncDiscreteBI$modelMatrixBI
+     AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$modelMatrixBI
   })
 
 
@@ -130,23 +140,25 @@ observeEvent(!is.null(input$ModelsDisBI),{
 # Temporal object to print in info panel
 # info: model
 #
-observeEvent(!is.null(input$ModelsDisBI),{
-  v$objectDiscreteBI <- AncDiscreteBI$modelMatrixBI
+observeEvent(!is.null(AncDiscreteBI$modelMatrixBI),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$modelMatrixBI
 })
 
 
 #Set Q matriz parameter
 #
 observeEvent(input$QmatrixBI != 'select', {
+  AncDiscreteBI$matrix1 <- matrix(data = NA, nrow = nStatesBI()[1], ncol = nStatesBI()[1],
+                                  dimnames = list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
+  AncDiscreteBI$matrix1[lower.tri(AncDiscreteBI$matrix1)] <- as.numeric(0.5)
+  AncDiscreteBI$matrix1[upper.tri(AncDiscreteBI$matrix1)] <- as.numeric(0.5)
+
   if (input$QmatrixBI == 'costumQmDiscBI') {
-    AncDiscreteBI$matrix0 <- matrix(data = as.numeric(0), nrow = nStatesBI()[1], ncol = nStatesBI()[1],
-                                             dimnames = list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
-    output$QmatBI <- renderRHandsontable( {# add matrix for a new Qmatrix
-      AncDiscreteBI$matrix0[lower.tri(AncDiscreteBI$matrix0)] <- as.numeric(0.5)
-      AncDiscreteBI$matrix0[upper.tri(AncDiscreteBI$matrix0)] <- as.numeric(0.5)
-      diag(AncDiscreteBI$matrix0) <- -rowSums(AncDiscreteBI$matrix0,na.rm = TRUE)
-      rhandsontable(AncDiscreteBI$matrix0,readOnly = F)})
-  } else {
+    AncDiscreteBI$QmatrixPar <- NULL
+    output$putitamatrix <- renderRHandsontable( {# add matrix for a new Qmatrix
+      rhandsontable(AncDiscreteBI$matrix1,readOnly = F)
+      })
+    } else {
     AncDiscreteBI$QmatrixPar <- input$QmatrixBI
   }
 })
@@ -154,6 +166,324 @@ observeEvent(input$QmatrixBI != 'select', {
 # Submit Q matrix
 #
 observeEvent(input$SubmQmatBI > 0,{
-  AncDiscreteBI$QmatrixPar <-  hot_to_r(input$QmatBI) # get values from costumizable table
+AncDiscreteBI$QmatrixPar <-  hot_to_r(input$putitamatrix)
+row.names(AncDiscreteBI$QmatrixPar) <- levels(SelectedVarDisc()) # assign name states
+colnames(AncDiscreteBI$QmatrixPar) <- levels(SelectedVarDisc())
+diag(AncDiscreteBI$QmatrixPar) <- -rowSums(AncDiscreteBI$QmatrixPar,na.rm = TRUE)# get values from costumizable table
 })
 
+# Temporal object to print in info panel
+# info: Q matrix
+#
+observeEvent(!is.null(AncDiscreteBI$QmatrixPar),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$QmatrixPar
+})
+
+
+#Set Pi: prior probabilities in the root
+#
+observeEvent(input$piBI != 'select', {
+  AncDiscreteBI$matrix2 <- matrix(data = NA, nrow = 1, ncol = nStatesBI()[1],
+                                  dimnames = list('Pi prob.',levels(SelectedVarDisc())))
+  AncDiscreteBI$matrix2[1,] <- as.numeric(1/nStatesBI()[1])
+ if (input$piBI == 'costumPiDiscBI') {
+    AncDiscreteBI$PiprobBI <- NULL
+    output$matPiBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+      rhandsontable(AncDiscreteBI$matrix2,readOnly = F)
+    })
+  } else {
+    AncDiscreteBI$PiprobBI <- input$piBI
+  }
+})
+
+# Submit Pi probabilities in the root
+#
+observeEvent(input$SubmPiBI > 0,{
+  tempPi <- hot_to_r(input$matPiBI)
+  sumPiProb <- sum(tempPi[1,])
+  
+  if (sumPiProb == 1) {
+    AncDiscreteBI$PiprobBI <-  c(hot_to_r(input$matPiBI))
+  }else{
+    AncDiscreteBI$objectDiscreteBI <- 'Probabilities must sum 1'
+  }
+
+})
+
+# Temporal object to print in info panel
+# info: Pi probabilities in the root
+#
+observeEvent(!is.null(AncDiscreteBI$PiprobBI),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$PiprobBI
+})
+
+
+# set number of simulation
+# 
+observeEvent(!is.null(input$nsimDisBI),{
+  AncDiscreteBI$nsim <- as.numeric(input$nsimDisBI)
+})
+
+# if mcmc, set sample frequency
+# 
+observeEvent(!is.null(input$samfreqDisBI),{
+  AncDiscreteBI$sampleFreq <- as.numeric(input$samfreqDisBI)
+})
+
+# if mcmc, set burning
+# 
+observeEvent(!is.null(input$samfreqDisBI),{
+  AncDiscreteBI$burnin <- as.numeric(input$burninDisBI) * (AncDiscreteBI$nsim * AncDiscreteBI$sampleFreq)
+})
+
+
+
+
+# Set Prior parameter if mcmc = costumize, 'useEmpirical' and 'oneBeta'
+# 
+observeEvent(input$priorDisBI == 'useEmpirical' & input$betaValueDisBI == 'oneBeta',{
+  
+  AncDiscreteBI$Priorpar <- NULL
+  AncDiscreteBI$matrix3.1 <- matrix(data = NA, nrow = 1, ncol = 1,dimnames = list('beta', 'value' ))
+  AncDiscreteBI$matrix3.1[1,] <- as.numeric(1)
+  
+  output$matBetaValDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix3.1,readOnly = F)
+  })
+
+})
+
+
+# Submit Beta value 
+#
+observeEvent(input$SubmBetaValDisBI > 0,{
+  
+  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,beta = c(hot_to_r(input$matBetaValDisBI)[1,]))
+  
+})
+
+
+# Set Prior parameter if mcmc = costumize, 'useEmpirical' and some 'betaPerRate'
+#
+observeEvent(input$priorDisBI == 'useEmpirical' & input$betavaluesDisBI == 'betaPerRate', {
+  AncDiscreteBI$Priorpar <- NULL
+  AncDiscreteBI$matrix3 <- matrix(data = NA, nrow = 1, ncol = length(which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)),
+                                  dimnames = list('betas',  sort(unique(c(AncDiscreteBI$modelMatrixBI))[which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)])))
+  AncDiscreteBI$matrix3[1,] <- as.numeric(1)
+  
+  output$matBetaValuePerRateDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix3,readOnly = F)
+  })
+
+  })
+
+
+# Submit Beta values per rates
+#
+observeEvent(input$SubmBetaValuePerRateDisBI > 0,{
+  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,beta = c(hot_to_r(input$matBetaValuePerRateDisBI)[1,]))
+
+})
+
+
+# Set Prior parameter if mcmc = costumize, 'noUseEmpirical' and 'oneAlphaBeta'
+#
+observeEvent(input$priorDisBI == 'noUseEmpirical' & input$alphaBetaValDisBI == 'oneAlphaBeta', {
+  AncDiscreteBI$matrix4 <- matrix(data = NA, nrow = 2, ncol = 1,
+                                  dimnames = list(c('alpha','beta'), 'Value'))
+  AncDiscreteBI$matrix4[1,1] <- as.numeric(0.5)
+  AncDiscreteBI$matrix4[2,1] <- as.numeric(1)
+  
+  AncDiscreteBI$Priorpar <- NULL
+  
+  output$matOneAlphaBetaValDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix4,readOnly = F)
+  })
+})
+
+# Submit one alpha and beta values 
+#
+observeEvent(input$SubmOneAlphaBetaValDisBI > 0,{
+  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,
+                                 alpha = hot_to_r(input$matOneAlphaBetaValDisBI)[1,1],
+                                 beta = hot_to_r(input$matOneAlphaBetaValDisBI)[2,1])
+  
+})
+
+
+# Set Prior parameter if mcmc = costumize, 'noUseEmpirical' and 'oneAlphaBeta'
+#
+
+observeEvent(input$priorDisBI == 'noUseEmpirical' & input$alphaBetaValDisBI == 'alphaBetaPerRate', {
+  AncDiscreteBI$matrix5 <- matrix(data = NA, nrow = 2, ncol = length(which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)),
+                                  dimnames = list(c('alpha','beta'),sort(unique(c(AncDiscreteBI$modelMatrixBI))[which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)])))
+  AncDiscreteBI$matrix5[1,] <- as.numeric(0.5)
+  AncDiscreteBI$matrix5[2,] <- as.numeric(1)
+  
+  AncDiscreteBI$Priorpar <- NULL
+  output$matAlphaBetaPerRateDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix5,readOnly = F)
+  })
+})
+
+
+# Submit one alpha and beta value per rates
+#
+observeEvent(input$SubmAlphaBetaPerRateDisBI > 0,{
+  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,
+                                 alpha = c(hot_to_r(input$matAlphaBetaPerRateDisBI)[1,]),
+                                 beta = c(hot_to_r(input$matAlphaBetaPerRateDisBI)[2,]))
+  
+})
+
+
+# Temporal object to print in info panel
+# info: PRIOR PARAMETERS
+#
+observeEvent(!is.null(AncDiscreteBI$Priorpar),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$Priorpar
+})
+
+
+
+# Set variance (steps) in for Q matrix: equal value for every rate
+# 
+observeEvent(input$vQDisBI == 'equalvQDisBI',{
+  AncDiscreteBI$matrix6 <- matrix(data = NA, nrow = 1, ncol = 1,dimnames = list('variance', 'value' ))
+  AncDiscreteBI$matrix6[1,1] <- as.numeric(0.1)
+  AncDiscreteBI$vQ <- NULL
+  output$matequalvQValDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix6,readOnly = F)
+  })
+  
+})
+
+
+# Submit Beta value 
+#
+observeEvent(input$SubmequalvQValDisBI > 0,{
+  AncDiscreteBI$vQ <- c(hot_to_r(input$matequalvQValDisBI)[1,])
+})
+
+
+# Set variance (steps) in for Q matrix
+#
+observeEvent(input$vQDisBI == 'vQValPerRatesDisBI', {
+  AncDiscreteBI$vQ <- NULL
+  AncDiscreteBI$matrix7 <- matrix(data = NA, nrow = 1, ncol = length(which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)),
+                                  dimnames = list('variances',  sort(unique(c(AncDiscreteBI$modelMatrixBI))[which(unique(c(AncDiscreteBI$modelMatrixBI)) != 0)])))
+  AncDiscreteBI$matrix7[1,] <- as.numeric(1)
+  
+  output$matvQValPerRatesDisBI <- renderRHandsontable( {# add matrix for a new Qmatrix
+    rhandsontable(AncDiscreteBI$matrix7,readOnly = F)
+  })
+  
+})
+
+
+# Submit Beta values per rates
+#
+observeEvent(input$SubmbvQValPerRatesDisBI > 0,{
+  AncDiscreteBI$vQ <- c(hot_to_r(input$matvQValPerRatesDisBI)[1,])
+  
+})
+
+# Temporal object to print in info panel
+# info: variances in steps for Qmatrix 
+#
+observeEvent(!is.null(AncDiscreteBI$vQ),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$vQ
+})
+
+
+
+
+
+
+
+
+#RUN
+
+observeEvent(input$RunAnalyDisBI > 0,{
+  
+  if(input$mcmcParDisBI == 'costummcmcDisBI') {
+    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
+                                             x = setNames(SelectedVarDisc(),row.names(CharInput())), 
+                                             model = AncDiscreteBI$modelMatrixBI,
+                                             nsim = AncDiscreteBI$nsim,
+                                             Q = AncDiscreteBI$QmatrixPar,
+                                             pi = AncDiscreteBI$PiprobBI,
+                                             samplefreq = AncDiscreteBI$sampleFreq,
+                                             burnin = ceiling(AncDiscreteBI$burnin),
+                                             prior = AncDiscreteBI$Priorpar,
+                                             vQ= AncDiscreteBI$vQ)
+  }else{
+    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
+                                             x = setNames(SelectedVarDisc(),row.names(CharInput())), 
+                                             model = AncDiscreteBI$modelMatrixBI,
+                                             nsim = AncDiscreteBI$nsim,
+                                             Q = AncDiscreteBI$QmatrixPar,
+                                             pi = AncDiscreteBI$PiprobBI,
+                                             samplefreq = AncDiscreteBI$sampleFreq,
+                                             burnin = ceiling(AncDiscreteBI$burnin))
+  }
+  
+  
+  
+  
+  
+  
+
+})
+
+# Temporal object to print in info panel
+# info: Pi probabilities in the root
+#
+observeEvent(!is.null(AncDiscreteBI$outputDisBI),{
+  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$outputDisBI
+})
+
+
+
+
+
+
+
+
+
+
+
+
+#PLOT
+
+output$PhyloPlot10 <- renderPlot({
+  
+  
+  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+  
+  DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
+  
+  plotTree.datamatrix(treeInput(),as.data.frame(setNames(SelectedVarDisc(),row.names(CharInput()))),colors=list(DisCols),header=FALSE,fsize=0.45)
+  
+  legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+  
+})
+
+
+
+  
+  
+  output$PhyloPlot11 <- renderPlot({
+    
+    if(input$RunAnalyDisBI > 0){
+    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+    pd <- summary(AncDiscreteBI$objectDiscreteBI)
+    
+    plot(pd,colors=DisColPal,fsize=0.4,ftype="i",lwd=2,
+         offset=0.4,ylim=c(-1,Ntip(treeInput())),
+         cex=c(0.5,0.3))
+    ## add a legend
+    legend('topright',legend=levels(setNames(SelectedVarDisc(),row.names(CharInput()))),pch=22,
+           pt.cex=1.5,pt.bg=cols,bty="n",cex=0.8)
+    }
+})
