@@ -1,0 +1,135 @@
+#NEXUS
+[R-package PHYTOOLS, Fri Jan 21 22:03:43 2022]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 61;
+	TAXLABELS
+		Albula_vulpes
+		Anguilla_anguilla
+		Anguilla_bicolor
+		Anguilla_japonica
+		Anguilla_rostrata
+		Ariosoma_anago
+		Ariosoma_balearicum
+		Ariosoma_shiroanago
+		Bathyuroconger_vicinus
+		Brachysomophis_crocodilinus
+		Conger_japonicus
+		Conger_myriaster
+		Conger_verreaxi
+		Conger_wilsoni
+		Congresox_talabonoides
+		Cynoponticus_ferox
+		Dysomma_anguillare
+		Elops_saurus
+		Facciolella_gilbertii
+		Gavialiceps_taeniola
+		Gnathophis_longicauda
+		Gorgasia_taiwanensis
+		Gymnothorax_castaneus
+		Gymnothorax_flavimarginatus
+		Gymnothorax_kidako
+		Gymnothorax_moringa
+		Gymnothorax_pseudothyrsoideus
+		Gymnothorax_reticularis
+		Heteroconger_hassi
+		Ichthyapus_ophioneus
+		Kaupichthys_hyoproroides
+		Kaupichthys_nuchalis
+		Megalops_cyprinoides
+		Moringua_edwardsi
+		Moringua_javanica
+		Muraenesox_bagio
+		Muraenesox_cinereus
+		Myrichthys_breviceps
+		Myrichthys_maculosus
+		Myrichthys_magnificus
+		Myrophis_vafer
+		Nemichthys_scolopaceus
+		Nettastoma_melanurum
+		Ophichthus_serpentinus
+		Ophichthus_zophochir
+		Oxyconger_leptognathus
+		Parabathymyrus_macrophthalmus
+		Paraconger_notialis
+		Pisodonophis_cancrivorus
+		Poeciloconger_kapala
+		Rhinomuraena_quaesita
+		Rhynchoconger_flavus
+		Saurenchelys_fierasfer
+		Scolecenchelys_breviceps
+		Scuticaria_tigrina
+		Serrivomer_beanii
+		Serrivomer_sector
+		Simenchelys_parasitica
+		Uroconger_lepturus
+		Uropterygius_micropterus
+		Venefica_proboscidea
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Albula_vulpes,
+		2	Anguilla_anguilla,
+		3	Anguilla_bicolor,
+		4	Anguilla_japonica,
+		5	Anguilla_rostrata,
+		6	Ariosoma_anago,
+		7	Ariosoma_balearicum,
+		8	Ariosoma_shiroanago,
+		9	Bathyuroconger_vicinus,
+		10	Brachysomophis_crocodilinus,
+		11	Conger_japonicus,
+		12	Conger_myriaster,
+		13	Conger_verreaxi,
+		14	Conger_wilsoni,
+		15	Congresox_talabonoides,
+		16	Cynoponticus_ferox,
+		17	Dysomma_anguillare,
+		18	Elops_saurus,
+		19	Facciolella_gilbertii,
+		20	Gavialiceps_taeniola,
+		21	Gnathophis_longicauda,
+		22	Gorgasia_taiwanensis,
+		23	Gymnothorax_castaneus,
+		24	Gymnothorax_flavimarginatus,
+		25	Gymnothorax_kidako,
+		26	Gymnothorax_moringa,
+		27	Gymnothorax_pseudothyrsoideus,
+		28	Gymnothorax_reticularis,
+		29	Heteroconger_hassi,
+		30	Ichthyapus_ophioneus,
+		31	Kaupichthys_hyoproroides,
+		32	Kaupichthys_nuchalis,
+		33	Megalops_cyprinoides,
+		34	Moringua_edwardsi,
+		35	Moringua_javanica,
+		36	Muraenesox_bagio,
+		37	Muraenesox_cinereus,
+		38	Myrichthys_breviceps,
+		39	Myrichthys_maculosus,
+		40	Myrichthys_magnificus,
+		41	Myrophis_vafer,
+		42	Nemichthys_scolopaceus,
+		43	Nettastoma_melanurum,
+		44	Ophichthus_serpentinus,
+		45	Ophichthus_zophochir,
+		46	Oxyconger_leptognathus,
+		47	Parabathymyrus_macrophthalmus,
+		48	Paraconger_notialis,
+		49	Pisodonophis_cancrivorus,
+		50	Poeciloconger_kapala,
+		51	Rhinomuraena_quaesita,
+		52	Rhynchoconger_flavus,
+		53	Saurenchelys_fierasfer,
+		54	Scolecenchelys_breviceps,
+		55	Scuticaria_tigrina,
+		56	Serrivomer_beanii,
+		57	Serrivomer_sector,
+		58	Simenchelys_parasitica,
+		59	Uroconger_lepturus,
+		60	Uropterygius_micropterus,
+		61	Venefica_proboscidea
+	;
+	TREE * UNTITLED = [&R] ((34:85.62618561,((((32:59.08822024,((22:1.327566935,29:1.327566935):57.49940879,(61:44.65436052,((((5:6.027710328,2:6.027710328):10.0360445,(3:11.83522957,4:11.83522957):4.228525255):15.145997,56:31.20975183):7.726409266,((42:28.58503593,31:28.58503593):3.690188926,(17:22.91897503,58:22.91897502):9.356249841):6.660936241):5.718199424):14.1726152):0.2612445229):7.642085787,(((21:49.17234326,((19:12.77457712,43:12.77457712):28.6631336,((20:29.9155294,((59:16.74380238,9:16.74380238):5.797571834,52:22.54137421):7.374155181):5.044438385,53:34.95996779):6.477742938):7.734632528):9.032629715,((((41:6.204793528,(13:3.516555662,14:3.516555662):2.688237866):27.93394837,((12:9.527511504,11:9.527511504):7.403367067,54:16.93087857):17.20786333):14.06138615,((((39:12.89223268,(45:9.818727927,44:9.818727927):3.07350476):8.949741592,(38:10.40352637,10:10.40352637):11.4384479):5.616744734,49:27.45871901):8.243604497,30:35.7023235):12.49780454):6.419142089,(40:21.31432739,46:21.31432739):33.30494274):3.585702826):2.572211391,((((((26:23.41594606,23:23.41594606):5.604799738,((27:12.18988328,((51:6.977032861,28:6.977032861):4.685955035,25:11.6629879):0.5268953837):5.32445005,24:17.51433334):11.50641247):4.476649608,(60:14.79071602,55:14.79071602):18.7066794):9.766889387,((15:13.87294385,(36:6.29551164,37:6.29551164):7.577432206):12.01920418,16:25.89214803):17.37213677):4.663560081,((6:14.59133965,47:14.59133965):17.5091625,(7:17.15293939,(50:5.605032554,8:5.605032554):11.54790684):14.94756277):15.82734273):4.78162335,57:52.70946823):8.067716127):5.953121679):1.997770954,48:68.72807699):10.05263617,35:78.78071317):6.845472457):13.37381436,((18:30.49876819,33:30.49876819):25.91122814,1:56.40999634):42.59000365);
+END;
