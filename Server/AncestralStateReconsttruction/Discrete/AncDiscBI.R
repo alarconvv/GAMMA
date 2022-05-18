@@ -304,7 +304,7 @@ observeEvent(input$priorDisBI == 'noUseEmpirical' & input$alphaBetaValDisBI == '
 # Submit one alpha and beta values 
 #
 observeEvent(input$SubmOneAlphaBetaValDisBI > 0,{
-  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,
+  AncDiscreteBI$Priorpar <- list(use.empirical = FALSE,
                                  alpha = hot_to_r(input$matOneAlphaBetaValDisBI)[1,1],
                                  beta = hot_to_r(input$matOneAlphaBetaValDisBI)[2,1])
   
@@ -330,7 +330,7 @@ observeEvent(input$priorDisBI == 'noUseEmpirical' & input$alphaBetaValDisBI == '
 # Submit one alpha and beta value per rates
 #
 observeEvent(input$SubmAlphaBetaPerRateDisBI > 0,{
-  AncDiscreteBI$Priorpar <- list(use.empirical = TRUE,
+  AncDiscreteBI$Priorpar <- list(use.empirical = FALSE,
                                  alpha = c(hot_to_r(input$matAlphaBetaPerRateDisBI)[1,]),
                                  beta = c(hot_to_r(input$matAlphaBetaPerRateDisBI)[2,]))
   
@@ -477,13 +477,15 @@ output$PhyloPlot10 <- renderPlot({
     
     if(input$RunAnalyDisBI > 0){
     DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+    DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
+    
     pd <- summary(AncDiscreteBI$objectDiscreteBI)
     
-    plot(pd,colors=DisColPal,fsize=0.4,ftype="i",lwd=2,
+    plot(pd,colors=DisCols,fsize=0.4,ftype="i",lwd=2,
          offset=0.4,ylim=c(-1,Ntip(treeInput())),
          cex=c(0.5,0.3))
     ## add a legend
     legend('topright',legend=levels(setNames(SelectedVarDisc(),row.names(CharInput()))),pch=22,
-           pt.cex=1.5,pt.bg=cols,bty="n",cex=0.8)
+           pt.cex=1.5,pt.bg=DisCols,bty="n",cex=0.8)
     }
 })
