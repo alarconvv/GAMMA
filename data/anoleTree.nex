@@ -1,0 +1,177 @@
+#NEXUS
+[R-package PHYTOOLS, Thu May 19 12:44:14 2022]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 82;
+	TAXLABELS
+		ahli
+		alayoni
+		alfaroi
+		aliniger
+		allisoni
+		allogus
+		altitudinalis
+		alumina
+		alutaceus
+		angusticeps
+		armouri
+		bahorucoensis
+		baleatus
+		baracoae
+		barahonae
+		bremeri
+		breslini
+		brevirostris
+		caudalis
+		chlorocyanus
+		clivicola
+		coelestinus
+		confusus
+		cooki
+		cristatellus
+		cupeyalensis
+		cuvieri
+		cyanopleurus
+		cybotes
+		darlingtoni
+		distichus
+		dolichocephalus
+		equestris
+		evermanni
+		garmani
+		grahami
+		guafe
+		guazuma
+		gundlachi
+		haetianus
+		hendersoni
+		homolechis
+		imias
+		inexpectatus
+		insolitus
+		isolepis
+		jubar
+		krugi
+		lineatopus
+		longitibialis
+		loysiana
+		luteogularis
+		macilentus
+		marcanoi
+		marron
+		mestrei
+		noblei
+		occultus
+		olssoni
+		opalinus
+		ophiolepis
+		oporinus
+		paternus
+		placidus
+		poncensis
+		porcatus
+		pulchellus
+		quadriocellifer
+		ricordii
+		rubribarbus
+		sagrei
+		semilineatus
+		sheplani
+		shrevei
+		singularis
+		smallwoodi
+		strahmi
+		stratulus
+		valencienni
+		vanidicus
+		websteri
+		whitemani
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	ahli,
+		2	alayoni,
+		3	alfaroi,
+		4	aliniger,
+		5	allisoni,
+		6	allogus,
+		7	altitudinalis,
+		8	alumina,
+		9	alutaceus,
+		10	angusticeps,
+		11	armouri,
+		12	bahorucoensis,
+		13	baleatus,
+		14	baracoae,
+		15	barahonae,
+		16	bremeri,
+		17	breslini,
+		18	brevirostris,
+		19	caudalis,
+		20	chlorocyanus,
+		21	clivicola,
+		22	coelestinus,
+		23	confusus,
+		24	cooki,
+		25	cristatellus,
+		26	cupeyalensis,
+		27	cuvieri,
+		28	cyanopleurus,
+		29	cybotes,
+		30	darlingtoni,
+		31	distichus,
+		32	dolichocephalus,
+		33	equestris,
+		34	evermanni,
+		35	garmani,
+		36	grahami,
+		37	guafe,
+		38	guazuma,
+		39	gundlachi,
+		40	haetianus,
+		41	hendersoni,
+		42	homolechis,
+		43	imias,
+		44	inexpectatus,
+		45	insolitus,
+		46	isolepis,
+		47	jubar,
+		48	krugi,
+		49	lineatopus,
+		50	longitibialis,
+		51	loysiana,
+		52	luteogularis,
+		53	macilentus,
+		54	marcanoi,
+		55	marron,
+		56	mestrei,
+		57	noblei,
+		58	occultus,
+		59	olssoni,
+		60	opalinus,
+		61	ophiolepis,
+		62	oporinus,
+		63	paternus,
+		64	placidus,
+		65	poncensis,
+		66	porcatus,
+		67	pulchellus,
+		68	quadriocellifer,
+		69	ricordii,
+		70	rubribarbus,
+		71	sagrei,
+		72	semilineatus,
+		73	sheplani,
+		74	shrevei,
+		75	singularis,
+		76	smallwoodi,
+		77	strahmi,
+		78	stratulus,
+		79	valencienni,
+		80	vanidicus,
+		81	websteri,
+		82	whitemani
+	;
+	TREE * UNTITLED = [&R] ((((((((1:0.7853323721,6:0.7853323721):0.6544733935,70:1.439805766):2.086344399,43:3.526150165):0.7678675123,((((71:1.545722385,(16:0.6584618934,68:0.6584618934):0.8872604911):0.3690359963,61:1.914758381):0.5233153148,56:2.438073696):0.7788842922,(((47:0.7131956929,42:0.7131956929):0.5431363146,23:1.256332007):0.2529346175,37:1.509266625):1.707691363):1.077059689):0.8263422517,((((35:1.200201468,60:1.200201468):0.1181231988,36:1.318324667):1.306859447,79:2.625184114):0.7356771526,49:3.360861266):1.759498662):0.402211196,(((34:1.281121607,78:1.281121607):2.112912339,(((48:1.9605364,67:1.9605364):0.7877582321,(39:2.318796037,65:2.318796037):0.4294985357):0.1821046782,(24:2.371729116,25:2.371729116):0.5586701344):0.4636346954):0.897345471,(((18:1.654454083,(19:1.02298475,55:1.02298475):0.6314692737):0.1603649384,81:1.814819022):0.5901449341,31:2.404963956):1.886415461):1.231191708):0.2093239179,(((((8:1.608646124,72:1.608646124):1.316203067,59:2.924849191):1.573341944,45:4.498191135):0.7176832128,((((82:2.052162759,((40:1.601900444,17:1.601900444):0.4177309758,((11:0.8903456911,29:0.8903456911):0.2650030773,74:1.155348768):0.8642826514):0.03253127967):0.6399360536,(50:1.512751965,77:1.512751965):1.179346788):0.5485801745,54:3.240678928):1.503165105,(((13:0.2503826975,15:0.2503826975):0.3158205568,69:0.5662032543):2.277999037,27:2.844202292):1.899641741):0.4720303153):0.4558799354,(((((((7:1.04933963,62:1.04933963):0.5532190745,46:1.602558704):1.523352525,(5:1.776137562,66:1.776137562):1.349773667):0.2222094578,51:3.348120687):0.5113717749,38:3.859492461):0.2786470172,((64:1.121747749,73:1.121747749):2.264195857,(2:2.276290837,(10:1.303276187,63:1.303276187):0.9730146503):1.109652769):0.7521959325):0.4732226953,((9:0.7251718127,44:0.7251718127):2.425509456,(((21:2.01575878,(26:0.5163781748,28:0.5163781748):1.499380605):0.7138418329,(3:1.681403623,53:1.681403623):1.04819705):0.05536721945,80:2.784967832):0.3657134363):1.460680905):1.060392109):0.0601407594):0.2681048973,(((((14:0.3512386765,(57:0.1284370787,76:0.1284370787):0.2228015978):0.1709498383,52:0.5221885148):0.1073952589,33:0.6295837137):3.778316662,(((12:2.304660397,(32:0.9055625309,41:0.9055625309):1.399097806):1.517614305,30:3.822274642):0.197324158,(((4:1.070125609,75:1.070125609):0.8262344917,20:1.896360161):1.281375947,22:3.177736108):0.8418627516):0.3883015761):0.9616997904,58:5.369600166):0.6303997737);
+END;

@@ -270,7 +270,7 @@ observeEvent(input$RunModAverDisML,{
   }
   
   
-  # make an array fron the list to calculate de mean
+  # make an array from the list to calculate de mean
   arr <- array( unlist(ModelsDiscret$w.perNode) , c(nrow(ModelsDiscret$w.perNode[[1]]),ncol(ModelsDiscret$w.perNode[[1]]),length(ModelsDiscret$w.perNode)) )
   
   # Calcualte the mean per character

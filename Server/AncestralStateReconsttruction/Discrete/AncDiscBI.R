@@ -10,6 +10,7 @@ output$infoPanelDiscreteBI <- renderPrint({
 # Vector to store matrices, vectors and output from Anc Discrete BI analysis
 # 
 AncDiscreteBI <- reactiveValues()
+
 AncDiscreteBI$objectDiscreteBI <- NULL
 AncDiscreteBI$modelMatrixBI <- NULL
 AncDiscreteBI$QmatrixPar <- NULL
@@ -20,6 +21,8 @@ AncDiscreteBI$sampleFreq <- NULL
 AncDiscreteBI$burnin <- NULL
 AncDiscreteBI$Priorpar <- NULL
 AncDiscreteBI$vQ <- NULL
+AncDiscreteBI$Density <- NULL
+
 
 
 # Count the number of states of the character to analyse
@@ -30,9 +33,12 @@ nStatesBI <- reactive(length(levels(SelectedVarDisc())))
 
 
 
+
 # Update selectInput to the models which are depending on the number of states
 # 
 observeEvent(input$typeChar == 'Discrete', {
+  AncDiscreteBI$setCharacter <- setNames(SelectedVarDisc(),row.names(CharInput()))
+  
 if (nStates()[1] == 2) {
   # update model list
   updateSelectInput(session, "ModelsDisBI", 
@@ -126,7 +132,7 @@ observeEvent(!is.null(input$ModelsDisBI),{
 # 
   observeEvent(input$SubmAddModelBI > 0, {
     # # Submit new model
-    AncDiscreteBI$modelMatrixBI <- hot_to_r(input$costuModelBI) # get values from costumizable table
+    AncDiscreteBI$modelMatrixBI <- hot_to_r(input$costuModelBI) # get values from costumi table
     row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
     colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
     # # Name new model
@@ -408,7 +414,7 @@ observeEvent(input$RunAnalyDisBI > 0,{
   
   if(input$mcmcParDisBI == 'costummcmcDisBI') {
     AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
-                                             x = setNames(SelectedVarDisc(),row.names(CharInput())), 
+                                             x = AncDiscreteBI$setCharacter, 
                                              model = AncDiscreteBI$modelMatrixBI,
                                              nsim = AncDiscreteBI$nsim,
                                              Q = AncDiscreteBI$QmatrixPar,
@@ -419,7 +425,7 @@ observeEvent(input$RunAnalyDisBI > 0,{
                                              vQ= AncDiscreteBI$vQ)
   }else{
     AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
-                                             x = setNames(SelectedVarDisc(),row.names(CharInput())), 
+                                             x = AncDiscreteBI$setCharacter, 
                                              model = AncDiscreteBI$modelMatrixBI,
                                              nsim = AncDiscreteBI$nsim,
                                              Q = AncDiscreteBI$QmatrixPar,
@@ -440,52 +446,88 @@ observeEvent(input$RunAnalyDisBI > 0,{
 # info: Pi probabilities in the root
 #
 observeEvent(!is.null(AncDiscreteBI$outputDisBI),{
-  AncDiscreteBI$objectDiscreteBI <- AncDiscreteBI$outputDisBI
+  AncDiscreteBI$objectDiscreteBI <- summary(AncDiscreteBI$outputDisBI)
 })
 
 
 
 
+observeEvent(input$RunAnalyDisBI,{
+
+  Charlevels <- as.matrix(paste('PP of being', levels(AncDiscreteBI$setCharacter)))
+  listNames <- lapply(levels(AncDiscreteBI$setCharacter),c)
+  names(listNames) <- c(Charlevels[,1])
+  
+   updateSelectInput(session, "plotModelDisBI", choices = c('PP by node' = 'pieBI',listNames), selected = 'pieBI' )
+
+   AncDiscreteBI$Density <- density(AncDiscreteBI$outputDisBI)
+   
+   updateSelectInput(session, "ploHPDDisBI", choices = c(names(AncDiscreteBI$Density$hpd) ))
+   
+   
+
+   
+   })
 
 
+# PLOTS
+# 
 
-
-
-
-
-
-#PLOT
+#Plot: Phylogenies, initial and outcomes
 
 output$PhyloPlot10 <- renderPlot({
   
-  
-  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
-  
-  DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
-  
-  plotTree.datamatrix(treeInput(),as.data.frame(setNames(SelectedVarDisc(),row.names(CharInput()))),colors=list(DisCols),header=FALSE,fsize=0.45)
-  
-  legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
-  
-})
+  if (input$RunAnalyDisBI > 0) {
+    if (  input$plotModelDisBI %in%  levels(AncDiscreteBI$setCharacter)) {
+      levelstab <- levels(AncDiscreteBI$setCharacter)
+      
+       wichPlotBI <- which(levelstab == as.character(input$plotModelDisBI))
+     
+      merged <- mergeMappedStates(AncDiscreteBI$outputDisBI, levelstab[levelstab != levelstab[wichPlotBI]], paste("not-",levelstab[wichPlotBI],sep = ''))
+      
+      densities <- density(merged, method = "densityMap",states = c(paste("not-",levelstab[wichPlotBI],sep = ''), as.character(levelstab[wichPlotBI])))
+      
+       plot(densities,fsize = c(0.4,0.8),lwd = c(3,6))
 
-
-
-  
-  
-  output$PhyloPlot11 <- renderPlot({
-    
-    if(input$RunAnalyDisBI > 0){
-    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
-    DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
-    
-    pd <- summary(AncDiscreteBI$objectDiscreteBI)
-    
-    plot(pd,colors=DisCols,fsize=0.4,ftype="i",lwd=2,
-         offset=0.4,ylim=c(-1,Ntip(treeInput())),
-         cex=c(0.5,0.3))
-    ## add a legend
-    legend('topright',legend=levels(setNames(SelectedVarDisc(),row.names(CharInput()))),pch=22,
-           pt.cex=1.5,pt.bg=DisCols,bty="n",cex=0.8)
+    }else{
+      object <- summary(AncDiscreteBI$outputDisBI)
+      DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(AncDiscreteBI$setCharacter)))
+      DisCols <- setNames(DisColPal,levels(AncDiscreteBI$setCharacter))
+      
+      plot(object,colors = DisCols, fsize = 0.7,ftype = "i")
+      legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     }
+    
+
+  }else{
+    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+
+    DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
+
+    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscreteBI$setCharacter),colors=list(DisCols),header=FALSE,fsize=0.45)
+
+    legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+  }
 })
+
+
+# Model
+
+output$PhyloPlot11 <- renderPlot({
+  if (!is.null(AncDiscreteBI$Density)) {
+  
+    plot(AncDiscreteBI$Density, transition = input$ploHPDDisBI[1])
+      
+  } else {
+    if (!is.null(AncDiscreteBI$modelMatrixBI)) {
+    matModelBI <- AncDiscreteBI$modelMatrixBI
+    class(matModelBI) <- "Qmatrix"
+    plot(as.Qmatrix(matModelBI), main = input$ModelsDisBI, show.zeros = FALSE)
+    }
+  }
+    
+    
+
+  
+})
+

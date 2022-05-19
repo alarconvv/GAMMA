@@ -32,7 +32,7 @@ output$objects <- renderPrint( {
 #
 treeInput <- eventReactive(input$importTree, {
   if (input$tree == 'examp') {
-    readRDS(file = 'data/anoletree.RDS')
+    readRDS(file = 'data/anoleTree.RDS')
   } else if (input$tree == 'treeFile') {
     if (input$format =='Nexus'){
       read.nexus(file = input$fileTree$datapath)
@@ -58,7 +58,7 @@ observeEvent(input$importTree, {
 #
 CharInput <- eventReactive(input$importCSV, {
   if (input$csvData == 'exampCSV'){
-    readRDS(file = 'data/anole.data.RDS')
+    readRDS(file = 'data/anoleData.RDS')
   } else if (input$csvData == 'DataFile'){
     read.csv(file = input$fileCSV$datapath,header = T, row.names = 1)
   } else {
