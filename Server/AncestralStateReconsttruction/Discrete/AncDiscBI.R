@@ -476,6 +476,7 @@ observeEvent(input$RunAnalyDisBI,{
 #Plot: Phylogenies, initial and outcomes
 
 output$PhyloPlot10 <- renderPlot({
+ 
   
   if (input$RunAnalyDisBI > 0) {
     if (  input$plotModelDisBI %in%  levels(AncDiscreteBI$setCharacter)) {
@@ -514,9 +515,13 @@ output$PhyloPlot10 <- renderPlot({
 # Model
 
 output$PhyloPlot11 <- renderPlot({
-  if (!is.null(AncDiscreteBI$Density)) {
+  if (input$RunAnalyDisBI > 0) {
   
-    plot(AncDiscreteBI$Density, transition = input$ploHPDDisBI[1])
+    matModelBI <- AncDiscreteBI$outputDisBI[[1]]$Q
+
+    
+    class(matModelBI) <- "Qmatrix"
+    plot(as.Qmatrix(matModelBI), main = input$ModelsDisBI, show.zeros = FALSE)
       
   } else {
     if (!is.null(AncDiscreteBI$modelMatrixBI)) {
@@ -525,9 +530,18 @@ output$PhyloPlot11 <- renderPlot({
     plot(as.Qmatrix(matModelBI), main = input$ModelsDisBI, show.zeros = FALSE)
     }
   }
-    
-    
 
-  
 })
+
+# Density
+
+  output$PhyloPlot12 <- renderPlot({
+if(input$RunAnalyDisBI > 0){
+    if ( input$ploHPDDisBI %in% names(AncDiscreteBI$Density$hpd)) {
+      
+      plot(AncDiscreteBI$Density, transition = input$ploHPDDisBI[1])
+}}
+    
+  })
+
 

@@ -173,19 +173,23 @@ shinyUI(
                                                                                                                )
                                                                                                       ),
                                                                                              tabPanel("Stocastic State Mapping",
-                                                                                                      fluidRow(column(3,wellPanel(selectInput("ModelsDisBI", "Set model",choices = NULL,multiple = F),
-                                                                                                                                  conditionalPanel("input.ModelsDisBI == 'Costumize'",
-                                                                                                                                                   br(), rHandsontableOutput("costuModelBI"),br(),
-                                                                                                                                                   actionButton('SubmAddModelBI','Submit model')),br(),
-
-                                                                                                                                  selectInput("QmatrixBI", "Q matrix: rates",choices = c('Select' = 'select', 'empirical' = 'empirical', 'mcmc' = 'mcmc','costumize' = 'costumQmDiscBI')),
+                                                                                                      fluidRow(column(3,wellPanel(selectInput("QmatrixBI", "Q matrix: rates",choices = c('Select' = 'select', 'empirical' = 'empirical', 'mcmc' = 'mcmc','costumize' = 'costumQmDiscBI')),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'costumQmDiscBI'",
                                                                                                                                                    br(),rHandsontableOutput(outputId = "putitamatrix"),br(),
                                                                                                                                                    actionButton('SubmQmatBI','Submit matrix')),br(),
                                                                                                                                   
+                                                                                                                                  conditionalPanel("input.QmatrixBI == 'empirical' | input.QmatrixBI == 'mcmc'",
+                                                                                                                                                   
+                                                                                                                                                   selectInput("ModelsDisBI", "Set model",choices = NULL,multiple = F),
+                                                                                                                                                   conditionalPanel("input.ModelsDisBI == 'Costumize'",
+                                                                                                                                                                    br(), rHandsontableOutput("costuModelBI"),br(),
+                                                                                                                                                                    actionButton('SubmAddModelBI','Submit model')),br()),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'mcmc'",
+                                                                                                                                                   
+                                                                                                                                               
+                                                                                                                                                   
                                                                                                                                                    selectInput("mcmcParDisBI", "Set mcmc parameter", choices = c('by default' = 'bydefaultmcmcDisBI','costumize' = 'costummcmcDisBI')),
                                                                                                                                                    conditionalPanel("input.mcmcParDisBI == 'costummcmcDisBI'",
                                                                                                                                                                     selectInput("priorDisBI", "Prior: gamma parameters", choices = c('Select' = 'select','Use empirical' = 'useEmpirical','No use empirical'='noUseEmpirical')),
@@ -222,19 +226,19 @@ shinyUI(
                                                                                                                                                    textInput('samfreqDisBI','Sample frequency',value = 10),
                                                                                                                                                    textInput('burninDisBI','Burn-in',value = 0.2)
                                                                                                                                                    ),
-                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select' = 'select', 'fitzjohn' = 'fitzjohn','estimated' = 'estimated', 'equal' = 'equal','Costumize' = 'costumPiDiscBI')),
+                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select' = 'select', 'fitzjohn' = 'fitzjohn','stationary' = 'estimated', 'equal' = 'equal','Costumize' = 'costumPiDiscBI')),
                                                                                                                                   conditionalPanel("input.piBI == 'costumPiDiscBI'",
                                                                                                                                                    rHandsontableOutput("matPiBI"),br(),
                                                                                                                                                    actionButton('SubmPiBI','Submit')),br(),
                                                                                                                                    textInput('nsimDisBI','nsim',value = 100),
                                                                                                                                   actionButton('RunAnalyDisBI','Run'), hr(),
                                                                                                                                   )),
-                                                                                                               column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot10'))),
-                                                                                                                                 column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')))
+                                                                                                               column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot10',height="800px"))),
+                                                                                                                                 column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')),
+                                                                                                                                        fluidRow(plotOutput(outputId = 'PhyloPlot12')))
                                                                                                                ),
                                                                                                                wellPanel(fluidRow(column(4,selectInput('plotModelDisBI','Plot outcome',choices = NULL)),
-                                                                                                                                  column(4,checkboxInput('bestStateBI', 'Plot the most likely state'),
-                                                                                                                                         selectInput('ploHPDDisBI','Plot transitions',choices = NULL)),
+                                                                                                                                  column(4,selectInput('ploHPDDisBI','Plot transitions',choices = NULL)),
                                                                                                                                   column(4,actionButton('PlotEditorDisBI', 'Plot Editor'))
                                                                                                                )
                                                                                                                ),hr(),
