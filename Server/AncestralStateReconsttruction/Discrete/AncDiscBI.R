@@ -1,3 +1,8 @@
+##############################################################################
+# Discrete Character : Stochastic Mapping
+##############################################################################
+
+
 #Render print in Info panel: ML Analysis
 #
 output$infoPanelDiscreteBI <- renderPrint({
@@ -22,6 +27,7 @@ AncDiscreteBI$burnin <- NULL
 AncDiscreteBI$Priorpar <- NULL
 AncDiscreteBI$vQ <- NULL
 AncDiscreteBI$Density <- NULL
+
 
 
 
@@ -515,11 +521,17 @@ output$PhyloPlot10 <- renderPlot({
 # Model
 
 output$PhyloPlot11 <- renderPlot({
-  if (input$RunAnalyDisBI > 0) {
   
-    matModelBI <- AncDiscreteBI$outputDisBI[[1]]$Q
-
+  if(input$SubmQmatBI > 0){
+    AncDiscreteBI$QmatrixPar
     
+    matModelBI <- AncDiscreteBI$QmatrixPar
+    class(matModelBI) <- "Qmatrix"
+    plot(as.Qmatrix(matModelBI), main = 'User Q matrix', show.zeros = FALSE)
+  }else{
+  
+  if (input$RunAnalyDisBI > 0) {
+    matModelBI <- AncDiscreteBI$outputDisBI[[1]]$Q
     class(matModelBI) <- "Qmatrix"
     plot(as.Qmatrix(matModelBI), main = input$ModelsDisBI, show.zeros = FALSE)
       
@@ -530,6 +542,7 @@ output$PhyloPlot11 <- renderPlot({
     plot(as.Qmatrix(matModelBI), main = input$ModelsDisBI, show.zeros = FALSE)
     }
   }
+    }
 
 })
 

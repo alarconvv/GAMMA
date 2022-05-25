@@ -1,31 +1,40 @@
+################################################################################
+#   Data panel
+################################################################################
+
+
 
 
 #Temporal objects
-v <- reactiveValues()
-v$data <- NULL
-v$clss <- NULL
-v$numvar <- NULL
-v$factvar <- NULL
-v$objetContinuousML <- NULL
-v$Models <- list()
-v$objectContinuousBI <- NULL
-v$counterModelDisML <- NULL
-v$objectDiscreteML <- NULL
-v$objectDiscreteBI <- NULL
+#
+
+AncData <- reactiveValues()
+AncData$data <- NULL
+AncData$clss <- NULL
+AncData$numvar <- NULL
+AncData$factvar <- NULL
 
 
 #Render print in Info panel: Data panel
 #
 output$objects <- renderPrint( {
-  if (!is.null(v$clss)){
-    if (v$clss == 'data.frame' || v$clss == 'matrix' || v$clss == 'table') {
-      head(v$data, 10L)
+  if (!is.null(AncData$clss)){
+    if (AncData$clss == 'data.frame' || AncData$clss == 'matrix' || AncData$clss == 'table') {
+      head(AncData$data, 10L)
     } else {
-      print(v$data)
+      print(AncData$data)
     }
   }
 }
 )
+
+# set seed for the all session
+#
+observeEvent(!is.null(input$seed),{
+  set.seed(input$seed[1])
+})
+
+
 
 
 # Read phylogeny
@@ -49,8 +58,8 @@ treeInput <- eventReactive(input$importTree, {
 #Temporal object to print in info panel
 # info: tree
 observeEvent(input$importTree, {
-  v$data <- treeInput()
-  v$clss <- class(x = v$data)
+  AncData$data <- treeInput()
+  AncData$clss <- class(x = AncData$data)
 })
 
 
@@ -73,8 +82,8 @@ CharInput <- eventReactive(input$importCSV, {
 #info: dataframe with characters
 #
 observeEvent(input$importCSV, {
-  v$data <- CharInput()
-  v$clss <- class(x = v$data)
+  AncData$data <- CharInput()
+  AncData$clss <- class(x = AncData$data)
 })
 
 
@@ -95,18 +104,21 @@ checkNames <- eventReactive(input$checknames, {
 #info: confirm if tree and cvs have the same names
 #
 observeEvent(input$checknames, {
-  v$data <- checkNames()
-  v$clss <- class(v$data)
+  AncData$data <- checkNames()
+  AncData$clss <- class(AncData$data)
 })
 
 
 #Plot tree if checkbox is clicked
 #
-output$PhyloPlot <- renderPlot( {
-  if (input$plottree == T) {
+heightDt <- reactive(input$PlotHeightDt[1])
+widthDt <- reactive(input$PlotWidthDt[1])
+
+output$PhyloPlot <- renderPlot( height = heightDt  , width = widthDt,{
+
     plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
-               cex = input$tipSize[1],use.edge.length = input$branchLength[1])
-  }
+               cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType)
+  
 })
 
 
@@ -114,41 +126,41 @@ output$PhyloPlot <- renderPlot( {
 #Note: when there is only one option you should use list(), but there are more than one you could code names() straightforward
 #
 observeEvent(CharInput(), {
-  v$numvar <- which(lapply(CharInput(), class) == 'numeric' | lapply(CharInput(), class) == 'integer')
-  v$factvar <- which(lapply(CharInput(), class) == 'factor' | lapply(CharInput(), class) == 'character')
-  if (length(v$numvar) == 0) {
-    if (length(v$factvar) > 1) {
+  AncData$numvar <- which(lapply(CharInput(), class) == 'numeric' | lapply(CharInput(), class) == 'integer')
+  AncData$factvar <- which(lapply(CharInput(), class) == 'factor' | lapply(CharInput(), class) == 'character')
+  if (length(AncData$numvar) == 0) {
+    if (length(AncData$factvar) > 1) {
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Discrete Char'= names(v$factvar)))
+                        choices=list('Select','Discrete Char'= names(AncData$factvar)))
     } else {
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Discrete Char'= list(names(v$factvar))))
+                        choices=list('Select','Discrete Char'= list(names(AncData$factvar))))
     }
-  } else if (length(v$factvar) == 0) {
-    if (length(v$numvar) > 1){
+  } else if (length(AncData$factvar) == 0) {
+    if (length(AncData$numvar) > 1){
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Continuou Char'= names(v$numvar)))
+                        choices=list('Select','Continuou Char'= names(AncData$numvar)))
     }else{
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Continuou Char'= list(names(v$numvar))))
+                        choices=list('Select','Continuou Char'= list(names(AncData$numvar))))
     }
   } else {
-    if (length(v$factvar) > 1 & length(v$numvar) == 1) {
+    if (length(AncData$factvar) > 1 & length(AncData$numvar) == 1) {
       updateSelectInput(session, "dataVar",
-                        choices = list('Select','Discrete Char'= names(v$factvar),
-                                       'Continuou Char'= list(names(v$numvar))))
-    } else if (length(v$factvar) == 1 & length(v$numvar) > 1) {
+                        choices = list('Select','Discrete Char'= names(AncData$factvar),
+                                       'Continuou Char'= list(names(AncData$numvar))))
+    } else if (length(AncData$factvar) == 1 & length(AncData$numvar) > 1) {
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Discrete Char'= list(names(v$factvar)),
-                                     'Continuou Char'= names(v$numvar)))
-    } else if (length(v$factvar) == 1 & length(v$numvar) == 1) {
+                        choices=list('Select','Discrete Char'= list(names(AncData$factvar)),
+                                     'Continuou Char'= names(AncData$numvar)))
+    } else if (length(AncData$factvar) == 1 & length(AncData$numvar) == 1) {
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Discrete Char'= list(names(v$factvar)),'
-                                               Continuou Char'= list(names(v$numvar))))
+                        choices=list('Select','Discrete Char'= list(names(AncData$factvar)),'
+                                               Continuou Char'= list(names(AncData$numvar))))
     } else {
       updateSelectInput(session, "dataVar",
-                        choices=list('Select','Discrete Char'= names(v$factvar),
-                                     'Continuou Char'= names(v$numvar)))
+                        choices=list('Select','Discrete Char'= names(AncData$factvar),
+                                     'Continuou Char'= names(AncData$numvar)))
     }
   }
 })
@@ -172,7 +184,7 @@ ClassCol <- eventReactive(input$dataVar, {
 #
 observe( {
   if (!is.null(ClassCol())) {
-    v$data <- ClassCol()
+    AncData$data <- ClassCol()
   }
 })
 
@@ -190,10 +202,10 @@ ConfirmClassCol <- eventReactive(input$typeChar, {
 
 
 #Temporal object to print in info panes
-#info: print how the character will be analized
+#info: print how the character will be analyzed
 observe( {
   if (!is.null(ConfirmClassCol())) {
-    v$data <- ConfirmClassCol()
+    AncData$data <- ConfirmClassCol()
   }
 })
 

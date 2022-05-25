@@ -52,15 +52,21 @@ shinyUI(
                                                                                      conditionalPanel(condition = "input.csvData == 'DataFile'",
                                                                                                       fileInput("fileCSV", "Load data file")),
                                                                                      actionButton("importCSV", "Import csv",style='padding:4px; font-size:80%'), hr(),
+                                                                                     checkboxInput("checknames", "Check tree and csv names"),
                                                                                      selectInput('dataVar','Select character',choices='Select', selected=NULL),
-                                                                                     selectInput('typeChar','Confirm character type',choices=c('Select','Discrete','Continuous'), selected='Select')
+                                                                                     selectInput('typeChar','Confirm character type',choices=c('Select','Discrete','Continuous'), selected='Select'),hr(),
+                                                                                     numericInput(inputId = "seed", label = "Set seed",value =  999, min = 1, max = 1000000),
                                                                                      )
                                                                          ),
-                                                                  column(9,fluidRow(column(9,checkboxInput("plottree", "Plot tree"),plotOutput(outputId = 'PhyloPlot')),
+                                                                  column(9,fluidRow(column(9, plotOutput(outputId = 'PhyloPlot', inline = T)),
                                                                                     column(3,wellPanel(checkboxInput("tipLabels", "Show tip labels"),
                                                                                                        conditionalPanel(condition = "input.tipLabels==1",
                                                                                                                         sliderInput("tipSize", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
-                                                                                                       checkboxInput("branchLength", "Use edge length"),checkboxInput("checknames", "Check tree and csv names")
+                                                                                                       checkboxInput("branchLength", "Use edge length"),
+                                                                                                       numericInput(inputId = 'PlotHeightDt',label = 'Plot height (px)',value =800,min = 20,max = 1500),
+                                                                                                       numericInput(inputId = 'PlotWidthDt',label = 'Plot width (px)',value =600,min = 20,max = 1500),
+                                                                                                       selectInput("plotType", "Plot type",
+                                                                                                                   c("phylogram" = "phylogram","cladogram" = "cladogram","fan" = "fan", "unrooted" = "unrooted","radial" = "radial", "tidy" = "tidy" ),selected = "phylogram")
                                                                                                        )
                                                                                            )
                                                                                     ),hr(),
@@ -91,14 +97,17 @@ shinyUI(
                                                                                                                                   )
                                                                                                                       ),
                                                                                                                column(9,fluidRow(column(6,
-                                                                                                                                        fluidRow(column(12,plotOutput(outputId = 'PhyloPlot2'))),
-                                                                                                                                        fluidRow(column(12, plotOutput(outputId = 'PhyloPlot3')))),
+                                                                                                                                        fluidRow(column(12,plotOutput(outputId = 'PhyloPlot2', inline = T)))),
                                                                                                                                  column(6,
                                                                                                                                         fluidRow(column(12,plotOutput(outputId = 'histo1'))),
                                                                                                                                         fluidRow(column(12,plotOutput(outputId = 'QQ1'))))
                                                                                                                                  ),
-                                                                                                                      wellPanel(fluidRow(column(6,selectInput('mapModelMl','Plot model',choices=NULL, selected=NULL)),
-                                                                                                                                         column(6,actionButton('PlotEditorML', 'Plot Editor'))
+                                                                                                                      wellPanel(fluidRow(column(4,selectInput('mapModelMl','Plot model',choices=NULL, selected=NULL),
+                                                                                                                                                sliderInput("tipSizeContMl", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
+                                                                                                                                         column(4, numericInput(inputId = 'PlotHeightContMl',label = 'Plot height (px)',value =800,min = 20,max = 1500),
+                                                                                                                                                numericInput(inputId = 'PlotWidthContMl',label = 'Plot width (px)',value =400,min = 20,max = 1500)
+                                                                                                                                                ),
+                                                                                                                                         column(4,actionButton('PlotEditorML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),
                                                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelContinuousML"))))

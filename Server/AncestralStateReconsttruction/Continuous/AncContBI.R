@@ -1,3 +1,11 @@
+##############################################################################
+#     Continuous Character : Stochastic Mapping
+##############################################################################
+
+# Temporal value
+#
+AncContBI <- reactiveValues()
+AncContBI$objectContinuousBI <- NULL
 
 
 #Covariance matrix 
@@ -24,8 +32,8 @@ observeEvent(phyloVCV(), {
 #Render print in Info panel: BI Analysis
 #
 output$infoPanelContinuousBI <- renderPrint({
-  if (!is.null(v$objectContinuousBI)) {
-    print(v$objectContinuousBI)
+  if (!is.null(AncContBI$objectContinuousBI)) {
+    print(AncContBI$objectContinuousBI)
   }
 })
 
@@ -33,7 +41,7 @@ output$infoPanelContinuousBI <- renderPrint({
 #Temporal object ro print in info panel
 #info: print setting matrix
 observeEvent(phyloVCV(), {
-  v$objectContinuousBI <- costmat$cost
+  AncContBI$objectContinuousBI <- costmat$cost
   })
 
 
@@ -81,7 +89,7 @@ estimatesBI <- eventReactive(mcmcBI(), {
 #Temporal object to print in info panel
 #info: Posterior probabilites means
 observeEvent(mcmcBI(),{
-  v$objectContinuousBI <-  estimatesBI() ## estimates
+  AncContBI$objectContinuousBI <-  estimatesBI() ## estimates
 })
 
 
@@ -97,7 +105,7 @@ observeEvent(mcmcBI(),{
 #info: Plotting nodes
 #
 observeEvent(!is.null(input$plotNodesBI),{
-  v$objectContinuousBI <- paste('Right plots: nodes', input$plotNodesBI, collapse = '')
+  AncContBI$objectContinuousBI <- paste('Right plots: nodes', input$plotNodesBI, collapse = '')
 })
 
 

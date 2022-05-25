@@ -1,3 +1,15 @@
+##############################################################################
+#     Continuous Character : Maximum likelihood
+##############################################################################
+
+
+# Temporal value
+#
+AncContMl <- reactiveValues()
+AncContMl$objetContinuousML <- NULL
+AncContMl$Models <- list()
+
+
 # Transform character
 # 
 transform <- eventReactive(input$transform1, {
@@ -21,74 +33,107 @@ transform <- eventReactive(input$transform1, {
 #Render print in Info panel: ML Analysis
 #
 output$infoPanelContinuousML <- renderPrint( {
-  if (!is.null(v$objetContinuousML)) {
-    print(v$objetContinuousML)
+  if (!is.null(AncContMl$objetContinuousML)) {
+    print(AncContMl$objetContinuousML)
     }
   })
 
 #Plot initial tree if models do not have been estimated, otherwise plot model output
 #
-output$PhyloPlot2 <- renderPlot( {
+
+heightContMl <- reactive(input$PlotHeightContMl[1])
+widthContMl <- reactive(input$PlotWidthContMl[1])
+
+output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   if (input$mapModelMl == 'BM') {
     plotBM <- contMap(tree = treeInput(),
                       x = setNames(transform(), row.names(CharInput())),
                       method = 'user',
-                      anc.states = c(setNames(transform(), row.names(CharInput())),v$Models$BM$ace),
-                      show.tip.label = input$tipLabelsML[1],
-                      fsize = 0.1,
+                      anc.states = c(setNames(transform(), row.names(CharInput())),AncContMl$Models$BM$ace),
+                      show.tip.label = T,
                       plot = FALSE)
     n <- length(plotBM$cols)
     plotBM$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotBM, outline = F)
+    plot(plotBM, outline = F,cex =input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
     plotEB <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
                       method = 'user',
-                      anc.states = c(setNames(transform(),row.names(CharInput())),v$Models$EB$ace),
+                      anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$EB$ace),
                       show.tip.label = input$tipLabelsML[1],
-                      fsize = 0.1,
+                      fsize = input$tipSizeContMl[1],
                       plot = FALSE)
     n <- length(plotEB$cols)
     plotEB$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotEB, outline = F)
+    plot(plotEB, outline = F,cex =input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
     plotOU <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
                       method = 'user',
-                      anc.states = c(setNames(transform(),row.names(CharInput())),v$Models$OU$ace),
+                      anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$OU$ace),
                       show.tip.label = input$tipLabelsML[1],
-                      fsize = 0.1,
+                      fsize = input$tipSizeContMl[1],
                       plot = FALSE)
     n <- length(plotOU$cols)
     plotOU$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotOU, outline = F)
+    plot(plotOU, outline = F,cex =input$tipSizeContMl[1])
     } else {
       plot.phylo(x = treeInput(),
-                 show.tip.label = input$tipLabels[1],
-                 cex = input$tipSize[1],
-                 use.edge.length = input$branchLength[1])
-      #nodelabels(bg="white",cex=0.3,frame="circle")
+                 show.tip.label = T,
+                 cex = input$tipSizeContMl[1],
+                 use.edge.length = T)
       }
   })
 
 
-#Plot initial Phenogram if models do not have been estimated, otherwise plot model output
-#
-output$PhyloPlot3 <- renderPlot( {
-  phenogram(tree = as.phylo(treeInput()), #as.phylo method to plot in black color
-            x = setNames(transform(),row.names(CharInput())), 
-            spread.cost = c(1,0), 
-            fsize = 0.7)
-})
+
 
 
 #Plot histogram or frequency distribution
 #
 output$histo1 <- renderPlot( {
+  
+  colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
+  color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
+  
   if (input$AncPIC == 1) { #if PIC is required just for visualized, it is not taken into account for analysing
-    hist(x = pic(x = transform(), phy = treeInput()))
+   
+    
+    h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
+    
+    par(
+        cex.axis=0.7,
+        cex.lab= 0.9,
+        cex.main= 1,
+        family="sans"
+    )
+    plot(h$mids, h$counts, yaxs = "i",
+         type = 'n', bty = 'n',axes = F,main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, xlab= input$dataVar, ylab= ' N Tips' )
+    grid(10,10, lty = 2, lwd = 0.3)
+    axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
+    axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
+    hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, border= F,
+         col=color2)
+    box(lwd= 0.5, col= 'grey')
+    
+  
   } else {
-    hist(x = transform())
+    
+    h <- hist(x = transform(),plot=F)
+    par(
+        cex.axis=0.7,
+        cex.lab= 0.9,
+        cex.main= 1,
+        family="sans"
+    )
+    plot(h$mids, h$counts, yaxs = "i",
+         type = 'n', bty = 'n',axes = F, main='Histogram: raw data', sub = NULL, xlab= input$dataVar, ylab= ' N Tips')
+    grid(10,10, lty = 2, lwd = 0.3)
+    axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
+    axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
+    hist(x = transform(), add = TRUE, border= F,
+         col= color2)
+    box(lwd= 0.5, col= 'grey')
   }
 })
 
@@ -96,43 +141,78 @@ output$histo1 <- renderPlot( {
 # Plot QQ plot for fitting to a normal distribution
 # 
 output$QQ1 <- renderPlot( {
+  colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
+  color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
+  color3 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255)
+  
   if (input$AncPIC == 1) {
-    qqnorm(y = pic(x = transform(), phy = treeInput()))
+    q <-qqnorm(y = pic(x = transform(), phy = treeInput()),plot=F)
+    par(adj=0.5,
+        cex.axis=0.7,
+        cex.lab= 0.9,
+        cex.main= 1,
+        family="sans"
+    )
+    
+    plot(q$x, q$y, yaxs = "i", 
+         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
+         col=color3,pch=21,bg=color2)
+    grid(10,10, lty = 2, lwd = 0.3)
+    axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
+    axis(side = 2,ylim = c(0, max(q$y)), lwd=0,lwd.ticks = .5)
+    box(lwd= 0.5, col= 'grey5')
   } else {
-    qqnorm(y = transform())
+    q <-qqnorm(y = transform(),plot=F)
+    par(adj=0.5,
+        cex.axis=0.7,
+        cex.lab= 0.9,
+        cex.main= 1,
+        family="sans"
+    )
+    
+    plot(q$x, q$y, yaxs = "i", 
+         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
+         col=color3,pch=21,bg=color2)
+    grid(10,10, lty = 2, lwd = 0.3)
+    axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
+    axis(side = 2,ylim = c(0, max(q$y)), lwd=0,lwd.ticks = .5)
+    box(lwd= 0.5, col= 'grey')
   }
 })
 
 #Fit models: Run Analysis
 #
 observeEvent(input$runAncML == 1, {
+ 
   if ( "BM" %in% input$ModelContinuous ) {
-    v$Models$BM <- anc.ML(tree = treeInput(), 
+    AncContMl$Models$BM <- anc.ML(tree = treeInput(), 
                           x = setNames(transform(),row.names(CharInput())), 
                           maxit = input$maxitBM[1], 
                           model = 'BM')
   }
   
   if ("EB" %in% input$ModelContinuous) { 
-    v$Models$EB <- anc.ML(tree = treeInput(),
+    AncContMl$Models$EB <- anc.ML(tree = treeInput(),
                           x =  setNames(transform(),row.names(CharInput())), 
                           maxit = input$maxitEB[1], 
                           model = 'EB')
   }
   
   if ("OU" %in% input$ModelContinuous) {
-    v$Models$OU <- anc.ML(tree = treeInput(),
+    AncContMl$Models$OU <- anc.ML(tree = treeInput(),
                           x = setNames(transform(),row.names(CharInput())),
                           maxit = input$maxitOU[1],
                           model = 'OU')
   }
+  
 })
+
 
 
 # update  Selection input to plot an specific model that had been run
 # 
 observeEvent(input$runAncML == 1, {
-  updateSelectInput(session = session, inputId = "mapModelMl", choices = names(v$Models))
+  updateSelectInput(session = session, inputId = "mapModelMl", choices = names(AncContMl$Models))
 })
 
 
@@ -140,8 +220,8 @@ observeEvent(input$runAncML == 1, {
 # info: output per every model run
 #
 observeEvent(input$runAncML == 1, {
-  if (!is.null(v$Models)) {
-    v$objetContinuousML <- v$Models
+  if (!is.null(AncContMl$Models)) {
+    AncContMl$objetContinuousML <- AncContMl$Models
   }
 })
 
@@ -149,7 +229,7 @@ observeEvent(input$runAncML == 1, {
 #Calculate AIC (No keep it, just show it)
 #
 observeEvent(input$MLModAIC == 1,{
-  v$objetContinuousML <- sapply(v$Models, AIC)
+  AncContMl$objetContinuousML <- sapply(AncContMl$Models, AIC)
 })
 
 
@@ -165,9 +245,9 @@ output$downloadAnc <- downloadHandler(
   },
   content = function(file) {
     if (input$exportMLanc == 'MLancTXT') {
-      utils::capture.output(v$Models,file = file)
+      utils::capture.output(AncContMl$Models,file = file)
       } else {
-        saveRDS(object = v$Models,file = file)
+        saveRDS(object = AncContMl$Models,file = file)
         }
     })
 

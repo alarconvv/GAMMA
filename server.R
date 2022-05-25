@@ -15,6 +15,9 @@
 
 shinyServer(function(input, output, session) {
   
+  showLog()
+  logjs("App started")
+  
   ##############################################################################
   ##############################################################################
   #
@@ -44,25 +47,25 @@ shinyServer(function(input, output, session) {
   ##############################################################################
   
   ##############################################################################
-  #     Continuous Character : Maxima likelihood
+  #     Continuous Character : Maximum likelihood
   ##############################################################################
 
   source(file = 'Server/AncestralStateReconsttruction/Continuous/AncContML.R', local = T)
   
   ##############################################################################
-  #     Continuous Character : Stocastic Mapping
+  #     Continuous Character : Stochastic Mapping
   ##############################################################################
 
    source(file = 'Server/AncestralStateReconsttruction/Continuous/AncContBI.R', local = T)
   
   ##############################################################################
-  # Discrete Character : Maxima Likelihood
+  # Discrete Character : Maximum Likelihood
   ##############################################################################
   
    source(file = 'Server/AncestralStateReconsttruction/Discrete/AncDiscML.R', local = T)
 
   ##############################################################################
-  # Discrete Character : Stocastic Mapping
+  # Discrete Character : Stochastic Mapping
   ##############################################################################
  
   source(file = 'Server/AncestralStateReconsttruction/Discrete/AncDiscBI.R', local = T)
