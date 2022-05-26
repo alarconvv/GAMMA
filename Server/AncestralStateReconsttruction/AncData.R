@@ -117,7 +117,8 @@ widthDt <- reactive(input$PlotWidthDt[1])
 output$PhyloPlot <- renderPlot( height = heightDt  , width = widthDt,{
 
     plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
-               cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType)
+               cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType,
+               edge.width = 0.8,edge.color = 'grey40')
   
 })
 

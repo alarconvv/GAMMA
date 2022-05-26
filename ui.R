@@ -21,50 +21,52 @@ library(phytools)
 library(reactable)
 library(shinyjs)
 library(rhandsontable)
-
+library(shinyWidgets)
 
 
 # Define UI for application that draws a histogram
+
+theme <-bs_theme(version = 4, bootswatch = "minty"  )
+#theme <-'bootstrap.min.css'
+
 shinyUI(
-  navbarPage("GAMMA",theme = bs_theme(version = 4, bootswatch = "minty"),
-             
+
+  
+  
+  navbarPage(title = "GAMMA", theme=theme,
              tabPanel("Home",
-                      tags$style(HTML("
-              .tabbable > .nav > li > a {margin-top:0px;}")),
-                      
                       includeHTML("www/home.html")
-                 
                       ),
              
              navbarMenu("Methods",
                         tabPanel("Independent Contrats"),
                         tabPanel("Ancestral States Reconstruction",
-                                 fluidPage(theme = bs_theme(version = 4, bootswatch = "minty"),
-                                           tabsetPanel(type = "tabs",
+                                 fluidPage(theme=theme,
+                                   tabsetPanel(type = "tabs",
                                                        tabPanel("Data",
                                                                 fluidRow(
                                                                   column(3,wellPanel(selectInput("tree", "Load tree",c("Select" = "select","Example" = "examp","Import tree" = "treeFile")),
                                                                                      conditionalPanel(condition = "input.tree=='treeFile'",
                                                                                                       selectInput("format", "Tree format",c("Select" = "select","Nexus" = "Nexus","Newick" = "Newick")),
                                                                                                       fileInput("fileTree", "Load tree file")),
-                                                                                     actionButton("importTree", "Import tree",style='padding:4px; font-size:80%'), hr(),
+                                                                                     actionButton("importTree", "Import tree"), hr(),
                                                                                      selectInput("csvData", "Load csv",c("Select" = "select","Example" = "exampCSV","Import csv" = "DataFile")),
                                                                                      conditionalPanel(condition = "input.csvData == 'DataFile'",
                                                                                                       fileInput("fileCSV", "Load data file")),
-                                                                                     actionButton("importCSV", "Import csv",style='padding:4px; font-size:80%'), hr(),
+                                                                                     actionButton("importCSV", "Import csv"), hr(),
                                                                                      checkboxInput("checknames", "Check tree and csv names"),
                                                                                      selectInput('dataVar','Select character',choices='Select', selected=NULL),
                                                                                      selectInput('typeChar','Confirm character type',choices=c('Select','Discrete','Continuous'), selected='Select'),hr(),
-                                                                                     numericInput(inputId = "seed", label = "Set seed",value =  999, min = 1, max = 1000000),
+                                                                                     numericInput(inputId = "seed", label = "Set seed",value =  999, min = 1, max = 1000000)
                                                                                      )
                                                                          ),
-                                                                  column(9,fluidRow(column(9, plotOutput(outputId = 'PhyloPlot', inline = T)),
+                                                                  column(9,fluidRow(column(9,plotOutput(outputId = 'PhyloPlot', inline = T)),
                                                                                     column(3,wellPanel(checkboxInput("tipLabels", "Show tip labels"),
                                                                                                        conditionalPanel(condition = "input.tipLabels==1",
                                                                                                                         sliderInput("tipSize", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
                                                                                                        checkboxInput("branchLength", "Use edge length"),
                                                                                                        numericInput(inputId = 'PlotHeightDt',label = 'Plot height (px)',value =800,min = 20,max = 1500),
-                                                                                                       numericInput(inputId = 'PlotWidthDt',label = 'Plot width (px)',value =600,min = 20,max = 1500),
+                                                                                                       numericInput(inputId = 'PlotWidthDt',label = 'Plot width (px)',value =400,min = 20,max = 1500),
                                                                                                        selectInput("plotType", "Plot type",
                                                                                                                    c("phylogram" = "phylogram","cladogram" = "cladogram","fan" = "fan", "unrooted" = "unrooted","radial" = "radial", "tidy" = "tidy" ),selected = "phylogram")
                                                                                                        )
@@ -103,11 +105,12 @@ shinyUI(
                                                                                                                                         fluidRow(column(12,plotOutput(outputId = 'QQ1'))))
                                                                                                                                  ),
                                                                                                                       wellPanel(fluidRow(column(4,selectInput('mapModelMl','Plot model',choices=NULL, selected=NULL),
-                                                                                                                                                sliderInput("tipSizeContMl", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
+                                                                                                                                                sliderInput("tipSizeContMl", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
                                                                                                                                          column(4, numericInput(inputId = 'PlotHeightContMl',label = 'Plot height (px)',value =800,min = 20,max = 1500),
                                                                                                                                                 numericInput(inputId = 'PlotWidthContMl',label = 'Plot width (px)',value =400,min = 20,max = 1500)
                                                                                                                                                 ),
-                                                                                                                                         column(4,actionButton('PlotEditorML', 'Plot Editor'))
+                                                                                                                                         column(4,checkboxInput('phenogramML', 'Plot phenogram'),
+                                                                                                                                                actionButton('PlotEditorML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),
                                                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelContinuousML"))))
@@ -129,15 +132,19 @@ shinyUI(
                                                                                                                                                             )
                                                                                                                                                 ),
                                                                                                                                          column(9,fluidRow(column(6,
-                                                                                                                                                                  fluidRow(column(12,plotOutput(outputId = 'PhyloPlot4'))),
-                                                                                                                                                                  fluidRow(column(12, plotOutput(outputId = 'PhyloPlot5')))),
+                                                                                                                                                                  fluidRow(column(12,plotOutput(outputId = 'PhyloPlot4',inline = T,click = "plot_click")))
+                                                                                                                                                                  ),
                                                                                                                                                            column(6,
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'trace1'))),
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'desnsity1'))))
                                                                                                                                                            ),
-                                                                                                                                                wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices=NULL, selected=NULL,multiple = TRUE)),
-                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Plot phenogram')),
-                                                                                                                                                                   column(4,actionButton('PlotEditorBI', 'Plot Editor'))
+                                                                                                                                                fluidRow(column(12, plotOutput(outputId = 'PhyloPlot5'))),
+                                                                                                                                                wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices=NULL, selected=NULL,multiple = TRUE),
+                                                                                                                                                                          sliderInput("tipSizeContBI", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
+                                                                                                                                                                   column(4, numericInput(inputId = 'PlotHeightContBI',label = 'Plot height (px)',value =800,min = 20,max = 1500),
+                                                                                                                                                                          numericInput(inputId = 'PlotWidthContBI',label = 'Plot width (px)',value =400,min = 20,max = 1500)),
+                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Plot phenogram'),
+                                                                                                                                                                          actionButton('PlotEditorBI', 'Plot Editor'))
                                                                                                                                                                    )
                                                                                                                                                           ),hr(),
                                                                                                                                                 fluidRow(column(12,verbatimTextOutput("infoPanelContinuousBI")))
@@ -196,9 +203,6 @@ shinyUI(
                                                                                                                                                                     actionButton('SubmAddModelBI','Submit model')),br()),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'mcmc'",
-                                                                                                                                                   
-                                                                                                                                               
-                                                                                                                                                   
                                                                                                                                                    selectInput("mcmcParDisBI", "Set mcmc parameter", choices = c('by default' = 'bydefaultmcmcDisBI','costumize' = 'costummcmcDisBI')),
                                                                                                                                                    conditionalPanel("input.mcmcParDisBI == 'costummcmcDisBI'",
                                                                                                                                                                     selectInput("priorDisBI", "Prior: gamma parameters", choices = c('Select' = 'select','Use empirical' = 'useEmpirical','No use empirical'='noUseEmpirical')),
@@ -240,7 +244,7 @@ shinyUI(
                                                                                                                                                    rHandsontableOutput("matPiBI"),br(),
                                                                                                                                                    actionButton('SubmPiBI','Submit')),br(),
                                                                                                                                    textInput('nsimDisBI','nsim',value = 100),
-                                                                                                                                  actionButton('RunAnalyDisBI','Run'), hr(),
+                                                                                                                                  actionButton('RunAnalyDisBI','Run'), hr()
                                                                                                                                   )),
                                                                                                                column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot10',height="800px"))),
                                                                                                                                  column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')),

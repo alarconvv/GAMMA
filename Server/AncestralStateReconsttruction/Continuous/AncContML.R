@@ -7,7 +7,7 @@
 #
 AncContMl <- reactiveValues()
 AncContMl$objetContinuousML <- NULL
-AncContMl$Models <- list()
+AncContMl$Models <- NULL
 
 
 # Transform character
@@ -38,6 +38,8 @@ output$infoPanelContinuousML <- renderPrint( {
     }
   })
 
+
+
 #Plot initial tree if models do not have been estimated, otherwise plot model output
 #
 
@@ -45,48 +47,70 @@ heightContMl <- reactive(input$PlotHeightContMl[1])
 widthContMl <- reactive(input$PlotWidthContMl[1])
 
 output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
+  if(input$runAncML >0){
+  if (input$phenogramML == 1) {
+    if (input$mapModelMl == 'BM') {
+      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$BM$ace),
+                spread.cost = c(1,0), 
+                fsize = input$tipSizeContMl[1],
+                lwd=0.8,colors ='grey40' )
+      
+    } else if (input$mapModelMl == 'EB') {
+      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$EB$ace),
+                spread.cost = c(1,0), 
+                fsize = input$tipSizeContMl[1],
+                lwd=0.8,colors ='grey40')
+    } else if (input$mapModelMl == 'OU') {
+      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$OU$ace),
+                spread.cost = c(1,0), 
+                fsize = input$tipSizeContMl[1],
+                lwd=0.8,colors ='grey40')
+    }
+  }else{
+  
   if (input$mapModelMl == 'BM') {
     plotBM <- contMap(tree = treeInput(),
                       x = setNames(transform(), row.names(CharInput())),
                       method = 'user',
                       anc.states = c(setNames(transform(), row.names(CharInput())),AncContMl$Models$BM$ace),
                       show.tip.label = T,
-                      plot = FALSE)
+                      plot = FALSE
+                      )
     n <- length(plotBM$cols)
     plotBM$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotBM, outline = F,cex =input$tipSizeContMl[1])
+    plot(plotBM, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
     plotEB <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
                       method = 'user',
                       anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$EB$ace),
-                      show.tip.label = input$tipLabelsML[1],
-                      fsize = input$tipSizeContMl[1],
+                      show.tip.label = T,
                       plot = FALSE)
     n <- length(plotEB$cols)
     plotEB$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotEB, outline = F,cex =input$tipSizeContMl[1])
+    plot(plotEB, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
     plotOU <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
                       method = 'user',
                       anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$OU$ace),
-                      show.tip.label = input$tipLabelsML[1],
-                      fsize = input$tipSizeContMl[1],
+                      show.tip.label = T,
                       plot = FALSE)
     n <- length(plotOU$cols)
     plotOU$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotOU, outline = F,cex =input$tipSizeContMl[1])
-    } else {
+    plot(plotOU, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
+  }
+    } 
+  }else {
       plot.phylo(x = treeInput(),
                  show.tip.label = T,
                  cex = input$tipSizeContMl[1],
-                 use.edge.length = T)
+                 use.edge.length = T,edge.width = 0.8,edge.color = 'grey40')
       }
   })
-
-
-
 
 
 #Plot histogram or frequency distribution
@@ -182,8 +206,15 @@ output$QQ1 <- renderPlot( {
 
 #Fit models: Run Analysis
 #
-observeEvent(input$runAncML == 1, {
- 
+observeEvent(input$runAncML, {
+
+  withProgress(message = 'Calculation in progress',
+               detail = 'This may take a while...', value = 0, {
+               
+                 incProgress(1/2)
+            
+  
+  
   if ( "BM" %in% input$ModelContinuous ) {
     AncContMl$Models$BM <- anc.ML(tree = treeInput(), 
                           x = setNames(transform(),row.names(CharInput())), 
@@ -204,14 +235,22 @@ observeEvent(input$runAncML == 1, {
                           maxit = input$maxitOU[1],
                           model = 'OU')
   }
+                 
+                 incProgress(2/2)
+                 
+                 
+               })
   
 })
 
 
 
+
+
+
 # update  Selection input to plot an specific model that had been run
 # 
-observeEvent(input$runAncML == 1, {
+observeEvent(input$runAncML, {
   updateSelectInput(session = session, inputId = "mapModelMl", choices = names(AncContMl$Models))
 })
 
@@ -219,17 +258,18 @@ observeEvent(input$runAncML == 1, {
 # Temporal object to print in info panel
 # info: output per every model run
 #
-observeEvent(input$runAncML == 1, {
-  if (!is.null(AncContMl$Models)) {
-    AncContMl$objetContinuousML <- AncContMl$Models
-  }
+observeEvent(input$runAncML, {
+if(!is.null(AncContMl$Models)){
+  AncContMl$objetContinuousML <- AncContMl$Models
+}
 })
 
 
 #Calculate AIC (No keep it, just show it)
 #
-observeEvent(input$MLModAIC == 1,{
-  AncContMl$objetContinuousML <- sapply(AncContMl$Models, AIC)
+observeEvent(input$MLModAIC,{
+  if(!is.null(AncContMl$Models)){
+  AncContMl$objetContinuousML <- sapply(AncContMl$Models, AIC)}
 })
 
 
