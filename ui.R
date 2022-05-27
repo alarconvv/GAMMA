@@ -141,12 +141,12 @@ shinyUI(
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'trace1'))),
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'desnsity1'))))
                                                                                                                                                            ),
-                                                                                                                                                fluidRow(column(12, plotOutput(outputId = 'PhyloPlot5'))),
                                                                                                                                                 wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices=NULL, selected=NULL,multiple = TRUE),
                                                                                                                                                                           sliderInput("tipSizeContBI", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
                                                                                                                                                                    column(4, sliderInput("PlotWidthContBI", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
                                                                                                                                                                           sliderInput("PlotHeightContBI", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)),
-                                                                                                                                                                   column(4,actionButton('PlotEditorBI', 'Plot Editor'))
+                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Plot phenogram'),
+                                                                                                                                                                          actionButton('PlotEditorBI', 'Plot Editor'))
                                                                                                                                                                    )
                                                                                                                                                           ),hr(),
                                                                                                                                                 fluidRow(column(12,verbatimTextOutput("infoPanelContinuousBI")))
@@ -176,12 +176,15 @@ shinyUI(
                                                                                                                                    downloadButton("downloadDisML", "Download")
                                                                                                                                    )
                                                                                                                       ),
-                                                                                                               column(9, fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot8'))),
+                                                                                                               column(9, fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot8',inline = T))),
                                                                                                                                   column(6,fluidRow(plotOutput(outputId = 'PhyloPlot9')))
                                                                                                                                   ),
-                                                                                                                      wellPanel(fluidRow(column(4,selectInput('plotModelDisML','Plot model',choices=NULL)),
-                                                                                                                                         column(4,checkboxInput('bestState', 'Plot the most likely state')),
-                                                                                                                                         column(4,actionButton('PlotEditorDisML', 'Plot Editor'))
+                                                                                                                      wellPanel(fluidRow(column(4,selectInput('plotModelDisML','Plot model',choices=NULL),
+                                                                                                                                                sliderInput("tipSizeDisML", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
+                                                                                                                                         column(4,sliderInput("PlotWidthDisML", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                sliderInput("PlotHeightDisML", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                                         column(4,checkboxInput('bestState', 'Plot the most likely state'),
+                                                                                                                                                actionButton('PlotEditorDisML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),
                                                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelDiscreteML")

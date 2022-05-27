@@ -134,22 +134,27 @@ output$histo1 <- renderPlot( {
   
   if (input$AncPIC == 1) { #if PIC is required just for visualized, it is not taken into account for analysing
    
-    h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
+    h <- hist(x =  pic(x = transform(), phy = treeInput()),plot=F)
+
     par(adj=0.5,
         cex.axis=0.9,
         cex.lab= 1,
         cex.main= 1.2,
         family="sans")
+    
     xlim <- range(h$mids)
     ylim <- range(h$counts)
-    plot(NA,xlim = xlim, ylim = ylim,bty = "n",  las = 1,axes = F,yaxs = "i",
-         main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, xlab= input$dataVar, ylab= ' N Tips' )
+    
+    
+    plot(NA, xlim = xlim , ylim =c(0, max(ylim)*1.1),bty = "n",  las = 1,axes = F,
+         main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, 
+         xlab= 'input$dataVar', ylab= ' N Tips' )
+    
     grid( lty = 2, lwd = 0.3)
-    axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
-    hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, 
+    axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+    axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
+    hist(x =  pic(x = transform(), phy = treeInput()), add = TRUE, 
          col=make.transparent(color1[1], 0.5), border= make.transparent(color1[1], 0.8) )
-    box(lwd= 0.7, col= 'grey57')
     
     # h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
     # 
@@ -171,22 +176,28 @@ output$histo1 <- renderPlot( {
   
   } else {
     
-    h <- hist(x = transform(),plot=F)
+    h <- hist(x =  transform(),plot=F)
+    
     par(adj=0.5,
         cex.axis=0.9,
         cex.lab= 1,
         cex.main= 1.2,
         family="sans")
+    
     xlim <- range(h$mids)
     ylim <- range(h$counts)
-    plot(NA,xlim = xlim, ylim = ylim,bty = "n",  las = 1,axes = F,yaxs = "i",
-         main='Histogram: raw data', sub = NULL, xlab= input$dataVar, ylab= ' N Tips')
+    
+    
+    plot(NA, xlim = xlim , ylim =c(0, max(ylim)*1.1),bty = "n",  las = 1,axes = F,
+         main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, 
+         xlab= 'input$dataVar', ylab= ' N Tips' )
+    
     grid( lty = 2, lwd = 0.3)
-    axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
-    hist(x =  transform(), add = TRUE, 
+    axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+    axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
+    
+    hist(x = transform(), add = TRUE, 
          col=make.transparent(color1[1], 0.5), border= make.transparent(color1[1], 0.8) )
-    box(lwd= 0.7, col= 'grey57')
     # h <- hist(x = transform(),plot=F)
     # par(
     #     cex.axis=0.7,
@@ -214,22 +225,22 @@ output$QQ1 <- renderPlot( {
   color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
 
     if (input$AncPIC == 1) {
-    q <-qqnorm(y = pic(x = transform(), phy = treeInput()),plot=F)
-    par(adj=0.5,
-        cex.axis=0.9,
-        cex.lab= 1,
-        cex.main= 1.2,
-        family="sans")
-    xlim <- range(q$x)
-    ylim <- range(q$y)
-    plot(q$x, q$y, yaxs = "i", xlim = xlim, ylim = ylim, cex=1.2,
-         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
-         col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
-    grid( lty = 2, lwd = 0.3)
-    axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(q$y)*1.1), lwd=0,lwd.ticks = .5)
-    abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
-    box(lwd= 0.7, col= 'grey57')
+      q <-qqnorm(y = pic(x = transform(), phy = treeInput()),plot=F)
+      par(adj=0.5,
+          cex.axis=0.9,
+          cex.lab= 1,
+          cex.main= 1.2,
+          family="sans")
+      xlim <- range(q$x)
+      ylim <- range(q$y)
+      plot(q$x, q$y, xlim = xlim, ylim = ylim, cex=1.2,
+           type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
+           col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
+      abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
+      grid( lty = 2, lwd = 0.3)
+      axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+      axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
+      
   } else {
     q <-qqnorm(y = transform(),plot=F)
     par(adj=0.5,
@@ -239,14 +250,13 @@ output$QQ1 <- renderPlot( {
         family="sans")
     xlim <- range(q$x)
     ylim <- range(q$y)
-    plot(q$x, q$y, yaxs = "i", xlim = xlim, ylim = ylim, cex=1.2,
-         type = 'p',axes = F,main = 'Normal Q-Q Plot', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
+    plot(q$x, q$y, xlim = xlim, ylim = ylim, cex=1.2,
+         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
          col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
-    grid( lty = 2, lwd = 0.3)
-    axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(q$y)*1.1), lwd=0,lwd.ticks = .5)
     abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
-    box(lwd= 0.7, col= 'grey57')
+    grid( lty = 2, lwd = 0.3)
+    axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+    axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
     
     # q <-qqnorm(y = transform(),plot=F)
     # par(adj=0.5,

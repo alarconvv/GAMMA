@@ -177,6 +177,11 @@ observeEvent(input$RunAnalyDisML ,{
   
   SppData<-data.frame(Genus_sp=names(AncDiscMl$setCharacterML),x=AncDiscMl$setCharacterML)
   
+  withProgress(message = 'Calculation in progress',
+               detail = 'This may take a while...', value = 0, {
+                 
+                 incProgress(1/2)
+  
   if ( nStates()[1]== 2){
     if ('ER' %in% input$ModelsDisML ){
       AncDiscMl$outcorHMM$ER <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
@@ -206,6 +211,10 @@ observeEvent(input$RunAnalyDisML ,{
     
     
   }
+                 incProgress(2/2)
+                 
+                 
+               })
   
   
 })
@@ -303,15 +312,21 @@ observeEvent(!is.null(input$RunModAverDisML),{
 })
 
 
+
+
+# initial and output tree / phenogram if it is chosen
+
+heightDisML <- reactive(input$PlotHeightDisML[1])
+widthDisML <- reactive(input$PlotWidthDisML[1])
 #plot phylogeny: Disc Char
-output$PhyloPlot8 <- renderPlot({
+output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
+  
+  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+  
+  DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
   
   if (input$RunAnalyDisML == 1 ){
     if (input$plotModelDisML == 'ModelAverage'){
-      DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
-      
-      DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
-      
       legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
       
       pieDiscML <- AncDiscMl$modelAverage
@@ -325,7 +340,7 @@ output$PhyloPlot8 <- renderPlot({
         }
       }
       
-      plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
+      plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
       
       legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
       
@@ -335,9 +350,6 @@ output$PhyloPlot8 <- renderPlot({
       
     }else{
       
-      DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
-      
-      DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
       
       Dimod <-which(names(AncDiscMl$outcorHMM) == input$plotModelDisML)
       
@@ -358,7 +370,7 @@ output$PhyloPlot8 <- renderPlot({
       }
       
       if (length(Dimod) > 0){
-        plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
+        plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
         
         legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
         
@@ -368,11 +380,9 @@ output$PhyloPlot8 <- renderPlot({
     }
     
   }else {
-    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+
     
-    DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
-    
-    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
+    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
     
     legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     

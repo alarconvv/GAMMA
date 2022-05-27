@@ -125,46 +125,28 @@ observeEvent(!is.null(AncContBI$mcmcBI),{
 heightContBI <- reactive(input$PlotHeightContBI[1])
 widthContBI <- reactive(input$PlotWidthContBI[1])
 
-output$PhyloPlot5 <- renderPlot( {
-  if (input$runAncBI == 1) {
-    #if (!input$phenogramBI == 1) {
-      # if (any(grepl('[0-9]', input$plotNodesBI) == T)) {
-      #   nodesBI4 <- input$plotNodesBI[which(grepl('[0-9]', input$plotNodesBI) == T)]
-      #   plot.phylo(x = treeInput(), 
-      #              show.tip.label = T,
-      #              cex = 0.1,
-      #              use.edge.length = T)
-      #   pp <- get(x = "last_plot.phylo", envir = .PlotPhyloEnv)
-      #   cols <- colorRampPalette(colors = c("blue","red"))(length(2:length(input$plotNodesBI)))
-      #   points(x = pp$xx[c(as.numeric(nodesBI4))], y = pp$yy[c(as.numeric(nodesBI4))],
-      #          pch = 21, col = cols, bg = "white", cex = 1.5)
-      #   nodelabels(bg = "white", cex = 0.6, frame = 'none', node = c(as.numeric(nodesBI4)))
-      #   points(x = pp$xx[c(as.numeric(nodesBI4))], y = pp$yy[c(as.numeric(nodesBI4))],
-      #          pch = 21, col = cols, bg = sapply(cols,make.transparent,0.2), cex = 1.5)
-      #   } else {
-      #     plot.phylo(x = treeInput(), 
-      #                show.tip.label = input$tipLabels[1],
-      #                cex = input$tipSize[1], 
-      #                use.edge.length = input$branchLength[1])
-      #     nodelabels(bg = "white", cex = 0.3, frame = "circle")
-      #  }
 
-      
-     # } else {
-        matrix1 <- AncContBI$mcmcBI$mcmc[floor(0.2 * nrow(AncContBI$mcmcBI$mcmc)):nrow(AncContBI$mcmcBI$mcmc), c(4:length(colnames(AncContBI$mcmcBI$mcmc)) - 1)]
-        estimates <- colMeans(matrix1)
-        hpd <- matrix(NA,length(colnames(matrix1)), 2) #Estimate intervals todrw in phenogram
+
+
+#Plot stochastic mapping state output
+
+output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
+  if (input$runAncBI == 1) {
+    if(input$phenogramBI == 1){
+      matrix1 <- AncContBI$mcmcBI$mcmc[floor(0.2 * nrow(AncContBI$mcmcBI$mcmc)):nrow(AncContBI$mcmcBI$mcmc), c(4:length(colnames(AncContBI$mcmcBI$mcmc)) - 1)]
+      estimates <- colMeans(matrix1)
+      hpd <- matrix(NA,length(colnames(matrix1)), 2) #Estimate intervals todrw in phenogram
       for (i in 1:length(colnames(matrix1))) {
         class(matrix1[, i]) <- 'mcmc'
         hpd[i, 1] <- HPDinterval(matrix1[,i])[1,1]
         hpd[i, 2] <- HPDinterval(matrix1[,i])[1,2]
       }
-        par(adj=0.5,
-            cex.axis=0.9,
-            cex.lab= 1,
-            cex.main= 1.2,
-            family="sans")
-        
+      par(adj=0.5,
+          cex.axis=0.9,
+          cex.lab= 1,
+          cex.main= 1.2,
+          family="sans")
+      
       tree <- paintSubTree(tree = as.phylo(treeInput()), 
                            node = length(treeInput()$tip) + 1, "1")
       trans <- as.character(floor(0:26/2)) #make transparent lines
@@ -175,27 +157,10 @@ output$PhyloPlot5 <- renderPlot( {
                   colors = make.transparent("mediumpurple", 0.05), add = i > 0, ftype = 'off')
         phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI, (1 - p) * hpd[, 2] + p * estimates),
                   colors = make.transparent("mediumpurple", 0.05), add = TRUE)
-        }
+      }
       phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI, estimates),
                 add = TRUE, colors = "white",lwd= 1.5) # The mean 
-     # }
-
-  }
-  
-    # } else {
-    #   plot.phylo(x = treeInput(),
-    #              show.tip.label = T,
-    #              cex = input$tipSizeContBI[1],
-    #              use.edge.length = T,edge.width = 0.8,edge.color = 'grey40')
-    # 
-    #   }
-  })
-
-
-#Plot stochastic mapping state output
-
-output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
-  if (input$runAncBI == 1) {
+    }else{
   plot5 <- contMap(tree = treeInput(),
                    x = AncContBI$setCharacterContBI,
                    method = 'user', show.tip.label = T,
@@ -214,12 +179,15 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
          pch = 21, bg = "white", cex = 2.3)
   nodelabels(bg = "white", cex = 0.6, frame = 'none')
   
+    }
+  
   }else {
 
   plot.phylo(x = treeInput(),
              show.tip.label = T,
              cex = input$tipSizeContBI[1],
              use.edge.length = T,edge.width = 0.8,edge.color = 'grey40')
+  
 }
   })
 
@@ -240,7 +208,7 @@ observeEvent(!is.null(AncContBI$mcmcBI),{
 })
 
 #update nodes
-observeEvent(input$plot_click,{
+observeEvent(c(input$phenogramBI==0, input$plot_click, input$runAncBI),{
   #!is.null(AncContBI$mcmcBI)
   updateSelectInput(session, "plotNodesBI",
                     choices = c(input$plotNodesBI,nearPoints(AncContBI$pot, input$plot_click, xvar = 'x', yvar = 'y')[1,1]),
@@ -270,16 +238,15 @@ output$trace1 <- renderPlot( {
           cex.lab= 1,
           cex.main= 1.2,
           family="sans")
-      plot(NA, xlim = xlim, ylim = ylim, bty = "n", ylab = "density", xlab = input$dataVar, las = 1,axes = F,yaxs = "i")
+      plot(NA, xlim = xlim, ylim = ylim, bty = "n", ylab = "density", xlab = input$dataVar, las = 1,axes = F)
       clip(xlim[1], xlim[2], ylim[1], ylim[2])
       grid( lty = 2, lwd = 0.3)
-      axis(side = 1,xlim = xlim*1.1, lwd=0, lwd.ticks = .5)
-      axis(side = 2,ylim = ylim*1.1, lwd=0,lwd.ticks = .5)
+      axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+      axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
       cols <- colorRampPalette(colors = c("mediumpurple","red"))(length(1:length(pd)))
       for (i in 2:length(pd)) {
         lines(x = pd$gen, y = pd[,i], col = make.transparent(cols[i], 0.5))
       }
-      box(lwd= 0.7, col= 'grey57')
      # } else {
       #   plot.anc.Bayes(x = AncContBI$mcmcBI,
       #                  bty = "l",
@@ -304,15 +271,14 @@ output$desnsity1 <- renderPlot( {
           cex.lab= 1,
           cex.main= 1.2,
           family="sans")
-      plot(NA, xlim = xlim, ylim = ylim, bty = "n", ylab = "density", xlab = input$dataVar,las = 1,axes = F,yaxs = "i", log = "x")
+      plot(NA, xlim = xlim, ylim = ylim, bty = "n", ylab = "density", xlab = input$dataVar,las = 1,axes = F, log = "x")
       clip(x1 = xlim[1], x2 = xlim[2], y1 = ylim[1], y2 = ylim[2])
       grid( lty = 2, lwd = 0.3)
-      axis(side = 1,xlim = xlim*1.1, lwd=0, lwd.ticks = .5)
-      axis(side = 2,ylim = ylim*1.1, lwd=0,lwd.ticks = .5)
+      axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
+      axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
       cols <- colorRampPalette(colors = c("mediumpurple","red"))(length(input$plotNodesBI))
       nulo <- mapply(function(dd,col) polygon(exp(dd$x),dd$y,col = make.transparent(col, 0.2), border = col),
                      dd = pd, col = cols)
-      box(lwd= 0.7, col= 'grey57')
       # } else {
       #   plot(density.anc.Bayes(x = AncContBI$mcmcBI, what = input$plotNodesBI[1]), bty = "l", main = "Posterior density", font.main = 3)
       # }
