@@ -27,25 +27,32 @@ AncDiscreteBI$burnin <- NULL
 AncDiscreteBI$Priorpar <- NULL
 AncDiscreteBI$vQ <- NULL
 AncDiscreteBI$Density <- NULL
+#AncDiscreteBI$setCharacter <- NULL
+# AncDiscreteBI$nStatesBI <- NULL
+# AncDiscreteBI$levelsStatesBI <- NULL
+
 
 
 
 
 # Count the number of states of the character to analyse
 # 
-nStatesBI <- reactive(length(levels(SelectedVarDisc())))
 
 
+nStatesBI <- eventReactive(c(SelectedVarDisc(),
+                             input$dataVar != 'Select'),{length(levels(SelectedVarDisc()))})
 
 
 
 
 # Update selectInput to the models which are depending on the number of states
 # 
-observeEvent(input$typeChar == 'Discrete', {
-  AncDiscreteBI$setCharacter <- setNames(SelectedVarDisc(),row.names(CharInput()))
+observeEvent(c(SelectedVarDisc(),
+               input$dataVar != 'Select'), {
+ 
+   AncDiscreteBI$setCharacter <- setNames(SelectedVarDisc(),row.names(CharInput()))
   
-if (nStates()[1] == 2) {
+if (nStatesBI()[1] == 2) {
   # update model list
   updateSelectInput(session, "ModelsDisBI", 
                     choices = c('Select' = 'Select','ER' = 'ER', 'ARD' = 'ARD', 
@@ -506,7 +513,7 @@ output$PhyloPlot10 <- renderPlot({
     }
     
 
-  }else{
+  }else {
     DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
 
     DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))

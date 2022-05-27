@@ -15,6 +15,10 @@ AncDiscMl$AICw <- NULL
 AncDiscMl$w.perNode <- list()
 AncDiscMl$modelAverage <- NULL
 AncDiscMl$objectDiscreteML  <- NULL
+#AncDiscMl$setCharacterML <- NULL
+# AncDiscMl$nStates  <- NULL
+# AncDiscMl$levelsStatesML <- NULL
+
 
 
 
@@ -28,11 +32,17 @@ output$infoPanelDiscreteML <- renderPrint({
 
 # n states
 #
-nStates <- reactive(length(levels(SelectedVarDisc())))
+nStates <- eventReactive(c(SelectedVarDisc(),
+                           input$dataVar != 'Select'),{length(levels(SelectedVarDisc()))})
 
-observeEvent(input$typeChar == 'Discrete',{
+
+
+observeEvent(c(SelectedVarDisc(),
+               input$dataVar != 'Select'),{
   
-  if (nStates()[1]== 2){
+  AncDiscMl$setCharacterML <- setNames(SelectedVarDisc(),row.names(CharInput()))
+
+  if ( nStates()[1]== 2){
     # update model list
     updateSelectInput(session, "ModelsDisML",
                       choices=c('ER'='ER', 'ARD'='ARD', 'Ireversible01'='Ireversible01','Ireversible10'='Ireversible10'))
@@ -55,7 +65,7 @@ observeEvent(input$typeChar == 'Discrete',{
 observeEvent(!is.null(input$ModelsDisML),{
   
   #Create a matrix0
-  AncDiscMl$matrix0 <- matrix(NA,nStates()[1],nStates()[1],dimnames=list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
+  AncDiscMl$matrix0 <- matrix(NA, nStates()[1], nStates()[1],dimnames=list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
   
   
   # Create ER model
@@ -165,9 +175,9 @@ observeEvent(!is.null(input$ModelsDisML),{
 # Run Analysis for 2 states
 observeEvent(input$RunAnalyDisML ,{
   
-  SppData<-data.frame(Genus_sp=names(setNames(SelectedVarDisc(),row.names(CharInput()))),x=setNames(SelectedVarDisc(),row.names(CharInput())))
+  SppData<-data.frame(Genus_sp=names(AncDiscMl$setCharacterML),x=AncDiscMl$setCharacterML)
   
-  if (nStates()[1]== 2){
+  if ( nStates()[1]== 2){
     if ('ER' %in% input$ModelsDisML ){
       AncDiscMl$outcorHMM$ER <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
                                            rate.cat=1,rate.mat=matrix(c(NA,1,1,NA),2,2),root.p=c(0.5,0.5))}
@@ -182,7 +192,7 @@ observeEvent(input$RunAnalyDisML ,{
                                                      rate.cat=1,rate.mat=matrix(c(NA,1,0,NA),2,2),root.p=c(0.5,0.5))}
   }
   
-  if (nStates()[1] > 2){
+  if ( nStates()[1] > 2){
     
     num <- which( names(AncDiscMl$multiStatesModels) %in% input$ModelsDisML)
     
@@ -225,7 +235,7 @@ observeEvent(input$DisMLModAIC,{
   
   
   foo<-function(object){
-    setNames(c(attributes(logLik(object))$df,logLik(object),AIC(object),AICc(object)),
+    setNames(c(attributes(logLik.corhmm(object))$df,logLik.corhmm(object),AIC(object),AICc(object)),
              c("df","logLik","AIC","AICc"))
   }
   
@@ -315,7 +325,7 @@ output$PhyloPlot8 <- renderPlot({
         }
       }
       
-      plotTree.datamatrix(treeInput(),as.data.frame(setNames(SelectedVarDisc(),row.names(CharInput()))),colors=list(DisCols),header=FALSE,fsize=0.45)
+      plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
       
       legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
       
@@ -348,7 +358,7 @@ output$PhyloPlot8 <- renderPlot({
       }
       
       if (length(Dimod) > 0){
-        plotTree.datamatrix(treeInput(),as.data.frame(setNames(SelectedVarDisc(),row.names(CharInput()))),colors=list(DisCols),header=FALSE,fsize=0.45)
+        plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
         
         legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
         
@@ -357,12 +367,12 @@ output$PhyloPlot8 <- renderPlot({
       
     }
     
-  }else{
+  }else {
     DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
     
     DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
     
-    plotTree.datamatrix(treeInput(),as.data.frame(setNames(SelectedVarDisc(),row.names(CharInput()))),colors=list(DisCols),header=FALSE,fsize=0.45)
+    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=0.45)
     
     legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     

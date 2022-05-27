@@ -8,11 +8,14 @@
 AncContMl <- reactiveValues()
 AncContMl$objetContinuousML <- NULL
 AncContMl$Models <- NULL
+#AncContMl$setCharacterContMl <-NULL
 
 
 # Transform character
 # 
-transform <- eventReactive(input$transform1, {
+transform <- eventReactive(c(input$transform1,
+                             SelectedVar(),
+                             input$dataVar != 'Select'), {
   if (input$transform1 == 'ln') {
     log(SelectedVar())
   } else if (input$transform1 == 'log10') {
@@ -27,8 +30,15 @@ transform <- eventReactive(input$transform1, {
     exp(SelectedVar())
   } else {SelectedVar()
   }
+  
 })
 
+
+# set character
+observeEvent(transform(),{
+  AncContMl$setCharacterContMl <- setNames(transform(), row.names(CharInput()))
+  
+})
 
 #Render print in Info panel: ML Analysis
 #
@@ -47,24 +57,24 @@ heightContMl <- reactive(input$PlotHeightContMl[1])
 widthContMl <- reactive(input$PlotWidthContMl[1])
 
 output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
-  if(input$runAncML >0){
+  if(input$runAncML >0 & input$ResetConMl == 0){
   if (input$phenogramML == 1) {
     if (input$mapModelMl == 'BM') {
       phenogram(tree = treeInput(), #as.phylo method to plot in black color
-                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$BM$ace),
+                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40' )
       
     } else if (input$mapModelMl == 'EB') {
       phenogram(tree = treeInput(), #as.phylo method to plot in black color
-                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$EB$ace),
+                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$EB$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40')
     } else if (input$mapModelMl == 'OU') {
       phenogram(tree = treeInput(), #as.phylo method to plot in black color
-                x =  c(setNames(transform(), row.names(CharInput())),AncContMl$Models$OU$ace),
+                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$OU$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40')
@@ -73,15 +83,15 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   
   if (input$mapModelMl == 'BM') {
     plotBM <- contMap(tree = treeInput(),
-                      x = setNames(transform(), row.names(CharInput())),
+                      x = AncContMl$setCharacterContMl,
                       method = 'user',
-                      anc.states = c(setNames(transform(), row.names(CharInput())),AncContMl$Models$BM$ace),
+                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
                       show.tip.label = T,
                       plot = FALSE
                       )
     n <- length(plotBM$cols)
     plotBM$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotBM, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
+    plot(plotBM, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
     plotEB <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
@@ -91,7 +101,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
                       plot = FALSE)
     n <- length(plotEB$cols)
     plotEB$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotEB, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
+    plot(plotEB, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
     plotOU <- contMap(tree = treeInput(), 
                       x = setNames(transform(),row.names(CharInput())),
@@ -101,10 +111,10 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
                       plot = FALSE)
     n <- length(plotOU$cols)
     plotOU$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
-    plot(plotOU, outline = F,lwd =2,fsize = input$tipSizeContMl[1])
+    plot(plotOU, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   }
     } 
-  }else {
+  }else  {
       plot.phylo(x = treeInput(),
                  show.tip.label = T,
                  cex = input$tipSizeContMl[1],
@@ -116,92 +126,145 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
 #Plot histogram or frequency distribution
 #
 output$histo1 <- renderPlot( {
+ 
+  # colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
+  # color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
   
-  colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
-  color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
+  color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
   
   if (input$AncPIC == 1) { #if PIC is required just for visualized, it is not taken into account for analysing
    
-    
     h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
-    
-    par(
-        cex.axis=0.7,
-        cex.lab= 0.9,
-        cex.main= 1,
-        family="sans"
-    )
-    plot(h$mids, h$counts, yaxs = "i",
-         type = 'n', bty = 'n',axes = F,main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, xlab= input$dataVar, ylab= ' N Tips' )
-    grid(10,10, lty = 2, lwd = 0.3)
+    par(adj=0.5,
+        cex.axis=0.9,
+        cex.lab= 1,
+        cex.main= 1.2,
+        family="sans")
+    xlim <- range(h$mids)
+    ylim <- range(h$counts)
+    plot(NA,xlim = xlim, ylim = ylim,bty = "n",  las = 1,axes = F,yaxs = "i",
+         main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, xlab= input$dataVar, ylab= ' N Tips' )
+    grid( lty = 2, lwd = 0.3)
     axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
     axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
-    hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, border= F,
-         col=color2)
-    box(lwd= 0.5, col= 'grey')
+    hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, 
+         col=make.transparent(color1[1], 0.5), border= make.transparent(color1[1], 0.8) )
+    box(lwd= 0.7, col= 'grey57')
     
+    # h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
+    # 
+    # par(
+    #     cex.axis=0.7,
+    #     cex.lab= 0.9,
+    #     cex.main= 1,
+    #     family="sans"
+    # )
+    # plot(h$mids, h$counts, yaxs = "i",
+    #      type = 'n', bty = 'n',axes = F,main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, xlab= input$dataVar, ylab= ' N Tips' )
+    # grid(10,10, lty = 2, lwd = 0.3)
+    # axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
+    # axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
+    # hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, border= F,
+    #      col=color2)
+    # box(lwd= 0.5, col= 'grey')
+    # 
   
   } else {
     
     h <- hist(x = transform(),plot=F)
-    par(
-        cex.axis=0.7,
-        cex.lab= 0.9,
-        cex.main= 1,
-        family="sans"
-    )
-    plot(h$mids, h$counts, yaxs = "i",
-         type = 'n', bty = 'n',axes = F, main='Histogram: raw data', sub = NULL, xlab= input$dataVar, ylab= ' N Tips')
-    grid(10,10, lty = 2, lwd = 0.3)
+    par(adj=0.5,
+        cex.axis=0.9,
+        cex.lab= 1,
+        cex.main= 1.2,
+        family="sans")
+    xlim <- range(h$mids)
+    ylim <- range(h$counts)
+    plot(NA,xlim = xlim, ylim = ylim,bty = "n",  las = 1,axes = F,yaxs = "i",
+         main='Histogram: raw data', sub = NULL, xlab= input$dataVar, ylab= ' N Tips')
+    grid( lty = 2, lwd = 0.3)
     axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
     axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
-    hist(x = transform(), add = TRUE, border= F,
-         col= color2)
-    box(lwd= 0.5, col= 'grey')
+    hist(x =  transform(), add = TRUE, 
+         col=make.transparent(color1[1], 0.5), border= make.transparent(color1[1], 0.8) )
+    box(lwd= 0.7, col= 'grey57')
+    # h <- hist(x = transform(),plot=F)
+    # par(
+    #     cex.axis=0.7,
+    #     cex.lab= 0.9,
+    #     cex.main= 1,
+    #     family="sans"
+    # )
+    # plot(h$mids, h$counts, yaxs = "i",
+    #      type = 'n', bty = 'n',axes = F, main='Histogram: raw data', sub = NULL, xlab= input$dataVar, ylab= ' N Tips')
+    # grid(10,10, lty = 2, lwd = 0.3)
+    # axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
+    # axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
+    # hist(x = transform(), add = TRUE, border= F,
+    #      col= color2)
+    # box(lwd= 0.5, col= 'grey')
   }
+  
 })
 
 
 # Plot QQ plot for fitting to a normal distribution
 # 
 output$QQ1 <- renderPlot( {
-  colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
-  color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
-  color3 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255)
   
-  if (input$AncPIC == 1) {
+  color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
+
+    if (input$AncPIC == 1) {
     q <-qqnorm(y = pic(x = transform(), phy = treeInput()),plot=F)
     par(adj=0.5,
-        cex.axis=0.7,
-        cex.lab= 0.9,
-        cex.main= 1,
-        family="sans"
-    )
-    
-    plot(q$x, q$y, yaxs = "i", 
-         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
-         col=color3,pch=21,bg=color2)
-    grid(10,10, lty = 2, lwd = 0.3)
+        cex.axis=0.9,
+        cex.lab= 1,
+        cex.main= 1.2,
+        family="sans")
+    xlim <- range(q$x)
+    ylim <- range(q$y)
+    plot(q$x, q$y, yaxs = "i", xlim = xlim, ylim = ylim, cex=1.2,
+         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
+         col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
+    grid( lty = 2, lwd = 0.3)
     axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(q$y)), lwd=0,lwd.ticks = .5)
-    box(lwd= 0.5, col= 'grey5')
+    axis(side = 2,ylim = c(0, max(q$y)*1.1), lwd=0,lwd.ticks = .5)
+    abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
+    box(lwd= 0.7, col= 'grey57')
   } else {
     q <-qqnorm(y = transform(),plot=F)
     par(adj=0.5,
-        cex.axis=0.7,
-        cex.lab= 0.9,
-        cex.main= 1,
-        family="sans"
-    )
-    
-    plot(q$x, q$y, yaxs = "i", 
-         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
-         col=color3,pch=21,bg=color2)
-    grid(10,10, lty = 2, lwd = 0.3)
+        cex.axis=0.9,
+        cex.lab= 1,
+        cex.main= 1.2,
+        family="sans")
+    xlim <- range(q$x)
+    ylim <- range(q$y)
+    plot(q$x, q$y, yaxs = "i", xlim = xlim, ylim = ylim, cex=1.2,
+         type = 'p',axes = F,main = 'Normal Q-Q Plot', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
+         col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
+    grid( lty = 2, lwd = 0.3)
     axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
-    axis(side = 2,ylim = c(0, max(q$y)), lwd=0,lwd.ticks = .5)
-    box(lwd= 0.5, col= 'grey')
+    axis(side = 2,ylim = c(0, max(q$y)*1.1), lwd=0,lwd.ticks = .5)
+    abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
+    box(lwd= 0.7, col= 'grey57')
+    
+    # q <-qqnorm(y = transform(),plot=F)
+    # par(adj=0.5,
+    #     cex.axis=0.7,
+    #     cex.lab= 0.9,
+    #     cex.main= 1,
+    #     family="sans"
+    # )
+    # 
+    # plot(q$x, q$y, yaxs = "i", 
+    #      type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
+    #      col=color3,pch=21,bg=color2)
+    # grid( lty = 2, lwd = 0.3)
+    # axis(side = 1,xlim = range(q$x)*1.1,  lwd=0, lwd.ticks = .5)
+    # axis(side = 2,ylim = c(0, max(q$y)), lwd=0,lwd.ticks = .5)
+    # box(lwd= 0.5, col= 'grey')
   }
+  
 })
 
 #Fit models: Run Analysis
@@ -291,3 +354,7 @@ output$downloadAnc <- downloadHandler(
         }
     })
 
+observeEvent(input$ResetConMl,{
+
+  reset('ResetConCharML')
+})

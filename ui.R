@@ -65,8 +65,8 @@ shinyUI(
                                                                                                        conditionalPanel(condition = "input.tipLabels==1",
                                                                                                                         sliderInput("tipSize", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
                                                                                                        checkboxInput("branchLength", "Use edge length"),
-                                                                                                       numericInput(inputId = 'PlotHeightDt',label = 'Plot height (px)',value =800,min = 20,max = 1500),
-                                                                                                       numericInput(inputId = 'PlotWidthDt',label = 'Plot width (px)',value =400,min = 20,max = 1500),
+                                                                                                       sliderInput("PlotWidthDt", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                       sliderInput("PlotHeightDt", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800),
                                                                                                        selectInput("plotType", "Plot type",
                                                                                                                    c("phylogram" = "phylogram","cladogram" = "cladogram","fan" = "fan", "unrooted" = "unrooted","radial" = "radial", "tidy" = "tidy" ),selected = "phylogram")
                                                                                                        )
@@ -79,7 +79,8 @@ shinyUI(
                                                        tabPanel("Analysis",
                                                                 conditionalPanel(condition = "input.typeChar == 'Continuous'",
                                                                                  tabsetPanel(id = "ContinuousCharacter",
-                                                                                             tabPanel("Maxima Likelihood",
+                                                                                             tabPanel(title = "Maxima Likelihood", useShinyjs(),
+                                                                                                      div(id= 'ResetConCharML',
                                                                                                       fluidRow(column(3,wellPanel(radioButtons("transform1", "Transformation type",
                                                                                                                                                c("No transform" = "NoTrans","ln" = "ln","log10" = "log10",
                                                                                                                                                  "Square Root" = "squareRoot","Cube Root"="cubeRoot",
@@ -95,7 +96,8 @@ shinyUI(
                                                                                                                                   actionButton("runAncML", "run"),hr(),
                                                                                                                                   checkboxInput("MLModAIC", "Model selection AIC"),hr(),
                                                                                                                                   radioButtons("exportMLanc", "Export output",c("R object (RDS)" = "MLancRDS","TXT" = "MLancTXT")),
-                                                                                                                                  downloadButton("downloadAnc", "Download")
+                                                                                                                                  downloadButton("downloadAnc", "Download"),hr(),
+                                                                                                                                  actionButton("ResetConMl", "Reset Panel")
                                                                                                                                   )
                                                                                                                       ),
                                                                                                                column(9,fluidRow(column(6,
@@ -106,8 +108,8 @@ shinyUI(
                                                                                                                                  ),
                                                                                                                       wellPanel(fluidRow(column(4,selectInput('mapModelMl','Plot model',choices=NULL, selected=NULL),
                                                                                                                                                 sliderInput("tipSizeContMl", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
-                                                                                                                                         column(4, numericInput(inputId = 'PlotHeightContMl',label = 'Plot height (px)',value =800,min = 20,max = 1500),
-                                                                                                                                                numericInput(inputId = 'PlotWidthContMl',label = 'Plot width (px)',value =400,min = 20,max = 1500)
+                                                                                                                                         column(4, sliderInput("PlotWidthContMl", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                sliderInput("PlotHeightContMl", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)
                                                                                                                                                 ),
                                                                                                                                          column(4,checkboxInput('phenogramML', 'Plot phenogram'),
                                                                                                                                                 actionButton('PlotEditorML', 'Plot Editor'))
@@ -115,6 +117,7 @@ shinyUI(
                                                                                                                                 ),hr(),
                                                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelContinuousML"))))
                                                                                                                )
+                                                                                                      )
                                                                                                       ),
                                                                                              tabPanel("Stocastic State Mapping",fluidRow(column(3,wellPanel(selectInput("parametersBI", "Set parameters",
                                                                                                                                                                         c("Select" = "select","by default" = "defaultBI","Costumize" = "costumizeBI")),
@@ -141,10 +144,9 @@ shinyUI(
                                                                                                                                                 fluidRow(column(12, plotOutput(outputId = 'PhyloPlot5'))),
                                                                                                                                                 wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices=NULL, selected=NULL,multiple = TRUE),
                                                                                                                                                                           sliderInput("tipSizeContBI", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
-                                                                                                                                                                   column(4, numericInput(inputId = 'PlotHeightContBI',label = 'Plot height (px)',value =800,min = 20,max = 1500),
-                                                                                                                                                                          numericInput(inputId = 'PlotWidthContBI',label = 'Plot width (px)',value =400,min = 20,max = 1500)),
-                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Plot phenogram'),
-                                                                                                                                                                          actionButton('PlotEditorBI', 'Plot Editor'))
+                                                                                                                                                                   column(4, sliderInput("PlotWidthContBI", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                                          sliderInput("PlotHeightContBI", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                                                                   column(4,actionButton('PlotEditorBI', 'Plot Editor'))
                                                                                                                                                                    )
                                                                                                                                                           ),hr(),
                                                                                                                                                 fluidRow(column(12,verbatimTextOutput("infoPanelContinuousBI")))

@@ -115,10 +115,15 @@ heightDt <- reactive(input$PlotHeightDt[1])
 widthDt <- reactive(input$PlotWidthDt[1])
 
 output$PhyloPlot <- renderPlot( height = heightDt  , width = widthDt,{
+  
+  if(is.null(treeInput())){
+    return()
+  }
 
-    plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
+    rawPhylo <-plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
                cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType,
                edge.width = 0.8,edge.color = 'grey40')
+    return(rawPhylo)
   
 })
 
@@ -169,7 +174,8 @@ observeEvent(CharInput(), {
 
 #Classify character in their different types
 #
-ClassCol <- eventReactive(input$dataVar, {
+ClassCol <- eventReactive(c(input$dataVar,
+                            !is.null(input$dataVar)), {
   if (class(CharInput()[,which(colnames(CharInput()) == input$dataVar)]) == 'numeric') {
     c('Numerical class. Please, confirm how to analyze it: as a Discrete or a Contiuous character')
   } else if (class(CharInput()[,which(colnames(CharInput())== input$dataVar)])== 'factor') {
@@ -214,13 +220,18 @@ observe( {
 #Assign the character to a variable and confirm the object class
 # Continuous character
 #
-SelectedVar <- eventReactive(input$typeChar == 'Continuous', {
-  as.numeric(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
-})
+
+
+SelectedVar <- eventReactive(c(input$typeChar == 'Continuous', input$dataVar != 'Select'), {
+    as.numeric(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
+  })
+
 
 #Discrete character
 #
-SelectedVarDisc <- eventReactive(input$typeChar == 'Discrete', {
-  as.factor(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
-})
+
+  SelectedVarDisc <- eventReactive(c(input$typeChar == 'Discrete', input$dataVar != 'Select'), {
+      as.factor(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
+  })
+
 
