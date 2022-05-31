@@ -23,6 +23,7 @@ library(shinyjs)
 library(rhandsontable)
 library(shinyWidgets)
 
+#devtools::install_github(repo = 'https://github.com/liamrevell/phytools',force = TRUE)
 
 # Define UI for application that draws a histogram
 
@@ -47,7 +48,7 @@ shinyUI(
                                                                 fluidRow(
                                                                   column(3,wellPanel(selectInput("tree", "Load tree",c("Select" = "select","Example" = "examp","Import tree" = "treeFile")),
                                                                                      conditionalPanel(condition = "input.tree=='treeFile'",
-                                                                                                      selectInput("format", "Tree format",c("Select" = "select","Nexus" = "Nexus","Newick" = "Newick")),
+                                                                                                     # selectInput("format", "Tree format",c("Select" = "select","Nexus" = "Nexus","Newick" = "Newick")),
                                                                                                       fileInput("fileTree", "Load tree file")),
                                                                                      actionButton("importTree", "Import tree"), hr(),
                                                                                      selectInput("csvData", "Load csv",c("Select" = "select","Example" = "exampCSV","Import csv" = "DataFile")),
@@ -168,7 +169,7 @@ shinyUI(
                                                                                                                                    checkboxInput("DisMLModAIC", "Model selection AIC"),
                                                                                                                                    conditionalPanel("input.DisMLModAIC == 1",
                                                                                                                                                     checkboxInput("ModAverDisML", "Model averaging") ),
-                                                                                                                                   conditionalPanel("input.ModAverDisML == 1",
+                                                                                                                                   conditionalPanel("input.ModAverDisML == 1 & input.DisMLModAIC == 1",
                                                                                                                                                     selectInput("SetModAverDisML", "Set models",choices=NULL, selected=NULL,multiple = TRUE),
                                                                                                                                                     actionButton('RunModAverDisML','Run')),hr(),
                                                                                                                                    radioButtons("exportDisMLanc", "Export output",c("R object (RDS)" = "MLancRDS","TXT" = "MLancTXT")),

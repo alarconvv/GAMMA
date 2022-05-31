@@ -2,6 +2,14 @@
 # Discrete Character : Maximum Likelihood
 ##############################################################################
 
+
+# Info panel
+output$infoPanelDiscreteML <- renderPrint({
+  if (!is.null(AncDiscMl$objectDiscreteML)){
+    print(AncDiscMl$objectDiscreteML)
+  }
+})
+
 # Vector to store models and outputs
 # 
 
@@ -15,38 +23,56 @@ AncDiscMl$AICw <- NULL
 AncDiscMl$w.perNode <- list()
 AncDiscMl$modelAverage <- NULL
 AncDiscMl$objectDiscreteML  <- NULL
-#AncDiscMl$setCharacterML <- NULL
-# AncDiscMl$nStates  <- NULL
-# AncDiscMl$levelsStatesML <- NULL
+AncDiscMl$setCharacterML <- NULL
 
 
 
+#Tree
+
+treeDisML <- eventReactive(c( treeInput()),{
+  validate(
+    need(try(treeInput()), "Please select a tree")
+  )
+  treeInput()
+}
+)
 
 
-# Info panel
-output$infoPanelDiscreteML <- renderPrint({
-  if (!is.null(AncDiscMl$objectDiscreteML)){
-    print(AncDiscMl$objectDiscreteML)
-  }
-})
+#Tree
+
+DataDisML  <- eventReactive(c(SelectedVarDisc()),{
+  validate(
+    need(try(SelectedVarDisc()), "Please select a data set")
+  )
+  SelectedVarDisc()
+}
+)
+
+
+
 
 # n states
 #
-nStates <- eventReactive(c(SelectedVarDisc(),
-                           input$dataVar != 'Select'),{length(levels(SelectedVarDisc()))})
+nStates <- eventReactive(c(DataDisML()),{length(levels(DataDisML()))})
+
+
+# set character
+observeEvent(DataDisML(),{
+  AncDiscMl$setCharacterML <- setNames(DataDisML(),row.names(CharInput()))
+})
 
 
 
-observeEvent(c(SelectedVarDisc(),
-               input$dataVar != 'Select'),{
+
+observeEvent(DataDisML(),{
   
-  AncDiscMl$setCharacterML <- setNames(SelectedVarDisc(),row.names(CharInput()))
+
 
   if ( nStates()[1]== 2){
     # update model list
     updateSelectInput(session, "ModelsDisML",
                       choices=c('ER'='ER', 'ARD'='ARD', 'Ireversible01'='Ireversible01','Ireversible10'='Ireversible10'))
-  }else {
+  }else if ( nStates()[1] > 2) {
     # update model list for 3 states
     updateSelectInput(session, "ModelsDisML",
                       choices=c('ER'='ER', 'ARD'='ARD', 'SYM'='SYM'))
@@ -65,15 +91,15 @@ observeEvent(c(SelectedVarDisc(),
 observeEvent(!is.null(input$ModelsDisML),{
   
   #Create a matrix0
-  AncDiscMl$matrix0 <- matrix(NA, nStates()[1], nStates()[1],dimnames=list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
+  AncDiscMl$matrix0 <- matrix(NA, nStates()[1], nStates()[1],dimnames=list(levels(DataDisML()),levels(DataDisML())))
   
   
   # Create ER model
   if (  'ER'  %in% input$ModelsDisML){
     AncDiscMl$multiStatesModels$ER <- AncDiscMl$matrix0
     
-    row.names(AncDiscMl$multiStatesModels$ER) <- levels(SelectedVarDisc())
-    colnames(AncDiscMl$multiStatesModels$ER) <- levels(SelectedVarDisc())
+    row.names(AncDiscMl$multiStatesModels$ER) <- levels(DataDisML())
+    colnames(AncDiscMl$multiStatesModels$ER) <- levels(DataDisML())
     
     AncDiscMl$multiStatesModels$ER[lower.tri(AncDiscMl$multiStatesModels$ER)] <- 1
     AncDiscMl$multiStatesModels$ER[upper.tri(AncDiscMl$multiStatesModels$ER)] <- 1
@@ -83,8 +109,8 @@ observeEvent(!is.null(input$ModelsDisML),{
   if ('ARD' %in% input$ModelsDisML){
     AncDiscMl$multiStatesModels$ARD <- AncDiscMl$matrix0
     
-    row.names(AncDiscMl$multiStatesModels$ARD) <- levels(SelectedVarDisc())
-    colnames(AncDiscMl$multiStatesModels$ARD) <- levels(SelectedVarDisc())
+    row.names(AncDiscMl$multiStatesModels$ARD) <- levels(DataDisML())
+    colnames(AncDiscMl$multiStatesModels$ARD) <- levels(DataDisML())
     
     AncDiscMl$multiStatesModels$ARD[lower.tri(AncDiscMl$multiStatesModels$ARD)] <- 2
     AncDiscMl$multiStatesModels$ARD[upper.tri(AncDiscMl$multiStatesModels$ARD)] <- 1
@@ -94,8 +120,8 @@ observeEvent(!is.null(input$ModelsDisML),{
   if ('SYM' %in% input$ModelsDisML){
     AncDiscMl$multiStatesModels$SYM <- AncDiscMl$matrix0
     
-    row.names(AncDiscMl$multiStatesModels$SYM) <- levels(SelectedVarDisc())
-    colnames(AncDiscMl$multiStatesModels$SYM) <- levels(SelectedVarDisc())
+    row.names(AncDiscMl$multiStatesModels$SYM) <- levels(DataDisML())
+    colnames(AncDiscMl$multiStatesModels$SYM) <- levels(DataDisML())
     
     AncDiscMl$multiStatesModels$SYM[lower.tri(AncDiscMl$multiStatesModels$SYM)] <- 1:length(AncDiscMl$multiStatesModels$SYM[lower.tri(AncDiscMl$multiStatesModels$SYM)])
     AncDiscMl$multiStatesModels$SYM[upper.tri(AncDiscMl$multiStatesModels$SYM)] <- 1:length(AncDiscMl$multiStatesModels$SYM[lower.tri(AncDiscMl$multiStatesModels$SYM)])
@@ -105,8 +131,8 @@ observeEvent(!is.null(input$ModelsDisML),{
   if ('Ireversible01' %in% input$ModelsDisML){
     AncDiscMl$multiStatesModels$Ireversible01 <- AncDiscMl$matrix0
     
-    row.names(AncDiscMl$multiStatesModels$Ireversible01) <- levels(SelectedVarDisc())
-    colnames(AncDiscMl$multiStatesModels$Ireversible01) <- levels(SelectedVarDisc())
+    row.names(AncDiscMl$multiStatesModels$Ireversible01) <- levels(DataDisML())
+    colnames(AncDiscMl$multiStatesModels$Ireversible01) <- levels(DataDisML())
     
     AncDiscMl$multiStatesModels$Ireversible01[lower.tri(AncDiscMl$multiStatesModels$Ireversible01)] <- 1
     AncDiscMl$multiStatesModels$Ireversible01[upper.tri(AncDiscMl$multiStatesModels$Ireversible01)] <- 0
@@ -116,8 +142,8 @@ observeEvent(!is.null(input$ModelsDisML),{
   if ('Ireversible10' %in% input$ModelsDisML){
     AncDiscMl$multiStatesModels$Ireversible10 <- AncDiscMl$matrix0
     
-    row.names(AncDiscMl$multiStatesModels$Ireversible10) <- levels(SelectedVarDisc())
-    colnames(AncDiscMl$multiStatesModels$Ireversible10) <- levels(SelectedVarDisc())
+    row.names(AncDiscMl$multiStatesModels$Ireversible10) <- levels(DataDisML())
+    colnames(AncDiscMl$multiStatesModels$Ireversible10) <- levels(DataDisML())
     
     AncDiscMl$multiStatesModels$Ireversible10[lower.tri(AncDiscMl$multiStatesModels$Ireversible10)] <- 0
     AncDiscMl$multiStatesModels$Ireversible10[upper.tri(AncDiscMl$multiStatesModels$Ireversible10)] <- 1
@@ -152,8 +178,8 @@ observeEvent(input$SubmAddModel > 0,{
   AncDiscMl$counter[1] <- AncDiscMl$counter[1] + 1
 
   AncDiscMl$multiStatesModels$x <- hot_to_r(input$w1)
-  row.names(AncDiscMl$multiStatesModels$x) <- levels(SelectedVarDisc())
-  colnames(AncDiscMl$multiStatesModels$x) <- levels(SelectedVarDisc())
+  row.names(AncDiscMl$multiStatesModels$x) <- levels(DataDisML())
+  colnames(AncDiscMl$multiStatesModels$x) <- levels(DataDisML())
   
   names(AncDiscMl$multiStatesModels)[length(AncDiscMl$multiStatesModels)] <- paste('UserModel',as.character(AncDiscMl$counter[1] - 1),sep = '')
   
@@ -184,16 +210,16 @@ observeEvent(input$RunAnalyDisML ,{
   
   if ( nStates()[1]== 2){
     if ('ER' %in% input$ModelsDisML ){
-      AncDiscMl$outcorHMM$ER <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
+      AncDiscMl$outcorHMM$ER <- corHMM(treeDisML(),SppData,node.states=input$typeDisML[1],
                                            rate.cat=1,rate.mat=matrix(c(NA,1,1,NA),2,2),root.p=c(0.5,0.5))}
     if ('ARD' %in% input$ModelsDisML){
-      AncDiscMl$outcorHMM$ARD <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
+      AncDiscMl$outcorHMM$ARD <- corHMM(treeDisML(),SppData,node.states=input$typeDisML[1],
                                             rate.cat=1,rate.mat=matrix(c(NA,1,2,NA),2,2),root.p=c(0.5,0.5))}
     if ('Ireversible01' %in% input$ModelsDisML){
-      AncDiscMl$outcorHMM$Ireversible01 <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
+      AncDiscMl$outcorHMM$Ireversible01 <- corHMM(treeDisML(),SppData,node.states=input$typeDisML[1],
                                                       rate.cat=1,rate.mat=matrix(c(NA,0,1,NA),2,2),root.p=c(0.5,0.5))}
     if ('Ireversible10' %in% input$ModelsDisML){
-      AncDiscMl$outcorHMM$Ireversible10<- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
+      AncDiscMl$outcorHMM$Ireversible10<- corHMM(treeDisML(),SppData,node.states=input$typeDisML[1],
                                                      rate.cat=1,rate.mat=matrix(c(NA,1,0,NA),2,2),root.p=c(0.5,0.5))}
   }
   
@@ -203,7 +229,7 @@ observeEvent(input$RunAnalyDisML ,{
     
     for (i in num){
       
-      AncDiscMl$outcorHMM$x <- corHMM(treeInput(),SppData,node.states=input$typeDisML[1],
+      AncDiscMl$outcorHMM$x <- corHMM(treeDisML(),SppData,node.states=input$typeDisML[1],
                                           rate.cat=1,rate.mat=AncDiscMl$multiStatesModels[[i]])
       names(AncDiscMl$outcorHMM)[length(AncDiscMl$outcorHMM)] <- names(AncDiscMl$multiStatesModels)[i]
       
@@ -285,7 +311,7 @@ observeEvent(input$RunModAverDisML,{
   for (i in 1:length(toAverage)){
     
     if (input$typeDisML == 'joint'){
-      AncDiscMl$w.perNode$x <- to.matrix(AncDiscMl$outcorHMM[[toAverage[i]]]$states,1:length(levels(SelectedVarDisc()))) * (AncDiscMl$AICw[i,])
+      AncDiscMl$w.perNode$x <- to.matrix(AncDiscMl$outcorHMM[[toAverage[i]]]$states,1:length(levels(DataDisML()))) * (AncDiscMl$AICw[i,])
     }else{
       AncDiscMl$w.perNode$x <- AncDiscMl$outcorHMM[[toAverage[i]]]$states * (AncDiscMl$AICw[i,])
     }
@@ -300,7 +326,7 @@ observeEvent(input$RunModAverDisML,{
   # Calcualte the mean per character
   AncDiscMl$modelAverage <- apply( arr, 1:2, sum )
   
-  colnames(AncDiscMl$modelAverage) <- levels(SelectedVarDisc())
+  colnames(AncDiscMl$modelAverage) <- levels(DataDisML())
   
 })
 
@@ -321,13 +347,13 @@ widthDisML <- reactive(input$PlotWidthDisML[1])
 #plot phylogeny: Disc Char
 output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
   
-  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(DataDisML())))
   
-  DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
+  DisCols <- setNames(DisColPal,levels(DataDisML()))
   
   if (input$RunAnalyDisML == 1 ){
     if (input$plotModelDisML == 'ModelAverage'){
-      legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+      legend('topright',legend = levels(DataDisML()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
       
       pieDiscML <- AncDiscMl$modelAverage
       
@@ -340,9 +366,9 @@ output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
         }
       }
       
-      plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
+      plotTree.datamatrix(treeDisML(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
       
-      legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+      legend('topright',legend = levels(DataDisML()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
       
       nodelabels(pie=pieDiscML,piecol=DisCols,cex=0.5)
       
@@ -355,7 +381,7 @@ output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
       
       
       if (input$typeDisML == 'joint'){
-        pieDiscML <- to.matrix(AncDiscMl$outcorHMM[[Dimod[1]]]$states,1:length(levels(SelectedVarDisc())))
+        pieDiscML <- to.matrix(AncDiscMl$outcorHMM[[Dimod[1]]]$states,1:length(levels(DataDisML())))
       }else{
         pieDiscML <- AncDiscMl$outcorHMM[[Dimod[1]]]$states
       }
@@ -370,9 +396,9 @@ output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
       }
       
       if (length(Dimod) > 0){
-        plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
+        plotTree.datamatrix(treeDisML(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
         
-        legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+        legend('topright',legend = levels(DataDisML()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
         
         nodelabels(pie=pieDiscML,piecol=DisCols,cex=0.5)
       }
@@ -382,9 +408,9 @@ output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
   }else {
 
     
-    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
+    plotTree.datamatrix(treeDisML(),as.data.frame(AncDiscMl$setCharacterML),colors=list(DisCols),header=FALSE,fsize=input$tipSizeDisML[1],lwd = 0.8)
     
-    legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+    legend('topright',legend = levels(DataDisML()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     
   }
   
@@ -431,7 +457,7 @@ observeEvent(input$ModelsDisML,{
         
         for (i in 1:length(input$SetModAverDisML)){
           
-          plot(as.Qmatrix.corhmm(AncDiscMl$outcorHMM[[Dimod[i]]],SelectedVarDisc()),main= input$SetModAverDisML[i],show.zeros=FALSE)
+          plot(as.Qmatrix.corhmm(AncDiscMl$outcorHMM[[Dimod[i]]],DataDisML()),main= input$SetModAverDisML[i],show.zeros=FALSE)
           
         }
         
@@ -441,7 +467,7 @@ observeEvent(input$ModelsDisML,{
         Dimod <-which(names(AncDiscMl$outcorHMM) == input$plotModelDisML)
         
         if (length(Dimod) > 0){
-          plot(as.Qmatrix.corhmm(AncDiscMl$outcorHMM[[Dimod]],SelectedVarDisc()),main= input$plotModelDisML[1],show.zeros=FALSE)
+          plot(as.Qmatrix.corhmm(AncDiscMl$outcorHMM[[Dimod]],DataDisML()),main= input$plotModelDisML[1],show.zeros=FALSE)
         }
       }
       
@@ -453,14 +479,14 @@ observeEvent(input$ModelsDisML,{
         par(mfrow = c(part,2),mar=c(1,1,1,1))
         
         for (i in 1:length(AncDiscMl$multiStatesModels)){
-          plot(as.Qmatrix.matrix(AncDiscMl$multiStatesModels[[i]],SelectedVarDisc()),main= names(AncDiscMl$multiStatesModels)[i],show.zeros=FALSE)
+          plot(as.Qmatrix.matrix(AncDiscMl$multiStatesModels[[i]],DataDisML()),main= names(AncDiscMl$multiStatesModels)[i],show.zeros=FALSE)
         }
       }else{
         par(mfrow = c(1,1),mar=c(1,1,1,1))
         
         for (i in 1:length(AncDiscMl$multiStatesModels)){
           
-          plot(as.Qmatrix.matrix(AncDiscMl$multiStatesModels[[i]],SelectedVarDisc()),main= names(AncDiscMl$multiStatesModels)[i],show.zeros=FALSE)
+          plot(as.Qmatrix.matrix(AncDiscMl$multiStatesModels[[i]],DataDisML()),main= names(AncDiscMl$multiStatesModels)[i],show.zeros=FALSE)
         }
       }
     }

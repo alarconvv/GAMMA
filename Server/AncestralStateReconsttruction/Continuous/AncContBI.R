@@ -2,25 +2,58 @@
 #     Continuous Character : Stochastic Mapping
 ##############################################################################
 
+#Render print in Info panel: BI Analysis
+#
+output$infoPanelContinuousBI <- renderPrint({
+  if (!is.null(AncContBI$objectContinuousBI)) {
+    print(AncContBI$objectContinuousBI)
+  }
+})
+
+
 # Temporal value
 #
 AncContBI <- reactiveValues()
 AncContBI$objectContinuousBI <- NULL
 AncContBI$pp <- NULL
 AncContBI$pot <-NULL
-#AncContBI$setCharacterContBI <- NULL
+AncContBI$setCharacterContBI <- NULL
+
+#Tree
+
+treeContBI <- eventReactive(c( treeInput()),{
+  validate(
+    need(try(treeInput()), "Please select a tree")
+  )
+  treeInput()
+}
+)
+
+
+#Tree
+
+DataContBI <- eventReactive(c( SelectedVar()),{
+  validate(
+    need(try(c(SelectedVar())), "Please select a data set")
+  )
+  SelectedVar()
+}
+)
+
+
+
+
 
 # set character
-observeEvent(c(SelectedVar(),
-               input$dataVar != 'Select'),{
-  AncContBI$setCharacterContBI <- setNames(SelectedVar(),row.names(CharInput()))
+observeEvent(DataContBI(),{
+  
+  AncContBI$setCharacterContBI <- setNames(DataContBI(),row.names(CharInput()))
 })
 
 #Covariance matrix 
 #
-phyloVCV <- eventReactive(c(SelectedVar(),
-                            input$dataVar != 'Select'), {
-  phyl.vcv(as.matrix(AncContBI$setCharacterContBI),vcv(treeInput()),1)
+phyloVCV <- eventReactive(DataContBI(), {
+  phyl.vcv(as.matrix(AncContBI$setCharacterContBI),vcv(treeContBI()),1)
 })
 
 
@@ -30,21 +63,15 @@ observeEvent(phyloVCV(), {
   costmat$cost <- list()
   costmat$cost$sig2 <- phyloVCV()$R[1, 1]
   costmat$cost$a <- phyloVCV()$alpha
-  costmat$cost$y <- rep(costmat$cost$a, treeInput()$Nnode - 1)
-  costmat$cost$pr.mean <- c(1000,rep(0, treeInput()$Nnode))
-  costmat$cost$pr.var <- c(costmat$cost$pr.mean[1]^2, rep(1000, treeInput()$Nnode))
-  costmat$cost$prop <- rep(0.01 * max(phyloVCV()$C) * costmat$cost$sig2, treeInput()$Nnode + 1)
+  costmat$cost$y <- rep(costmat$cost$a, treeContBI()$Nnode - 1)
+  costmat$cost$pr.mean <- c(1000,rep(0, treeContBI()$Nnode))
+  costmat$cost$pr.var <- c(costmat$cost$pr.mean[1]^2, rep(1000, treeContBI()$Nnode))
+  costmat$cost$prop <- rep(0.01 * max(phyloVCV()$C) * costmat$cost$sig2, treeContBI()$Nnode + 1)
   costmat$cost$sample <- 100
   })
 
 
-#Render print in Info panel: BI Analysis
-#
-output$infoPanelContinuousBI <- renderPrint({
-  if (!is.null(AncContBI$objectContinuousBI)) {
-    print(AncContBI$objectContinuousBI)
-  }
-})
+
 
 
 #Temporal object ro print in info panel
@@ -83,11 +110,11 @@ observeEvent(input$runAncBI,{
                  incProgress(1/2)
               
                    if (input$parametersBI == 'defaultBI') {
-          AncContBI$mcmcBI <-      anc.Bayes(tree = treeInput(),
+          AncContBI$mcmcBI <-      anc.Bayes(tree = treeContBI(),
                                x = AncContBI$setCharacterContBI,
                                ngen = as.numeric(input$ngenBI[1]))
                    } else {
-                     AncContBI$mcmcBI <-  anc.Bayes(tree = treeInput(),
+                     AncContBI$mcmcBI <-  anc.Bayes(tree = treeContBI(),
                                x = AncContBI$setCharacterContBI,
                                ngen = as.numeric(input$ngenBI[1]),
                                control = costmat$cost)
@@ -131,6 +158,7 @@ widthContBI <- reactive(input$PlotWidthContBI[1])
 #Plot stochastic mapping state output
 
 output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
+  req(treeContBI())
   if (input$runAncBI == 1) {
     if(input$phenogramBI == 1){
       matrix1 <- AncContBI$mcmcBI$mcmc[floor(0.2 * nrow(AncContBI$mcmcBI$mcmc)):nrow(AncContBI$mcmcBI$mcmc), c(4:length(colnames(AncContBI$mcmcBI$mcmc)) - 1)]
@@ -147,8 +175,8 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
           cex.main= 1.2,
           family="sans")
       
-      tree <- paintSubTree(tree = as.phylo(treeInput()), 
-                           node = length(treeInput()$tip) + 1, "1")
+      tree <- paintSubTree(tree = as.phylo(treeContBI()), 
+                           node = length(treeContBI()$tip) + 1, "1")
       trans <- as.character(floor(0:26/2)) #make transparent lines
       trans[as.numeric(trans) < 10] <- paste("0", trans[as.numeric(trans) < 10], sep = "")
       for (i in 0:50) { #Plot every line or interval
@@ -161,7 +189,7 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
       phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI, estimates),
                 add = TRUE, colors = "white",lwd= 1.5) # The mean 
     }else{
-  plot5 <- contMap(tree = treeInput(),
+  plot5 <- contMap(tree = treeContBI(),
                    x = AncContBI$setCharacterContBI,
                    method = 'user', show.tip.label = T,
                    anc.states = estimatesBI(),
@@ -183,7 +211,7 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
   
   }else {
 
-  plot.phylo(x = treeInput(),
+  plot.phylo(x = treeContBI(),
              show.tip.label = T,
              cex = input$tipSizeContBI[1],
              use.edge.length = T,edge.width = 0.8,edge.color = 'grey40')
@@ -220,7 +248,7 @@ observeEvent(c(input$phenogramBI==0, input$plot_click, input$runAncBI),{
 #Temporal object to print in info panel
 #info: Plotting nodes
 #
-observeEvent(length(input$plotNodesBI)>0,{
+observeEvent(input$plotNodesBI,{
   AncContBI$objectContinuousBI <- c('Ploting posterior probabilities for' , paste('node:',input$plotNodesBI) )
 })
 

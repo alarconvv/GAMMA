@@ -21,9 +21,9 @@ output$objects <- renderPrint( {
   if (!is.null(AncData$clss)){
     if (AncData$clss == 'data.frame' || AncData$clss == 'matrix' || AncData$clss == 'table') {
       head(AncData$data, 10L)
-    } else {
-      print(AncData$data)
-    }
+    } 
+  }else {
+    print(AncData$data)
   }
 }
 )
@@ -39,27 +39,63 @@ observeEvent(!is.null(input$seed),{
 
 # Read phylogeny
 #
+# treeInput <- eventReactive(input$importTree, {
+#   
+#   if (input$tree == 'examp') {
+#     readRDS(file = 'data/anoleTree.RDS')
+#   } else if (input$tree == 'treeFile') {
+#     if (input$format =='Nexus'){
+#       read.nexus(file = input$fileTree$datapath)
+#     } else if (input$format == 'Newick'){
+#       read.tree(file = input$fileTree$datapath)
+#     }
+#   } else {  validate(
+#     need(try(input$importTree), "Please select a data set")
+#   )
+#     c('You should choose a tree')
+#   }
+# }
+# )
+
 treeInput <- eventReactive(input$importTree, {
+  
   if (input$tree == 'examp') {
     readRDS(file = 'data/anoleTree.RDS')
-  } else if (input$tree == 'treeFile') {
-    if (input$format =='Nexus'){
+  } else if (input$tree == 'treeFile' ) {
+    
+    validate(
+      need(try(input$fileTree$datapath), "Please, select a tree ")
+    )
+    
+    con <- file(input$fileTree$datapath,"r")
+    first_line <- readLines(con,n=2)
+    findNexus <-grep(pattern = '#NEXUS|#Nexus|#nexus',x = first_line )
+    close(con)
+    if(length(findNexus) == 1){
       read.nexus(file = input$fileTree$datapath)
-    } else if (input$format == 'Newick'){
+    }else{
       read.tree(file = input$fileTree$datapath)
     }
-  } else {
-    c('You should choose a tree')
+    
   }
+       
+      
 }
 )
+
+
+
+
 
 
 #Temporal object to print in info panel
 # info: tree
 observeEvent(input$importTree, {
-  AncData$data <- treeInput()
-  AncData$clss <- class(x = AncData$data)
+  if(input$tree != 'select'){
+    AncData$data <- treeInput()
+  }else{
+    AncData$data <- c('Please, select a tree')
+  }
 })
 
 
@@ -69,10 +105,13 @@ CharInput <- eventReactive(input$importCSV, {
   if (input$csvData == 'exampCSV'){
     readRDS(file = 'data/anoleData.RDS')
   } else if (input$csvData == 'DataFile'){
+    
+    validate(
+      need(try(input$fileCSV$datapath),"Please, select a data set ")
+    )
+    
     read.csv(file = input$fileCSV$datapath,header = T, row.names = 1)
-  } else {
-    c('You should select data' )
-  }
+  } 
 })
 
 # tooltip message('Please, be sure that CSV data has headers such as "Species", name.Character1, name.Character2, ... etc')
@@ -82,8 +121,13 @@ CharInput <- eventReactive(input$importCSV, {
 #info: dataframe with characters
 #
 observeEvent(input$importCSV, {
+if(input$csvData != 'select'){
   AncData$data <- CharInput()
   AncData$clss <- class(x = AncData$data)
+}else if(is.null(input$fileCSV$datapath) | input$csvData == 'select'){
+  AncData$data <- c('Please, select a data set')
+}
+
 })
 
 
@@ -115,10 +159,8 @@ heightDt <- reactive(input$PlotHeightDt[1])
 widthDt <- reactive(input$PlotWidthDt[1])
 
 output$PhyloPlot <- renderPlot( height = heightDt  , width = widthDt,{
-  
-  if(is.null(treeInput())){
-    return()
-  }
+  req(treeInput())
+
 
     rawPhylo <-plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
                cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType,
@@ -174,8 +216,7 @@ observeEvent(CharInput(), {
 
 #Classify character in their different types
 #
-ClassCol <- eventReactive(c(input$dataVar,
-                            !is.null(input$dataVar)), {
+ClassCol <- eventReactive(input$dataVar, {
   if (class(CharInput()[,which(colnames(CharInput()) == input$dataVar)]) == 'numeric') {
     c('Numerical class. Please, confirm how to analyze it: as a Discrete or a Contiuous character')
   } else if (class(CharInput()[,which(colnames(CharInput())== input$dataVar)])== 'factor') {
@@ -196,7 +237,7 @@ observe( {
 })
 
 
-#Confirming the type of selected column
+#Confirm the type of selected column
 ConfirmClassCol <- eventReactive(input$typeChar, {
   if (input$typeChar == 'Continuous') {
     c('CONTINUOUS character. Data successfully loaded. Please, go to Analysis tab')
@@ -223,6 +264,7 @@ observe( {
 
 
 SelectedVar <- eventReactive(c(input$typeChar == 'Continuous', input$dataVar != 'Select'), {
+  shiny::req(input$dataVar != 'Select' | !is.null(input$dataVar))
     as.numeric(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
   })
 
@@ -231,6 +273,7 @@ SelectedVar <- eventReactive(c(input$typeChar == 'Continuous', input$dataVar != 
 #
 
   SelectedVarDisc <- eventReactive(c(input$typeChar == 'Discrete', input$dataVar != 'Select'), {
+    shiny::req(input$dataVar != 'Select' | !is.null(input$dataVar))
       as.factor(CharInput()[, which(colnames(CharInput()) == input$dataVar)])
   })
 

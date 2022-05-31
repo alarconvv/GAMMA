@@ -27,11 +27,29 @@ AncDiscreteBI$burnin <- NULL
 AncDiscreteBI$Priorpar <- NULL
 AncDiscreteBI$vQ <- NULL
 AncDiscreteBI$Density <- NULL
-#AncDiscreteBI$setCharacter <- NULL
-# AncDiscreteBI$nStatesBI <- NULL
-# AncDiscreteBI$levelsStatesBI <- NULL
+AncDiscreteBI$setCharacter <- NULL
 
 
+
+#Tree
+
+treeDisBI  <- eventReactive(c( treeInput()),{
+  validate(
+    need(try(treeInput()), "Please select a tree")
+  )
+  treeInput()
+}
+)
+
+#Tree
+
+DataDisBI  <- eventReactive(c(SelectedVarDisc()),{
+  validate(
+    need(try(SelectedVarDisc()), "Please select a data set")
+  )
+  SelectedVarDisc()
+}
+)
 
 
 
@@ -39,18 +57,21 @@ AncDiscreteBI$Density <- NULL
 # 
 
 
-nStatesBI <- eventReactive(c(SelectedVarDisc(),
-                             input$dataVar != 'Select'),{length(levels(SelectedVarDisc()))})
+nStatesBI <- eventReactive(c(DataDisBI()),{length(levels(DataDisBI()))})
 
+
+# set character
+observeEvent(DataDisBI(),{
+  AncDiscreteBI$setCharacter <- setNames(DataDisBI(),row.names(CharInput()))
+})
 
 
 
 # Update selectInput to the models which are depending on the number of states
 # 
-observeEvent(c(SelectedVarDisc(),
-               input$dataVar != 'Select'), {
+observeEvent(c(DataDisBI()), {
  
-   AncDiscreteBI$setCharacter <- setNames(SelectedVarDisc(),row.names(CharInput()))
+  
   
 if (nStatesBI()[1] == 2) {
   # update model list
@@ -73,14 +94,14 @@ if (nStatesBI()[1] == 2) {
 observeEvent(!is.null(input$ModelsDisBI),{ 
   
   AncDiscreteBI$matrix0 <- matrix(data = as.integer(0), nrow = nStatesBI()[1], ncol = nStatesBI()[1], 
-                                           dimnames = list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
+                                           dimnames = list(levels(DataDisBI()),levels(DataDisBI())))
 
   # Create ER model
   # 
   if (input$ModelsDisBI == 'ER') {
     AncDiscreteBI$modelMatrixBI <- AncDiscreteBI$matrix0 # assign a 0 matrices to create a model
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)] <- 1 # only 1 type of rate
     AncDiscreteBI$modelMatrixBI[upper.tri(AncDiscreteBI$modelMatrixBI)] <- 1
     names(AncDiscreteBI$modelMatrixBI) <- 'ER'
@@ -89,8 +110,8 @@ observeEvent(!is.null(input$ModelsDisBI),{
   # 
   if (input$ModelsDisBI == 'ARD') {
     AncDiscreteBI$modelMatrixBI <- AncDiscreteBI$matrix0 # assign a 0 matrices to create a model
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)] <- 2 # 2 type of rates
     AncDiscreteBI$modelMatrixBI[upper.tri(AncDiscreteBI$modelMatrixBI)] <- 1
     names(AncDiscreteBI$modelMatrixBI) <- 'ARD'
@@ -99,8 +120,8 @@ observeEvent(!is.null(input$ModelsDisBI),{
   # 
   if (input$ModelsDisBI == 'Ireversible01') {
     AncDiscreteBI$modelMatrixBI <- AncDiscreteBI$matrix0 # assign a 0 matrices to create a model
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)] <- 1 # only 1 type of rate
     AncDiscreteBI$modelMatrixBI[upper.tri(AncDiscreteBI$modelMatrixBI)] <- 0
     names(AncDiscreteBI$modelMatrixBI) <- 'Ireversible01'
@@ -109,8 +130,8 @@ observeEvent(!is.null(input$ModelsDisBI),{
   # 
   if (input$ModelsDisBI == 'Ireversible10') {
     AncDiscreteBI$modelMatrixBI <- AncDiscreteBI$matrix0 # assign a 0 matrices to create a model
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)] <- 0 # only 1 type of rate
     AncDiscreteBI$modelMatrixBI[upper.tri(AncDiscreteBI$modelMatrixBI)] <- 1
     names(AncDiscreteBI$modelMatrixBI) <- 'Ireversible10'
@@ -119,8 +140,8 @@ observeEvent(!is.null(input$ModelsDisBI),{
   # 
   if (input$ModelsDisBI == 'SYM') {
     AncDiscreteBI$modelMatrixBI <- AncDiscreteBI$matrix0 # assign a 0 matrices to create a model
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     #Different rate per each pair 
     AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)] <- 1:length(AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)])
     AncDiscreteBI$modelMatrixBI[upper.tri(AncDiscreteBI$modelMatrixBI)] <- 1:length(AncDiscreteBI$modelMatrixBI[lower.tri(AncDiscreteBI$modelMatrixBI)])
@@ -146,8 +167,8 @@ observeEvent(!is.null(input$ModelsDisBI),{
   observeEvent(input$SubmAddModelBI > 0, {
     # # Submit new model
     AncDiscreteBI$modelMatrixBI <- hot_to_r(input$costuModelBI) # get values from costumi table
-    row.names(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc()) # assign name states
-    colnames(AncDiscreteBI$modelMatrixBI) <- levels(SelectedVarDisc())
+    row.names(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI()) # assign name states
+    colnames(AncDiscreteBI$modelMatrixBI) <- levels(DataDisBI())
     # # Name new model
      names(AncDiscreteBI$modelMatrixBI) <- 'UserModel'
      
@@ -168,7 +189,7 @@ observeEvent(!is.null(AncDiscreteBI$modelMatrixBI),{
 #
 observeEvent(input$QmatrixBI != 'select', {
   AncDiscreteBI$matrix1 <- matrix(data = NA, nrow = nStatesBI()[1], ncol = nStatesBI()[1],
-                                  dimnames = list(levels(SelectedVarDisc()),levels(SelectedVarDisc())))
+                                  dimnames = list(levels(DataDisBI()),levels(DataDisBI())))
   AncDiscreteBI$matrix1[lower.tri(AncDiscreteBI$matrix1)] <- as.numeric(0.5)
   AncDiscreteBI$matrix1[upper.tri(AncDiscreteBI$matrix1)] <- as.numeric(0.5)
 
@@ -186,8 +207,8 @@ observeEvent(input$QmatrixBI != 'select', {
 #
 observeEvent(input$SubmQmatBI > 0,{
 AncDiscreteBI$QmatrixPar <-  hot_to_r(input$putitamatrix)
-row.names(AncDiscreteBI$QmatrixPar) <- levels(SelectedVarDisc()) # assign name states
-colnames(AncDiscreteBI$QmatrixPar) <- levels(SelectedVarDisc())
+row.names(AncDiscreteBI$QmatrixPar) <- levels(DataDisBI()) # assign name states
+colnames(AncDiscreteBI$QmatrixPar) <- levels(DataDisBI())
 diag(AncDiscreteBI$QmatrixPar) <- -rowSums(AncDiscreteBI$QmatrixPar,na.rm = TRUE)# get values from costumizable table
 })
 
@@ -203,7 +224,7 @@ observeEvent(!is.null(AncDiscreteBI$QmatrixPar),{
 #
 observeEvent(input$piBI != 'select', {
   AncDiscreteBI$matrix2 <- matrix(data = NA, nrow = 1, ncol = nStatesBI()[1],
-                                  dimnames = list('Pi prob.',levels(SelectedVarDisc())))
+                                  dimnames = list('Pi prob.',levels(DataDisBI())))
   AncDiscreteBI$matrix2[1,] <- as.numeric(1/nStatesBI()[1])
  if (input$piBI == 'costumPiDiscBI') {
     AncDiscreteBI$PiprobBI <- NULL
@@ -426,7 +447,7 @@ observeEvent(!is.null(AncDiscreteBI$vQ),{
 observeEvent(input$RunAnalyDisBI > 0,{
   
   if(input$mcmcParDisBI == 'costummcmcDisBI') {
-    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
+    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeDisBI(),
                                              x = AncDiscreteBI$setCharacter, 
                                              model = AncDiscreteBI$modelMatrixBI,
                                              nsim = AncDiscreteBI$nsim,
@@ -437,7 +458,7 @@ observeEvent(input$RunAnalyDisBI > 0,{
                                              prior = AncDiscreteBI$Priorpar,
                                              vQ= AncDiscreteBI$vQ)
   }else{
-    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeInput(),
+    AncDiscreteBI$outputDisBI <- make.simmap(tree = treeDisBI(),
                                              x = AncDiscreteBI$setCharacter, 
                                              model = AncDiscreteBI$modelMatrixBI,
                                              nsim = AncDiscreteBI$nsim,
@@ -509,18 +530,18 @@ output$PhyloPlot10 <- renderPlot({
       DisCols <- setNames(DisColPal,levels(AncDiscreteBI$setCharacter))
       
       plot(object,colors = DisCols, fsize = 0.7,ftype = "i")
-      legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+      legend('topright',legend = levels(DataDisBI()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     }
     
 
   }else {
-    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(SelectedVarDisc())))
+    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(DataDisBI())))
 
-    DisCols <- setNames(DisColPal,levels(SelectedVarDisc()))
+    DisCols <- setNames(DisColPal,levels(DataDisBI()))
 
-    plotTree.datamatrix(treeInput(),as.data.frame(AncDiscreteBI$setCharacter),colors=list(DisCols),header=FALSE,fsize=0.45)
+    plotTree.datamatrix(treeDisBI(),as.data.frame(AncDiscreteBI$setCharacter),colors=list(DisCols),header=FALSE,fsize=0.45)
 
-    legend('topright',legend = levels(SelectedVarDisc()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
+    legend('topright',legend = levels(DataDisBI()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
   }
 })
 

@@ -2,33 +2,66 @@
 #     Continuous Character : Maximum likelihood
 ##############################################################################
 
+#Render print in Info panel: ML Analysis
+#
+output$infoPanelContinuousML <- renderPrint( {
+  if (!is.null(AncContMl$objetContinuousML)) {
+    print(AncContMl$objetContinuousML)
+  }
+})
+
+
+
 
 # Temporal value
 #
 AncContMl <- reactiveValues()
 AncContMl$objetContinuousML <- NULL
 AncContMl$Models <- NULL
-#AncContMl$setCharacterContMl <-NULL
+AncContMl$setCharacterContMl <-NULL
+
+#Tree
+
+treeContML <- eventReactive(c( treeInput()),{
+  validate(
+    need(try(c(treeInput())), "Please select a tree")
+  )
+  treeInput()
+}
+)
+
+#Data
+
+DataContML <- eventReactive(c( SelectedVar()),{
+  validate(
+    need(try(c(SelectedVar())), "Please select a data set")
+  )
+  SelectedVar()
+}
+)
+
+
+
+
 
 
 # Transform character
 # 
-transform <- eventReactive(c(input$transform1,
-                             SelectedVar(),
-                             input$dataVar != 'Select'), {
+transform <- eventReactive(c(DataContML(),input$transform1), {
+  
   if (input$transform1 == 'ln') {
-    log(SelectedVar())
+    log(DataContML())
   } else if (input$transform1 == 'log10') {
-    log(SelectedVar(), 10)
+    log(DataContML(), 10)
   } else if (input$transform1 == 'squareRoot') {
-    sqrt(SelectedVar())
+    sqrt(DataContML())
   } else if (input$transform1 == 'cubeRoot') {
-    SelectedVar()^(1/3)
+    DataContML()^(1/3)
   } else if (input$transform1 == 'Reciprocal') {
-    1/SelectedVar()
+    1/DataContML()
   } else if (input$transform1 == 'exp1') {
-    exp(SelectedVar())
-  } else {SelectedVar()
+    exp(DataContML())
+  } else {DataContML()
   }
   
 })
@@ -36,17 +69,20 @@ transform <- eventReactive(c(input$transform1,
 
 # set character
 observeEvent(transform(),{
+  
   AncContMl$setCharacterContMl <- setNames(transform(), row.names(CharInput()))
   
 })
 
-#Render print in Info panel: ML Analysis
+#Temporal object to print in info panel
+# info: output per every model run
 #
-output$infoPanelContinuousML <- renderPrint( {
-  if (!is.null(AncContMl$objetContinuousML)) {
-    print(AncContMl$objetContinuousML)
-    }
-  })
+observeEvent(input$transform1, {
+  if(!is.null(transform())){
+    AncContMl$objetContinuousML <- transform()
+  }
+})
+
 
 
 
@@ -57,23 +93,26 @@ heightContMl <- reactive(input$PlotHeightContMl[1])
 widthContMl <- reactive(input$PlotWidthContMl[1])
 
 output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
-  if(input$runAncML >0 & input$ResetConMl == 0){
+
+  req(treeContML())
+  
+  if(input$runAncML >0 & !is.null(AncContMl$Models)){
   if (input$phenogramML == 1) {
     if (input$mapModelMl == 'BM') {
-      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+      phenogram(tree = treeContML(), #as.phylo method to plot in black color
                 x =  c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40' )
       
     } else if (input$mapModelMl == 'EB') {
-      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+      phenogram(tree = treeContML(), #as.phylo method to plot in black color
                 x =  c(AncContMl$setCharacterContMl,AncContMl$Models$EB$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40')
     } else if (input$mapModelMl == 'OU') {
-      phenogram(tree = treeInput(), #as.phylo method to plot in black color
+      phenogram(tree = treeContML(), #as.phylo method to plot in black color
                 x =  c(AncContMl$setCharacterContMl,AncContMl$Models$OU$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
@@ -82,7 +121,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   }else{
   
   if (input$mapModelMl == 'BM') {
-    plotBM <- contMap(tree = treeInput(),
+    plotBM <- contMap(tree = treeContML(),
                       x = AncContMl$setCharacterContMl,
                       method = 'user',
                       anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
@@ -93,20 +132,20 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
     plotBM$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
     plot(plotBM, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
-    plotEB <- contMap(tree = treeInput(), 
-                      x = setNames(transform(),row.names(CharInput())),
+    plotEB <- contMap(tree = treeContML(), 
+                      x = AncContMl$setCharacterContMl,
                       method = 'user',
-                      anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$EB$ace),
+                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$EB$ace),
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotEB$cols)
     plotEB$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
     plot(plotEB, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
-    plotOU <- contMap(tree = treeInput(), 
-                      x = setNames(transform(),row.names(CharInput())),
+    plotOU <- contMap(tree = treeContML(), 
+                      x = AncContMl$setCharacterContMl,
                       method = 'user',
-                      anc.states = c(setNames(transform(),row.names(CharInput())),AncContMl$Models$OU$ace),
+                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$OU$ace),
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotOU$cols)
@@ -115,7 +154,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   }
     } 
   }else  {
-      plot.phylo(x = treeInput(),
+      plot.phylo(x = treeContML(),
                  show.tip.label = T,
                  cex = input$tipSizeContMl[1],
                  use.edge.length = T,edge.width = 0.8,edge.color = 'grey40')
@@ -134,7 +173,7 @@ output$histo1 <- renderPlot( {
   
   if (input$AncPIC == 1) { #if PIC is required just for visualized, it is not taken into account for analysing
    
-    h <- hist(x =  pic(x = transform(), phy = treeInput()),plot=F)
+    h <- hist(x =  pic(x = transform(), phy = treeContML()),plot=F)
 
     par(adj=0.5,
         cex.axis=0.9,
@@ -148,15 +187,15 @@ output$histo1 <- renderPlot( {
     
     plot(NA, xlim = xlim , ylim =c(0, max(ylim)*1.1),bty = "n",  las = 1,axes = F,
          main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, 
-         xlab= 'input$dataVar', ylab= ' N Tips' )
+         xlab= input$dataVar, ylab= ' N Tips' )
     
     grid( lty = 2, lwd = 0.3)
     axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
     axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
-    hist(x =  pic(x = transform(), phy = treeInput()), add = TRUE, 
+    hist(x =  pic(x = transform(), phy = treeContML()), add = TRUE, 
          col=make.transparent(color1[1], 0.5), border= make.transparent(color1[1], 0.8) )
     
-    # h <- hist(x = pic(x = transform(), phy = treeInput()),plot=F)
+    # h <- hist(x = pic(x = transform(), phy = treeContML()),plot=F)
     # 
     # par(
     #     cex.axis=0.7,
@@ -169,7 +208,7 @@ output$histo1 <- renderPlot( {
     # grid(10,10, lty = 2, lwd = 0.3)
     # axis(side = 1,xlim = range(h$mids)*1.1, lwd=0, lwd.ticks = .5)
     # axis(side = 2,ylim = c(0, max(h$counts)), lwd=0,lwd.ticks = .5)
-    # hist(x = pic(x = transform(), phy = treeInput()), add = TRUE, border= F,
+    # hist(x = pic(x = transform(), phy = treeContML()), add = TRUE, border= F,
     #      col=color2)
     # box(lwd= 0.5, col= 'grey')
     # 
@@ -190,7 +229,7 @@ output$histo1 <- renderPlot( {
     
     plot(NA, xlim = xlim , ylim =c(0, max(ylim)*1.1),bty = "n",  las = 1,axes = F,
          main= 'Histogram: Phylogenetic Independent Contrasts', sub = NULL, 
-         xlab= 'input$dataVar', ylab= ' N Tips' )
+         xlab= input$dataVar, ylab= ' N Tips' )
     
     grid( lty = 2, lwd = 0.3)
     axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
@@ -225,7 +264,7 @@ output$QQ1 <- renderPlot( {
   color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
 
     if (input$AncPIC == 1) {
-      q <-qqnorm(y = pic(x = transform(), phy = treeInput()),plot=F)
+      q <-qqnorm(y = pic(x = transform(), phy = treeContML()),plot=F)
       par(adj=0.5,
           cex.axis=0.9,
           cex.lab= 1,
@@ -251,7 +290,7 @@ output$QQ1 <- renderPlot( {
     xlim <- range(q$x)
     ylim <- range(q$y)
     plot(q$x, q$y, xlim = xlim, ylim = ylim, cex=1.2,
-         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
+         type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
          col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
     abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
     grid( lty = 2, lwd = 0.3)
@@ -280,36 +319,55 @@ output$QQ1 <- renderPlot( {
 #Fit models: Run Analysis
 #
 observeEvent(input$runAncML, {
+  
+  
+  anc.ML2 <- function(tree, x, maxit = 2000, model = c("BM", "OU", "EB"), ...){
+    tryCatch(phytools::anc.ML(tree, x, maxit = maxit, model = model, ...), 
+             error = function(e) {
+               message('No data in chosen Analysis.', e)
+               # showModal(
+               #   modalDialog(
+               #     title = paste0('Error in',model, ' model'),
+               #     e$message,
+               #     easyClose = TRUE,
+               #     footer = modalButton("Dismiss"))
+               # )
+               showNotification(ui = paste0('Error in',model, ' model:',e$message, e),type = 'error',closeButton = T)
+               return(NULL)
+             })
+  }
 
   withProgress(message = 'Calculation in progress',
                detail = 'This may take a while...', value = 0, {
                
-                 incProgress(1/2)
+                 incProgress(1/4)
             
   
   
   if ( "BM" %in% input$ModelContinuous ) {
-    AncContMl$Models$BM <- anc.ML(tree = treeInput(), 
-                          x = setNames(transform(),row.names(CharInput())), 
+    AncContMl$Models$BM <- anc.ML2(tree = treeContML(), 
+                          x = AncContMl$setCharacterContMl, 
                           maxit = input$maxitBM[1], 
                           model = 'BM')
   }
+                 incProgress(2/4)
   
   if ("EB" %in% input$ModelContinuous) { 
-    AncContMl$Models$EB <- anc.ML(tree = treeInput(),
-                          x =  setNames(transform(),row.names(CharInput())), 
+    AncContMl$Models$EB <- anc.ML2(tree = treeContML(),
+                          x =  AncContMl$setCharacterContMl, 
                           maxit = input$maxitEB[1], 
                           model = 'EB')
   }
+                 incProgress(3/4)
   
   if ("OU" %in% input$ModelContinuous) {
-    AncContMl$Models$OU <- anc.ML(tree = treeInput(),
-                          x = setNames(transform(),row.names(CharInput())),
+    AncContMl$Models$OU <- anc.ML2(tree = treeContML(),
+                          x = AncContMl$setCharacterContMl,
                           maxit = input$maxitOU[1],
                           model = 'OU')
   }
                  
-                 incProgress(2/2)
+                 incProgress(3.5/4)
                  
                  
                })
@@ -365,6 +423,15 @@ output$downloadAnc <- downloadHandler(
     })
 
 observeEvent(input$ResetConMl,{
+
+  reset('mapModelMl')
+  AncContMl$objetContinuousML <- NULL
+  AncContMl$Models <- NULL
+  AncContMl$setCharacterContMl <-NULL
+  
+  treeContML <- NULL
+  
+  DataContML <- NULL
 
   reset('ResetConCharML')
 })
