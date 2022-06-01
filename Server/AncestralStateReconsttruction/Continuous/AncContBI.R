@@ -196,7 +196,7 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
                   plot = FALSE
                   )
   n <- length(plot5$cols)
-  plot5$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
+  plot5$cols[1:n] <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"), bias=1.5)(n)
   plot(plot5, outline = F,lwd =2.5,fsize = input$tipSizeContBI[1])
 
   AncContBI$pp <- get(x = "last_plot.phylo", envir = .PlotPhyloEnv)

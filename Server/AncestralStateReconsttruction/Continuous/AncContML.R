@@ -129,7 +129,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
                       plot = FALSE
                       )
     n <- length(plotBM$cols)
-    plotBM$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
+    plotBM$cols[1:n] <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"), bias=1.5) (n)
     plot(plotBM, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
     plotEB <- contMap(tree = treeContML(), 
@@ -139,7 +139,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotEB$cols)
-    plotEB$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
+    plotEB$cols[1:n] <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"), bias=1.5) (n)
     plot(plotEB, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
     plotOU <- contMap(tree = treeContML(), 
@@ -149,7 +149,7 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotOU$cols)
-    plotOU$cols[1:n] <- paletteer::paletteer_c("grDevices::Purple-Yellow", n)
+    plotOU$cols[1:n] <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"), bias=1.5) (n)
     plot(plotOU, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   }
     } 
@@ -169,7 +169,7 @@ output$histo1 <- renderPlot( {
   # colors1 <-col2rgb(paletteer::paletteer_c("grDevices::Purple-Yellow", 1))
   # color2 <- rgb(red = colors1[1,]/255,green =colors1[2,]/255,blue = colors1[3,]/255,alpha = 0.5)
   
-  color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
+  color1 <- colorRampPalette(c("#128cb0","#ffd004",  "#e52920"), bias=1.5) (10)
   
   if (input$AncPIC == 1) { #if PIC is required just for visualized, it is not taken into account for analysing
    
@@ -261,7 +261,7 @@ output$histo1 <- renderPlot( {
 # 
 output$QQ1 <- renderPlot( {
   
-  color1 <- colorRampPalette(colors = c("mediumpurple","red2"))(2)
+  color1 <- colorRampPalette(c("#128cb0","#ffd004",  "#e52920"), bias=1.5)(10)
 
     if (input$AncPIC == 1) {
       q <-qqnorm(y = pic(x = transform(), phy = treeContML()),plot=F)
@@ -275,7 +275,7 @@ output$QQ1 <- renderPlot( {
       plot(q$x, q$y, xlim = xlim, ylim = ylim, cex=1.2,
            type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'PIC Quantiles',
            col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
-      abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
+      abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[10], 0.8))
       grid( lty = 2, lwd = 0.3)
       axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
       axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
@@ -292,7 +292,7 @@ output$QQ1 <- renderPlot( {
     plot(q$x, q$y, xlim = xlim, ylim = ylim, cex=1.2,
          type = 'p',axes = F,main = 'Normal Q-Q Plot: PIC', sub = NULL, xlab = 'Theoretical Quantiles', ylab = 'Tip Quantiles',
          col=make.transparent(color1[1], 0.8),pch=21,bg=make.transparent(color1[1], 0.2))
-    abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[2], 0.8))
+    abline(lm(q$y ~ q$x),lwd= 0.8, col=make.transparent(color1[10], 0.8))
     grid( lty = 2, lwd = 0.3)
     axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
     axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
@@ -325,14 +325,14 @@ observeEvent(input$runAncML, {
     tryCatch(phytools::anc.ML(tree, x, maxit = maxit, model = model, ...), 
              error = function(e) {
                message('No data in chosen Analysis.', e)
-               # showModal(
-               #   modalDialog(
-               #     title = paste0('Error in',model, ' model'),
-               #     e$message,
-               #     easyClose = TRUE,
-               #     footer = modalButton("Dismiss"))
-               # )
-               showNotification(ui = paste0('Error in',model, ' model:',e$message, e),type = 'error',closeButton = T)
+               showModal(
+                 modalDialog(
+                   title = paste0('Error in',model, ' model'),
+                   e$message,
+                   easyClose = TRUE,
+                   footer = modalButton("Dismiss"))
+               )
+               #showNotification(ui = paste0('Error in',model, ' model:',e$message, e),duration = 7,type = 'error',closeButton = T)
                return(NULL)
              })
   }

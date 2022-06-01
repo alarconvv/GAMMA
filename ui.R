@@ -27,16 +27,16 @@ library(shinyWidgets)
 
 # Define UI for application that draws a histogram
 
-theme <-bs_theme(version = 4, bootswatch = "minty"  )
+theme <-bs_theme(version = 5, bootswatch = "minty", primary = '#128cb0')
 #theme <-'bootstrap.min.css'
 
 shinyUI(
 
   
   
-  navbarPage(title = "GAMMA", theme=theme,
+  navbarPage(title = "Guane", theme=theme,
              tabPanel("Home",
-                      includeHTML("www/home.html")
+                      #includeHTML("www/home.html")
                       ),
              
              navbarMenu("Methods",
