@@ -113,6 +113,8 @@ shinyUI(
                                                                                                                                                 sliderInput("PlotHeightContMl", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)
                                                                                                                                                 ),
                                                                                                                                          column(4,checkboxInput('phenogramML', 'Plot phenogram'),
+                                                                                                                                                conditionalPanel('input.phenogramML == 1',
+                                                                                                                                                                 checkboxInput('phenogramML', 'Plot phenogram')),
                                                                                                                                                 actionButton('PlotEditorML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),

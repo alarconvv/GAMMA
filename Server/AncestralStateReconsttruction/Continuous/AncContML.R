@@ -19,6 +19,9 @@ AncContMl <- reactiveValues()
 AncContMl$objetContinuousML <- NULL
 AncContMl$Models <- NULL
 AncContMl$setCharacterContMl <-NULL
+AncContMl$transform1 <-NULL
+AncContMl$transform2 <-NULL
+
 
 #Tree
 
@@ -49,6 +52,8 @@ DataContML <- eventReactive(c( SelectedVar()),{
 # 
 transform <- eventReactive(c(DataContML(),input$transform1), {
   
+  AncContMl$transform1 <- input$transform1[1]
+  
   if (input$transform1 == 'ln') {
     log(DataContML())
   } else if (input$transform1 == 'log10') {
@@ -64,6 +69,7 @@ transform <- eventReactive(c(DataContML(),input$transform1), {
   } else {DataContML()
   }
   
+  
 })
 
 
@@ -71,6 +77,24 @@ transform <- eventReactive(c(DataContML(),input$transform1), {
 observeEvent(transform(),{
   
   AncContMl$setCharacterContMl <- setNames(transform(), row.names(CharInput()))
+  
+  if(input$runAncML >0 & !is.null(AncContMl$Models)){
+    showModal(   modalDialog(
+      title = 'You have change the transformation type',
+      'Please, re-run the analysis',
+      easyClose = TRUE,
+      footer = modalButton("Dismiss")))
+    
+    AncContMl$objetContinuousML <- NULL
+    AncContMl$Models <- NULL
+    AncContMl$setCharacterContMl <-NULL
+    
+    treeContML <- NULL
+    
+    DataContML <- NULL
+    
+    reset('ResetConCharML')
+  }
   
 })
 
@@ -82,6 +106,7 @@ observeEvent(input$transform1, {
     AncContMl$objetContinuousML <- transform()
   }
 })
+
 
 
 
@@ -100,20 +125,20 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   if (input$phenogramML == 1) {
     if (input$mapModelMl == 'BM') {
       phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
+                x =  c(fixvar(),AncContMl$Models$BM$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40' )
       
     } else if (input$mapModelMl == 'EB') {
       phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$EB$ace),
+                x =  c(fixvar(),AncContMl$Models$EB$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40')
     } else if (input$mapModelMl == 'OU') {
       phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(AncContMl$setCharacterContMl,AncContMl$Models$OU$ace),
+                x =  c(fixvar(),AncContMl$Models$OU$ace),
                 spread.cost = c(1,0), 
                 fsize = input$tipSizeContMl[1],
                 lwd=0.8,colors ='grey40')
@@ -122,9 +147,9 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   
   if (input$mapModelMl == 'BM') {
     plotBM <- contMap(tree = treeContML(),
-                      x = AncContMl$setCharacterContMl,
+                      x = fixvar(),
                       method = 'user',
-                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$BM$ace),
+                      anc.states = c(fixvar(),AncContMl$Models$BM$ace),
                       show.tip.label = T,
                       plot = FALSE
                       )
@@ -133,9 +158,9 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
     plot(plotBM, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'EB') {
     plotEB <- contMap(tree = treeContML(), 
-                      x = AncContMl$setCharacterContMl,
+                      x = fixvar(),
                       method = 'user',
-                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$EB$ace),
+                      anc.states = c(fixvar(),AncContMl$Models$EB$ace),
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotEB$cols)
@@ -143,9 +168,9 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
     plot(plotEB, outline = F,lwd =2.5,fsize = input$tipSizeContMl[1])
   } else if (input$mapModelMl == 'OU') {
     plotOU <- contMap(tree = treeContML(), 
-                      x = AncContMl$setCharacterContMl,
+                      x = fixvar(),
                       method = 'user',
-                      anc.states = c(AncContMl$setCharacterContMl,AncContMl$Models$OU$ace),
+                      anc.states = c(fixvar(),AncContMl$Models$OU$ace),
                       show.tip.label = T,
                       plot = FALSE)
     n <- length(plotOU$cols)
@@ -320,7 +345,7 @@ output$QQ1 <- renderPlot( {
 #
 observeEvent(input$runAncML, {
   
-  
+
   anc.ML2 <- function(tree, x, maxit = 2000, model = c("BM", "OU", "EB"), ...){
     tryCatch(phytools::anc.ML(tree, x, maxit = maxit, model = model, ...), 
              error = function(e) {
@@ -346,7 +371,7 @@ observeEvent(input$runAncML, {
   
   if ( "BM" %in% input$ModelContinuous ) {
     AncContMl$Models$BM <- anc.ML2(tree = treeContML(), 
-                          x = AncContMl$setCharacterContMl, 
+                          x = fixvar(), 
                           maxit = input$maxitBM[1], 
                           model = 'BM')
   }
@@ -354,7 +379,7 @@ observeEvent(input$runAncML, {
   
   if ("EB" %in% input$ModelContinuous) { 
     AncContMl$Models$EB <- anc.ML2(tree = treeContML(),
-                          x =  AncContMl$setCharacterContMl, 
+                          x =  fixvar(), 
                           maxit = input$maxitEB[1], 
                           model = 'EB')
   }
@@ -362,7 +387,7 @@ observeEvent(input$runAncML, {
   
   if ("OU" %in% input$ModelContinuous) {
     AncContMl$Models$OU <- anc.ML2(tree = treeContML(),
-                          x = AncContMl$setCharacterContMl,
+                          x = fixvar(),
                           maxit = input$maxitOU[1],
                           model = 'OU')
   }
@@ -383,6 +408,13 @@ observeEvent(input$runAncML, {
 # 
 observeEvent(input$runAncML, {
   updateSelectInput(session = session, inputId = "mapModelMl", choices = names(AncContMl$Models))
+  
+  
+})
+
+#
+fixvar <- eventReactive(input$runAncML,{
+  AncContMl$setCharacterContMl
 })
 
 
