@@ -161,9 +161,11 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
   req(treeContBI())
   if (input$runAncBI == 1) {
     if(input$phenogramBI == 1){
-      matrix1 <- AncContBI$mcmcBI$mcmc[floor(0.2 * nrow(AncContBI$mcmcBI$mcmc)):nrow(AncContBI$mcmcBI$mcmc), c(4:length(colnames(AncContBI$mcmcBI$mcmc)) - 1)]
+     
+       matrix1 <- AncContBI$mcmcBI$mcmc[floor(0.2 * nrow(AncContBI$mcmcBI$mcmc)):nrow(AncContBI$mcmcBI$mcmc), c(4:length(colnames(AncContBI$mcmcBI$mcmc)) - 1)]
       estimates <- colMeans(matrix1)
       hpd <- matrix(NA,length(colnames(matrix1)), 2) #Estimate intervals todrw in phenogram
+      
       for (i in 1:length(colnames(matrix1))) {
         class(matrix1[, i]) <- 'mcmc'
         hpd[i, 1] <- HPDinterval(matrix1[,i])[1,1]
@@ -182,9 +184,9 @@ output$PhyloPlot4 <- renderPlot(height = heightContBI  , width = widthContBI,{
       for (i in 0:50) { #Plot every line or interval
         p <- i/length(trans)
         phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI,(1 - p) * hpd[, 1] + p * estimates),
-                  colors = make.transparent("mediumpurple", 0.05), add = i > 0, ftype = 'off')
+                  colors = make.transparent("#02b2ce", 0.05), add = i > 0, ftype = 'off')
         phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI, (1 - p) * hpd[, 2] + p * estimates),
-                  colors = make.transparent("mediumpurple", 0.05), add = TRUE)
+                  colors = make.transparent("#02b2ce", 0.05), add = TRUE)
       }
       phenogram(tree = as.phylo(tree), x = c(AncContBI$setCharacterContBI, estimates),
                 add = TRUE, colors = "white",lwd= 1.5) # The mean 
@@ -257,7 +259,6 @@ observeEvent(input$plotNodesBI,{
 #
 output$trace1 <- renderPlot( {
   if (!is.null(input$plotNodesBI)) {
-   # if (length(input$plotNodesBI) > 1) {
       pd <- AncContBI$mcmcBI$mcmc[, c(1,which(colnames(AncContBI$mcmcBI$mcmc) %in% input$plotNodesBI))]
       xlim <- range(pd$gen)
       ylim <- range(pd[, 2:length(pd)])
@@ -271,17 +272,10 @@ output$trace1 <- renderPlot( {
       grid( lty = 2, lwd = 0.3)
       axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
       axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
-      cols <- colorRampPalette(colors = c("mediumpurple","red"))(length(1:length(pd)))
-      for (i in 2:length(pd)) {
-        lines(x = pd$gen, y = pd[,i], col = make.transparent(cols[i], 0.5))
+      cols <- colorRampPalette(colors = c("#02b2ce",  "#e52920"))(length(input$plotNodesBI))
+      for (i in 1:length(input$plotNodesBI)) {
+        lines(x = pd$gen, y = pd[,i+1], col = make.transparent(cols[i], 0.5))
       }
-     # } else {
-      #   plot.anc.Bayes(x = AncContBI$mcmcBI,
-      #                  bty = "l",
-      #                  main = "Likelihood-profile from MCMC",
-      #                  font.main = 3,
-      #                  what = input$plotNodesBI[1])
-      # }
     }
   })
 
@@ -289,8 +283,8 @@ output$trace1 <- renderPlot( {
 #Plot  posterior probabilities per node (Density mcmc plot)
 #
 output$desnsity1 <- renderPlot( {
+
   if (!is.null(input$plotNodesBI)) {
-   # if (length(input$plotNodesBI) > 1) {
       pd <- lapply(input$plotNodesBI,function(nn,mcmc) density(mcmc, what = nn), mcmc = AncContBI$mcmcBI)
       xlim <- exp(range(sapply(pd,function(dd) range(dd$x))))
       ylim <- range(sapply(pd, function(dd) range(dd$y)))
@@ -304,12 +298,9 @@ output$desnsity1 <- renderPlot( {
       grid( lty = 2, lwd = 0.3)
       axis(side = 1, lwd=0.5, lwd.ticks = .5,mgp = c(3, 1, 0))
       axis(side = 2, lwd=0.5,lwd.ticks = .5,las = 2, mgp = c(3, 1, 0.5))
-      cols <- colorRampPalette(colors = c("mediumpurple","red"))(length(input$plotNodesBI))
+      cols2 <- colorRampPalette(colors = c("#02b2ce",  "#e52920"))(length(input$plotNodesBI))
       nulo <- mapply(function(dd,col) polygon(exp(dd$x),dd$y,col = make.transparent(col, 0.2), border = col),
-                     dd = pd, col = cols)
-      # } else {
-      #   plot(density.anc.Bayes(x = AncContBI$mcmcBI, what = input$plotNodesBI[1]), bty = "l", main = "Posterior density", font.main = 3)
-      # }
+                     dd = pd, col = cols2)
     }
   })
 

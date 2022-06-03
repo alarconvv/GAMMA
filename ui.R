@@ -114,7 +114,7 @@ shinyUI(
                                                                                                                                                 ),
                                                                                                                                          column(4,checkboxInput('phenogramML', 'Plot phenogram'),
                                                                                                                                                 conditionalPanel('input.phenogramML == 1',
-                                                                                                                                                                 checkboxInput('phenogramML', 'Plot phenogram')),
+                                                                                                                                                                 checkboxInput('NormalScaleConML', 'Normal scale')),
                                                                                                                                                 actionButton('PlotEditorML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),

@@ -64,15 +64,16 @@ observeEvent(DataDisML(),{
 
 
 
-observeEvent(DataDisML(),{
+observeEvent(nStates(),{
   
 
 
-  if ( nStates()[1]== 2){
+  if ( nStates()[1]== 2 | nStates()[1]== 1){
     # update model list
     updateSelectInput(session, "ModelsDisML",
                       choices=c('ER'='ER', 'ARD'='ARD', 'Ireversible01'='Ireversible01','Ireversible10'='Ireversible10'))
-  }else if ( nStates()[1] > 2) {
+    
+  }else{
     # update model list for 3 states
     updateSelectInput(session, "ModelsDisML",
                       choices=c('ER'='ER', 'ARD'='ARD', 'SYM'='SYM'))
@@ -270,7 +271,7 @@ observeEvent(input$DisMLModAIC,{
   
   
   foo<-function(object){
-    setNames(c(attributes(logLik.corhmm(object))$df,logLik.corhmm(object),AIC(object),AICc(object)),
+    setNames(c(attributes(logLik(object))$df,logLik(object),AIC(object),AICc(object)),
              c("df","logLik","AIC","AICc"))
   }
   
@@ -347,7 +348,7 @@ widthDisML <- reactive(input$PlotWidthDisML[1])
 #plot phylogeny: Disc Char
 output$PhyloPlot8 <- renderPlot(height = heightDisML  , width = widthDisML,{
   
-  DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(DataDisML())))
+  DisColPal <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"), bias=1.5)(length(levels(DataDisML()))) 
   
   DisCols <- setNames(DisColPal,levels(DataDisML()))
   

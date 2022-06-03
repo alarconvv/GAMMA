@@ -243,7 +243,7 @@ ConfirmClassCol <- eventReactive(input$typeChar, {
     c('CONTINUOUS character. Data successfully loaded. Please, go to Analysis tab')
   } else if (input$typeChar == 'Discrete') {
     c('DISCRETE character. Data successfully loaded. Please, go to Analysis tab')
-  } else {
+  } else if(input$typeChar == 'Select'){
     c('You should select a Character')
   }
 })

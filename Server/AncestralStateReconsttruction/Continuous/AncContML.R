@@ -44,10 +44,6 @@ DataContML <- eventReactive(c( SelectedVar()),{
 )
 
 
-
-
-
-
 # Transform character
 # 
 transform <- eventReactive(c(DataContML(),input$transform1), {
@@ -85,15 +81,15 @@ observeEvent(transform(),{
       easyClose = TRUE,
       footer = modalButton("Dismiss")))
     
-    AncContMl$objetContinuousML <- NULL
-    AncContMl$Models <- NULL
-    AncContMl$setCharacterContMl <-NULL
-    
-    treeContML <- NULL
-    
-    DataContML <- NULL
-    
-    reset('ResetConCharML')
+    # AncContMl$objetContinuousML <- NULL
+    # AncContMl$Models <- NULL
+    # AncContMl$setCharacterContMl <-NULL
+    # 
+    # treeContML <- NULL
+    # 
+    # DataContML <- NULL
+    # 
+    # reset('ResetConCharML')
   }
   
 })
@@ -109,8 +105,6 @@ observeEvent(input$transform1, {
 
 
 
-
-
 #Plot initial tree if models do not have been estimated, otherwise plot model output
 #
 
@@ -123,27 +117,181 @@ output$PhyloPlot2 <- renderPlot(height = heightContMl  , width = widthContMl, {
   
   if(input$runAncML >0 & !is.null(AncContMl$Models)){
   if (input$phenogramML == 1) {
-    if (input$mapModelMl == 'BM') {
-      phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(fixvar(),AncContMl$Models$BM$ace),
-                spread.cost = c(1,0), 
-                fsize = input$tipSizeContMl[1],
-                lwd=0.8,colors ='grey40' )
+    
+    
+    if (input$NormalScaleConML ==1){
       
-    } else if (input$mapModelMl == 'EB') {
-      phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(fixvar(),AncContMl$Models$EB$ace),
-                spread.cost = c(1,0), 
-                fsize = input$tipSizeContMl[1],
-                lwd=0.8,colors ='grey40')
-    } else if (input$mapModelMl == 'OU') {
-      phenogram(tree = treeContML(), #as.phylo method to plot in black color
-                x =  c(fixvar(),AncContMl$Models$OU$ace),
-                spread.cost = c(1,0), 
-                fsize = input$tipSizeContMl[1],
-                lwd=0.8,colors ='grey40')
+      
+      
+      
+      if (input$mapModelMl == 'BM') {
+        
+        if (input$transform1 == 'ln') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  exp(1)^c(fixvar(),AncContMl$Models$BM$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'log10') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  10^c(fixvar(),AncContMl$Models$BM$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'squareRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$BM$ace)^2,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'cubeRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$BM$ace)^3,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'Reciprocal') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  1/c(fixvar(),AncContMl$Models$BM$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'exp1') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  log(c(fixvar(),AncContMl$Models$BM$ace)),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$BM$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        }
+        
+        
+    
+        
+      } else if (input$mapModelMl == 'EB') {
+        if (input$transform1 == 'ln') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  exp(1)^c(fixvar(),AncContMl$Models$EB$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'log10') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  10^c(fixvar(),AncContMl$Models$EB$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'squareRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$EB$ace)^2,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'cubeRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$EB$ace)^3,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'Reciprocal') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  1/c(fixvar(),AncContMl$Models$EB$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'exp1') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  log(c(fixvar(),AncContMl$Models$EB$ace)),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$EB$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        }
+      } else if (input$mapModelMl == 'OU') {
+        if (input$transform1 == 'ln') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  exp(1)^c(fixvar(),AncContMl$Models$OU$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'log10') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  10^c(fixvar(),AncContMl$Models$OU$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'squareRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$OU$ace)^2,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'cubeRoot') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$OU$ace)^3,
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'Reciprocal') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  1/c(fixvar(),AncContMl$Models$OU$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else if (input$transform1 == 'exp1') {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  log(c(fixvar(),AncContMl$Models$OU$ace)),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        } else {
+          phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                    x =  c(fixvar(),AncContMl$Models$OU$ace),
+                    spread.cost = c(1,0), 
+                    fsize = input$tipSizeContMl[1],
+                    lwd=0.8,colors ='grey40' )
+        }
+      }
+      
+
+      
+      
+    }else{
+      if (input$mapModelMl == 'BM') {
+        phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                  x =  c(fixvar(),AncContMl$Models$BM$ace),
+                  spread.cost = c(1,0), 
+                  fsize = input$tipSizeContMl[1],
+                  lwd=0.8,colors ='grey40' )
+        
+      } else if (input$mapModelMl == 'EB') {
+        phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                  x =  c(fixvar(),AncContMl$Models$EB$ace),
+                  spread.cost = c(1,0), 
+                  fsize = input$tipSizeContMl[1],
+                  lwd=0.8,colors ='grey40')
+      } else if (input$mapModelMl == 'OU') {
+        phenogram(tree = treeContML(), #as.phylo method to plot in black color
+                  x =  c(fixvar(),AncContMl$Models$OU$ace),
+                  spread.cost = c(1,0), 
+                  fsize = input$tipSizeContMl[1],
+                  lwd=0.8,colors ='grey40')
+      }
     }
-  }else{
+    
+
+    
+    }else{
   
   if (input$mapModelMl == 'BM') {
     plotBM <- contMap(tree = treeContML(),
@@ -431,8 +579,11 @@ if(!is.null(AncContMl$Models)){
 #Calculate AIC (No keep it, just show it)
 #
 observeEvent(input$MLModAIC,{
-  if(!is.null(AncContMl$Models)){
-  AncContMl$objetContinuousML <- sapply(AncContMl$Models, AIC)}
+  if(!is.null(AncContMl$Models) & input$MLModAIC == 1){
+  AncContMl$objetContinuousML <- sapply(AncContMl$Models, AIC)
+  }else{
+    AncContMl$objetContinuousML <- AncContMl$Models
+  }
 })
 
 
