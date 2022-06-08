@@ -27,16 +27,65 @@ library(shinyWidgets)
 
 # Define UI for application that draws a histogram
 
-theme <-bs_theme(version = 5, bootswatch = "minty", primary = '#128cb0')
+#theme <- bs_theme(version = 5, bootswatch =  "minty",primary = "#0BB48C")
 #theme <-'bootstrap.min.css'
+theme <- bs_theme(version = 5, bootswatch =  "minty", primary = "#0BB48C",secondary = "#C1D9DB",
+  "font-size-base" = "0.9rem", "enable-rounded" = T
+) %>%
+   bs_add_rules(
+     '.navbar:not(.fixed-bottom):not(.navbar-fixed-bottom):not(.navbar-fixed-bottom) {
+    margin-bottom: 0px;}
+     .container, .container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
+         padding-left: 0.1rem;
+         padding-right: 0.1rem;
+     }
+     .navbar-brand { margin-left: 1rem;}
+     
+     .row>* {padding-right: calc(var(--bs-gutter-x) * 0.7);
+    padding-left: calc(var(--bs-gutter-x) * 0.7);}
+    
+    .nav-tabs .nav-link, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs ul.nav.navbar-nav>li>a{
+    margin-left: 0.45rem;
+    margin-top: 0.5rem;
+    }
+     
+     .nav-link, .nav-tabs>li>a, .nav-pills>li>a, ul.nav.navbar-nav>li>a{
+         color: #5a5a5a;
+     }
+     
+     .nav-tabs .nav-link.active, .nav-tabs>li>a.active, .nav-tabs .nav-pills>li>a.active, .nav-tabs ul.nav.navbar-nav>li>a.active, .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item.in .nav-link, .nav-tabs .nav-item.show .nav-tabs>li>a, .nav-tabs .nav-item.in .nav-tabs>li>a, .nav-tabs .nav-item.show .nav-pills>li>a, .nav-tabs .nav-item.in .nav-pills>li>a, .nav-tabs>li.show .nav-link, .nav-tabs>li.in .nav-link, .nav-tabs>li.show .nav-tabs>li>a, .nav-tabs>li.in .nav-tabs>li>a, .nav-tabs>li.show .nav-pills>li>a, .nav-tabs>li.in .nav-pills>li>a, .nav-tabs .nav-pills>li.show .nav-link, .nav-tabs .nav-pills>li.in .nav-link, .nav-tabs .nav-pills>li.show .nav-tabs>li>a, .nav-tabs .nav-pills>li.in .nav-tabs>li>a, .nav-tabs .nav-pills>li.show .nav-pills>li>a, .nav-tabs .nav-pills>li.in .nav-pills>li>a, .nav-tabs .nav-item.show ul.nav.navbar-nav>li>a, .nav-tabs .nav-item.in ul.nav.navbar-nav>li>a, .nav-tabs>li.show ul.nav.navbar-nav>li>a, .nav-tabs>li.in ul.nav.navbar-nav>li>a, .nav-tabs .nav-pills>li.show ul.nav.navbar-nav>li>a, .nav-tabs .nav-pills>li.in ul.nav.navbar-nav>li>a, .nav-tabs ul.nav.navbar-nav>li.show:not(.dropdown) .nav-link, .nav-tabs ul.nav.navbar-nav>li.in:not(.dropdown) .nav-link, .nav-tabs ul.nav.navbar-nav>li.show:not(.dropdown) .nav-tabs>li>a, .nav-tabs ul.nav.navbar-nav>li.in:not(.dropdown) .nav-tabs>li>a, .nav-tabs ul.nav.navbar-nav>li.show:not(.dropdown) .nav-pills>li>a, .nav-tabs ul.nav.navbar-nav>li.in:not(.dropdown) .nav-pills>li>a, .nav-tabs ul.nav.navbar-nav>li.show:not(.dropdown) ul.nav.navbar-nav>li>a, .nav-tabs ul.nav.navbar-nav>li.in:not(.dropdown) ul.nav.navbar-nav>li>a {
+     color: #0BB48C;
+     }
+     
+     .navbar-light .navbar-nav .show>.nav-link, .navbar-light .navbar-nav .in>.nav-link, .navbar-light .navbar-nav .nav-tabs>li.show>a, .navbar-light .navbar-nav .nav-tabs>li.in>a, .navbar-light .navbar-nav .nav-pills>li.show>a, .navbar-light .navbar-nav .nav-pills>li.in>a, .navbar.navbar-default .navbar-nav .show>.nav-link, .navbar.navbar-default .navbar-nav .in>.nav-link, .navbar.navbar-default .navbar-nav .nav-tabs>li.show>a, .navbar.navbar-default .navbar-nav .nav-tabs>li.in>a, .navbar.navbar-default .navbar-nav .nav-pills>li.show>a, .navbar.navbar-default .navbar-nav .nav-pills>li.in>a, .navbar-light ul.nav.navbar-nav>li.show>a, .navbar-light ul.nav.navbar-nav>li.in>a, .navbar.navbar-default ul.nav.navbar-nav>li.show>a, .navbar.navbar-default ul.nav.navbar-nav>li.in>a, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-tabs>li>a.active, .navbar-light .navbar-nav .nav-pills>li>a.active, .navbar.navbar-default .navbar-nav .nav-link.active, .navbar.navbar-default .navbar-nav .nav-tabs>li>a.active, .navbar.navbar-default .navbar-nav .nav-pills>li>a.active, .navbar-light ul.nav.navbar-nav>li>a.active, .navbar.navbar-default ul.nav.navbar-nav>li>a.active {
+     color: #0BB48C;
+     }
+     
+     .navbar-brand{
+     font-size: 1.2rem;
+     font-weight: 500;
+     }
+     
+     .navbar-light .navbar-brand, .navbar.navbar-default .navbar-brand {
+    color: #67847d;}
+    
+    
+    
+
+
+    
+     '
+   )
 
 shinyUI(
-
+ 
   
-  
-  navbarPage(title = "Guane", theme=theme,
+  navbarPage(title = "Guane", theme = theme,
+             
+             
+             
              tabPanel("Home",
-                      #includeHTML("www/home.html")
+                      includeHTML("www/home.html"),
                       ),
              
              navbarMenu("Methods",
