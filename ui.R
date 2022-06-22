@@ -97,7 +97,7 @@ shinyUI(
                                                                                                        sliderInput("PlotWidthDt", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
                                                                                                        sliderInput("PlotHeightDt", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800),
                                                                                                        selectInput("plotType", "Tree type",
-                                                                                                                   c("phylogram" = "Phylogram", "cladogram" = "Cladogram", "fan" = "Fan", "unrooted" = "Unrooted", "radial" = "Radial", "tidy" = "Tidy" ), selected = "phylogram")
+                                                                                                                   c("Phylogram" = "phylogram", "Cladogram" = "cladogram", "Fan" = "Fan", "Unrooted" = "unrooted", "Radial" = "radial", "Tidy" = "tidy" ), selected = "phylogram")
                                                                                                        )
                                                                                            )
                                                                                     ),hr(),
