@@ -9,26 +9,17 @@
 
 library(shiny)
 library(bslib)
-#library(shiny.i18n)
 library(ape)
-library(ggthemes)
 library(paletteer)
 library(coda)
-library(shinyMatrix)
 library(corHMM)
-library(shiny)
+#devtools::install_github(repo = 'https://github.com/liamrevell/phytools',force = TRUE)
 library(phytools)
-library(reactable)
-library(shinyjs)
 library(rhandsontable)
 library(shinyWidgets)
 
-#devtools::install_github(repo = 'https://github.com/liamrevell/phytools',force = TRUE)
 
-# Define UI for application that draws a histogram
 
-#theme <- bs_theme(version = 5, bootswatch =  "minty",primary = "#0BB48C")
-#theme <-'bootstrap.min.css'
 theme <- bs_theme(version = 5, bootswatch =  "minty", primary = "#0BB48C",secondary = "#C1D9DB",
   "font-size-base" = "0.9rem", "enable-rounded" = T
 ) %>%
@@ -68,57 +59,45 @@ theme <- bs_theme(version = 5, bootswatch =  "minty", primary = "#0BB48C",second
      
      .navbar-light .navbar-brand, .navbar.navbar-default .navbar-brand {
     color: #67847d;}
-    
-    
-    
-
-
-    
      '
    )
 
 shinyUI(
- 
-  
   navbarPage(title = "Guane", theme = theme,
-             
-             
-             
              tabPanel("Home",
                       includeHTML("www/home.html"),
                       ),
-             
              navbarMenu("Methods",
                         tabPanel("Independent Contrats"),
-                        tabPanel("Ancestral States Reconstruction",
-                                 fluidPage(theme=theme,
+                        tabPanel("Ancestral character estimation",
+                                 fluidPage(theme = theme,
                                    tabsetPanel(type = "tabs",
                                                        tabPanel("Data",
                                                                 fluidRow(
                                                                   column(3,wellPanel(selectInput("tree", "Load tree",c("Select" = "select","Example" = "examp","Import tree" = "treeFile")),
                                                                                      conditionalPanel(condition = "input.tree=='treeFile'",
                                                                                                      # selectInput("format", "Tree format",c("Select" = "select","Nexus" = "Nexus","Newick" = "Newick")),
-                                                                                                      fileInput("fileTree", "Load tree file")),
+                                                                                                      fileInput("fileTree", "Load file")),
                                                                                      actionButton("importTree", "Import tree"), hr(),
-                                                                                     selectInput("csvData", "Load csv",c("Select" = "select","Example" = "exampCSV","Import csv" = "DataFile")),
+                                                                                     selectInput("csvData", "Load csv", c("Select" = "select", "Example" = "exampCSV", "Import data" = "DataFile")),
                                                                                      conditionalPanel(condition = "input.csvData == 'DataFile'",
-                                                                                                      fileInput("fileCSV", "Load data file")),
+                                                                                                      fileInput("fileCSV", "Load file")),
                                                                                      actionButton("importCSV", "Import csv"), hr(),
-                                                                                     checkboxInput("checknames", "Check tree and csv names"),
-                                                                                     selectInput('dataVar','Select character',choices='Select', selected=NULL),
-                                                                                     selectInput('typeChar','Confirm character type',choices=c('Select','Discrete','Continuous'), selected='Select'),hr(),
+                                                                                     checkboxInput("checknames", "Check tree & data names"),
+                                                                                     selectInput('dataVar','Select a character',choices = 'Select', selected = NULL),
+                                                                                     selectInput('typeChar', 'Confirm character type', choices = c('Select','Discrete','Continuous'), selected = 'Select'), hr(),
                                                                                      numericInput(inputId = "seed", label = "Set seed",value =  999, min = 1, max = 1000000)
                                                                                      )
                                                                          ),
                                                                   column(9,fluidRow(column(9,plotOutput(outputId = 'PhyloPlot', inline = T)),
-                                                                                    column(3,wellPanel(checkboxInput("tipLabels", "Show tip labels"),
+                                                                                    column(3,wellPanel(checkboxInput("tipLabels", "Tip labels"),
                                                                                                        conditionalPanel(condition = "input.tipLabels==1",
                                                                                                                         sliderInput("tipSize", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
-                                                                                                       checkboxInput("branchLength", "Use edge length"),
-                                                                                                       sliderInput("PlotWidthDt", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
-                                                                                                       sliderInput("PlotHeightDt", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800),
-                                                                                                       selectInput("plotType", "Plot type",
-                                                                                                                   c("phylogram" = "phylogram","cladogram" = "cladogram","fan" = "fan", "unrooted" = "unrooted","radial" = "radial", "tidy" = "tidy" ),selected = "phylogram")
+                                                                                                       checkboxInput("branchLength", "Edge length"),
+                                                                                                       sliderInput("PlotWidthDt", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                       sliderInput("PlotHeightDt", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800),
+                                                                                                       selectInput("plotType", "Tree type",
+                                                                                                                   c("phylogram" = "Phylogram", "cladogram" = "Cladogram", "fan" = "Fan", "unrooted" = "Unrooted", "radial" = "Radial", "tidy" = "Tidy" ), selected = "phylogram")
                                                                                                        )
                                                                                            )
                                                                                     ),hr(),
@@ -129,13 +108,13 @@ shinyUI(
                                                        tabPanel("Analysis",
                                                                 conditionalPanel(condition = "input.typeChar == 'Continuous'",
                                                                                  tabsetPanel(id = "ContinuousCharacter",
-                                                                                             tabPanel(title = "Maxima Likelihood", useShinyjs(),
-                                                                                                      div(id= 'ResetConCharML',
-                                                                                                      fluidRow(column(3,wellPanel(radioButtons("transform1", "Transformation type",
-                                                                                                                                               c("No transform" = "NoTrans","ln" = "ln","log10" = "log10",
-                                                                                                                                                 "Square Root" = "squareRoot","Cube Root"="cubeRoot",
-                                                                                                                                                 "Reciprocal"="reciprocal","Exponential"="exp1"),selected = "NoTrans"),
-                                                                                                                                  checkboxInput("AncPIC", "Compute Phylogenetic Independent Contrast"),hr(),
+                                                                                             tabPanel(title = "Maximum Likelihood", useShinyjs(),
+                                                                                                      div(id = 'ResetConCharML',
+                                                                                                      fluidRow(column(3,wellPanel(radioButtons("transform1", "Data transformation",
+                                                                                                                                               c("Raw data" = "NoTrans","Natural logarithm" = "ln","Log base 10" = "log10",
+                                                                                                                                                 "Square Root" = "squareRoot","Cube Root" = "cubeRoot",
+                                                                                                                                                 "Reciprocal" = "reciprocal","Exponential" = "exp1"),selected = "NoTrans"),
+                                                                                                                                  checkboxInput("AncPIC", "Phylogenetic independent contrast estimation"),hr(),
                                                                                                                                   selectInput("ModelContinuous", "Fit model",c("BM" = "BM","OU" = "OU","EB" = "EB"),multiple = TRUE,selected = NULL),
                                                                                                                                   conditionalPanel(condition = "input.ModelContinuous.indexOf('BM') > -1",
                                                                                                                                                    textInput('maxitBM', 'Max iter BM', value = '2000')),
@@ -144,7 +123,7 @@ shinyUI(
                                                                                                                                   conditionalPanel(condition = "input.ModelContinuous.indexOf('OU') > -1",
                                                                                                                                                     textInput('maxitOU', 'Max iter OU', value = '20')),
                                                                                                                                   actionButton("runAncML", "run"),hr(),
-                                                                                                                                  checkboxInput("MLModAIC", "Model selection AIC"),hr(),
+                                                                                                                                  checkboxInput("MLModAIC", "Model selection - AIC"),hr(),
                                                                                                                                   radioButtons("exportMLanc", "Export output",c("R object (RDS)" = "MLancRDS","TXT" = "MLancTXT")),
                                                                                                                                   downloadButton("downloadAnc", "Download"),hr(),
                                                                                                                                   actionButton("ResetConMl", "Reset Panel")
@@ -156,12 +135,12 @@ shinyUI(
                                                                                                                                         fluidRow(column(12,plotOutput(outputId = 'histo1'))),
                                                                                                                                         fluidRow(column(12,plotOutput(outputId = 'QQ1'))))
                                                                                                                                  ),
-                                                                                                                      wellPanel(fluidRow(column(4,selectInput('mapModelMl','Plot model',choices=NULL, selected=NULL),
+                                                                                                                      wellPanel(fluidRow(column(4,selectInput('mapModelMl','Plot model',choices = NULL, selected = NULL),
                                                                                                                                                 sliderInput("tipSizeContMl", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
-                                                                                                                                         column(4, sliderInput("PlotWidthContMl", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
-                                                                                                                                                sliderInput("PlotHeightContMl", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)
+                                                                                                                                         column(4, sliderInput("PlotWidthContMl", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                sliderInput("PlotHeightContMl", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)
                                                                                                                                                 ),
-                                                                                                                                         column(4,checkboxInput('phenogramML', 'Plot phenogram'),
+                                                                                                                                         column(4,checkboxInput('phenogramML', 'Phenogram'),
                                                                                                                                                 conditionalPanel('input.phenogramML == 1',
                                                                                                                                                                  checkboxInput('NormalScaleConML', 'Normal scale')),
                                                                                                                                                 actionButton('PlotEditorML', 'Plot Editor'))
@@ -171,15 +150,15 @@ shinyUI(
                                                                                                                )
                                                                                                       )
                                                                                                       ),
-                                                                                             tabPanel("Stocastic State Mapping",fluidRow(column(3,wellPanel(selectInput("parametersBI", "Set parameters",
-                                                                                                                                                                        c("Select" = "select","by default" = "defaultBI","Costumize" = "costumizeBI")),
+                                                                                             tabPanel("Bayesian MCMC",fluidRow(column(3,wellPanel(selectInput("parametersBI", "Set parameters",
+                                                                                                                                                                        c("Select" = "select","By default" = "defaultBI","Costumize" = "costumizeBI")),
                                                                                                                                                             conditionalPanel(condition = "input.parametersBI == 'costumizeBI'",
-                                                                                                                                                                             textInput('sig2BI','Sig2: BM rate'),
-                                                                                                                                                                             textInput('aBI','a: State at the root node'),
+                                                                                                                                                                             textInput('sig2BI','Sig2: Brownian Motion rate'),
+                                                                                                                                                                             textInput('aBI','a: Root node state'),
                                                                                                                                                                              textInput('sampleBI','Sample')
                                                                                                                                                                              ),
-                                                                                                                                                            textInput('ngenBI','ngen',200000),
-                                                                                                                                                            textInput('BurninBI','burnin',0.2),
+                                                                                                                                                            textInput('ngenBI','Number of generations',200000),
+                                                                                                                                                            textInput('BurninBI','Burn-in',0.2),
                                                                                                                                                             actionButton("runAncBI", "Run"),hr(),
                                                                                                                                                             radioButtons("exportAncBI", "Export output",
                                                                                                                                                                          c("R object (RDS)" = "BIancRDS","TXT" = "BIancTXT")),
@@ -193,12 +172,12 @@ shinyUI(
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'trace1'))),
                                                                                                                                                                   fluidRow(column(12,plotOutput(outputId = 'desnsity1'))))
                                                                                                                                                            ),
-                                                                                                                                                wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices=NULL, selected=NULL,multiple = TRUE),
+                                                                                                                                                wellPanel(fluidRow(column(4,selectInput('plotNodesBI','Plot posterior prob. by node',choices = NULL, selected = NULL,multiple = TRUE),
                                                                                                                                                                           sliderInput("tipSizeContBI", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
-                                                                                                                                                                   column(4, sliderInput("PlotWidthContBI", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
-                                                                                                                                                                          sliderInput("PlotHeightContBI", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)),
-                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Plot phenogram'),
-                                                                                                                                                                          actionButton('PlotEditorBI', 'Plot Editor'))
+                                                                                                                                                                   column(4, sliderInput("PlotWidthContBI", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                                          sliderInput("PlotHeightContBI", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                                                                   column(4,checkboxInput('phenogramBI', 'Tree phenogram'),
+                                                                                                                                                                          actionButton('PlotEditorBI', 'Tree Editor'))
                                                                                                                                                                    )
                                                                                                                                                           ),hr(),
                                                                                                                                                 fluidRow(column(12,verbatimTextOutput("infoPanelContinuousBI")))
@@ -208,34 +187,34 @@ shinyUI(
                                                                                              )
                                                                                  ),
                                                                 conditionalPanel(condition = "input.typeChar == 'Discrete'",
-                                                                                 tabsetPanel(id= 'DiscreteCharacter',
-                                                                                             tabPanel("Maxima Likelihood",
-                                                                                                      fluidRow(column(3, wellPanel(selectInput("typeDisML", "Type of reconstruction",choices= c('joint'='joint', 'marginal'='marginal'),selected = 'marginal'),
-                                                                                                                                   selectInput("ModelsDisML", "Set models",choices= NULL,multiple = TRUE),
+                                                                                 tabsetPanel(id = 'DiscreteCharacter',
+                                                                                             tabPanel("Maximum Likelihood",
+                                                                                                      fluidRow(column(3, wellPanel(selectInput("typeDisML", "Estimation",choices = c('Joint' = 'joint', 'Marginal' = 'marginal'),selected = 'marginal'),
+                                                                                                                                   selectInput("ModelsDisML", "Set models",choices = NULL,multiple = TRUE),
                                                                                                                                    uiOutput("addModel3States"),
                                                                                                                                    conditionalPanel("input.AddModelDisML == 1",
-                                                                                                                                                    br(),rHandsontableOutput("w1"),br(),
+                                                                                                                                                    br(), rHandsontableOutput("w1"), br(),
                                                                                                                                                     actionButton('SubmAddModel','Submit')),br(),
                                                                                                                                    actionButton('RunAnalyDisML','Run'), hr(),
-                                                                                                                                   checkboxInput("DisMLModAIC", "Model selection AIC"),
+                                                                                                                                   checkboxInput("DisMLModAIC", "Model selection - AIC"),
                                                                                                                                    conditionalPanel("input.DisMLModAIC == 1",
                                                                                                                                                     checkboxInput("ModAverDisML", "Model averaging") ),
                                                                                                                                    conditionalPanel("input.ModAverDisML == 1 & input.DisMLModAIC == 1",
-                                                                                                                                                    selectInput("SetModAverDisML", "Set models",choices=NULL, selected=NULL,multiple = TRUE),
-                                                                                                                                                    actionButton('RunModAverDisML','Run')),hr(),
+                                                                                                                                                    selectInput("SetModAverDisML", "Set models",choices = NULL, selected = NULL, multiple = TRUE),
+                                                                                                                                                    actionButton('RunModAverDisML','Run')), hr(),
                                                                                                                                    radioButtons("exportDisMLanc", "Export output",c("R object (RDS)" = "MLancRDS","TXT" = "MLancTXT")),
-                                                                                                                                   selectInput("disCharOutputs", "Choose output",choices= c("Select"="Select","Fitted models"="FittedModels","AIC matrix"="AICmatrix", "Model averege"="ModelAverage")),
+                                                                                                                                   selectInput("disCharOutputs", "Choose output",choices = c("Select" = "Select", "Fitted models" = "FittedModels", "AIC matrix" = "AICmatrix", "Model averaging" = "ModelAverage")),
                                                                                                                                    downloadButton("downloadDisML", "Download")
                                                                                                                                    )
                                                                                                                       ),
                                                                                                                column(9, fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlot8',inline = T))),
                                                                                                                                   column(6,fluidRow(plotOutput(outputId = 'PhyloPlot9')))
                                                                                                                                   ),
-                                                                                                                      wellPanel(fluidRow(column(4,selectInput('plotModelDisML','Plot model',choices=NULL),
+                                                                                                                      wellPanel(fluidRow(column(4,selectInput('plotModelDisML','Plot model',choices = NULL),
                                                                                                                                                 sliderInput("tipSizeDisML", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7)),
-                                                                                                                                         column(4,sliderInput("PlotWidthDisML", "Plot width (px)",step = 100,min = 100, max = 1000, value = 400),
-                                                                                                                                                sliderInput("PlotHeightDisML", "Plot height (px)",step = 100,min = 100, max = 1000, value = 800)),
-                                                                                                                                         column(4,checkboxInput('bestState', 'Plot the most likely state'),
+                                                                                                                                         column(4,sliderInput("PlotWidthDisML", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                                sliderInput("PlotHeightDisML", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                                         column(4,checkboxInput('bestState', 'The most likely state'),
                                                                                                                                                 actionButton('PlotEditorDisML', 'Plot Editor'))
                                                                                                                                          )
                                                                                                                                 ),hr(),
@@ -245,12 +224,12 @@ shinyUI(
                                                                                                                       )
                                                                                                                )
                                                                                                       ),
-                                                                                             tabPanel("Stocastic State Mapping",
-                                                                                                      fluidRow(column(3,wellPanel(selectInput("QmatrixBI", "Q matrix: rates",choices = c('Select' = 'select', 'empirical' = 'empirical', 'mcmc' = 'mcmc','costumize' = 'costumQmDiscBI')),
+                                                                                             tabPanel("Bayesian MCMC",
+                                                                                                      fluidRow(column(3,wellPanel(selectInput("QmatrixBI", "Q matrix: rates",choices = c('Select' = 'select', 'Empirical' = 'empirical', 'MCMC' = 'mcmc','Costumize' = 'costumQmDiscBI')),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'costumQmDiscBI'",
-                                                                                                                                                   br(),rHandsontableOutput(outputId = "putitamatrix"),br(),
-                                                                                                                                                   actionButton('SubmQmatBI','Submit matrix')),br(),
+                                                                                                                                                   br(),rHandsontableOutput(outputId = "putitamatrix"), br(),
+                                                                                                                                                   actionButton('SubmQmatBI','Submit matrix')), br(),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'empirical' | input.QmatrixBI == 'mcmc'",
                                                                                                                                                    
@@ -260,23 +239,23 @@ shinyUI(
                                                                                                                                                                     actionButton('SubmAddModelBI','Submit model')),br()),
                                                                                                                                   
                                                                                                                                   conditionalPanel("input.QmatrixBI == 'mcmc'",
-                                                                                                                                                   selectInput("mcmcParDisBI", "Set mcmc parameter", choices = c('by default' = 'bydefaultmcmcDisBI','costumize' = 'costummcmcDisBI')),
+                                                                                                                                                   selectInput("mcmcParDisBI", "Set mcmc parameters", choices = c('By default' = 'bydefaultmcmcDisBI','Costumize' = 'costummcmcDisBI')),
                                                                                                                                                    conditionalPanel("input.mcmcParDisBI == 'costummcmcDisBI'",
-                                                                                                                                                                    selectInput("priorDisBI", "Prior: gamma parameters", choices = c('Select' = 'select','Use empirical' = 'useEmpirical','No use empirical'='noUseEmpirical')),
+                                                                                                                                                                    selectInput("priorDisBI", "Prior: Gamma parameters", choices = c('Select' = 'select','Use empirical' = 'useEmpirical','No use empirical' = 'noUseEmpirical')),
                                                                                                                                                                     conditionalPanel("input.priorDisBI == 'useEmpirical'",
-                                                                                                                                                                                     radioButtons("betavaluesDisBI", "Define Beta values",
-                                                                                                                                                                                                  c("Fix one value per rate" = "oneBeta","Assign a value per rate " = "betaPerRate"),selected = character(0)),
+                                                                                                                                                                                     radioButtons("betavaluesDisBI", "Beta values",
+                                                                                                                                                                                                  c("Fix one value per rate" = "oneBeta", "Assign a value per rate" = "betaPerRate"), selected = character(0)),
                                                                                                                                                                                      conditionalPanel("input.betavaluesDisBI == 'oneBeta'",
-                                                                                                                                                                                                      rHandsontableOutput("matBetaValDisBI"),br(),
+                                                                                                                                                                                                      rHandsontableOutput("matBetaValDisBI"), br(),
                                                                                                                                                                                                       actionButton('SubmBetaValDisBI','Submit beta')
                                                                                                                                                                                                       ),
                                                                                                                                                                                      conditionalPanel("input.betavaluesDisBI == 'betaPerRate'",
-                                                                                                                                                                                                      rHandsontableOutput("matBetaValuePerRateDisBI"),br(),
+                                                                                                                                                                                                      rHandsontableOutput("matBetaValuePerRateDisBI"), br(),
                                                                                                                                                                                                       actionButton('SubmBetaValuePerRateDisBI','Submit betas'))
                                                                                                                                                                                      ),br(),
                                                                                                                                                                     conditionalPanel("input.priorDisBI == 'noUseEmpirical'",
-                                                                                                                                                                                     radioButtons("alphaBetaValDisBI", "Define Alpha and Beta values",
-                                                                                                                                                                                                  c("Fix equal values per rate" = "oneAlphaBeta","Assign a alpha and beta value per rate " = "alphaBetaPerRate"), character(0)),
+                                                                                                                                                                                     radioButtons("alphaBetaValDisBI", "Alpha and Beta values",
+                                                                                                                                                                                                  c("Fix equal values per rate" = "oneAlphaBeta","Alpha and beta value per rate " = "alphaBetaPerRate"), character(0)),
                                                                                                                                                                                      conditionalPanel("input.alphaBetaValDisBI == 'oneAlphaBeta'",
                                                                                                                                                                                                       rHandsontableOutput("matOneAlphaBetaValDisBI"),br(),
                                                                                                                                                                                                       actionButton('SubmOneAlphaBetaValDisBI','Submit (a,b)')),
@@ -284,7 +263,7 @@ shinyUI(
                                                                                                                                                                                                       rHandsontableOutput("matAlphaBetaPerRateDisBI"),br(),
                                                                                                                                                                                                       actionButton('SubmAlphaBetaPerRateDisBI','Submit (a,b)*rate'))
                                                                                                                                                                                      ),br(),
-                                                                                                                                                                    selectInput("vQDisBI", "vQ: variance per rate", choices = c('Select' = 'select','equal' = 'equalvQDisBI','Assign variances'='vQValPerRatesDisBI')),
+                                                                                                                                                                    selectInput("vQDisBI", "vQ: variance per rate", choices = c('Select' = 'select','Equal' = 'equalvQDisBI', 'Variances' = 'vQValPerRatesDisBI')),
                                                                                                                                                                     conditionalPanel("input.vQDisBI == 'equalvQDisBI'",
                                                                                                                                                                                      rHandsontableOutput("matequalvQValDisBI"),br(),
                                                                                                                                                                                      actionButton('SubmequalvQValDisBI','Submit vQ')
@@ -292,11 +271,11 @@ shinyUI(
                                                                                                                                                                     conditionalPanel("input.vQDisBI == 'vQValPerRatesDisBI'",
                                                                                                                                                                                      rHandsontableOutput("matvQValPerRatesDisBI"),br(),
                                                                                                                                                                                      actionButton('SubmbvQValPerRatesDisBI','Submit vQ*rates'))
-                                                                                                                                                                    ),br(),
+                                                                                                                                                                    ), br(),
                                                                                                                                                    textInput('samfreqDisBI','Sample frequency',value = 10),
                                                                                                                                                    textInput('burninDisBI','Burn-in',value = 0.2)
                                                                                                                                                    ),
-                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select' = 'select', 'fitzjohn' = 'fitzjohn','stationary' = 'estimated', 'equal' = 'equal','Costumize' = 'costumPiDiscBI')),
+                                                                                                                                   selectInput("piBI", "Pi: prior prob. in root",choices = c('Select' = 'select', 'Fitzjohn' = 'fitzjohn', 'Stationary' = 'estimated', 'Equal' = 'equal', 'Costumize' = 'costumPiDiscBI')),
                                                                                                                                   conditionalPanel("input.piBI == 'costumPiDiscBI'",
                                                                                                                                                    rHandsontableOutput("matPiBI"),br(),
                                                                                                                                                    actionButton('SubmPiBI','Submit')),br(),

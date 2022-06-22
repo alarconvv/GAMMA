@@ -162,7 +162,7 @@ output$PhyloPlot <- renderPlot( height = heightDt  , width = widthDt,{
   req(treeInput())
 
 
-    rawPhylo <-plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
+    rawPhylo <- plot.phylo(treeInput(), show.tip.label = input$tipLabels[1],
                cex = input$tipSize[1],use.edge.length = input$branchLength[1], type = input$plotType,
                edge.width = 0.8,edge.color = 'grey40')
     return(rawPhylo)
@@ -218,9 +218,9 @@ observeEvent(CharInput(), {
 #
 ClassCol <- eventReactive(input$dataVar, {
   if (class(CharInput()[,which(colnames(CharInput()) == input$dataVar)]) == 'numeric') {
-    c('Numerical class. Please, confirm how to analyze it: as a Discrete or a Contiuous character')
-  } else if (class(CharInput()[,which(colnames(CharInput())== input$dataVar)])== 'factor') {
-    c('Factor class. Please, confirm how to analyze it: as a Discrete or a Contiuous character')
+    c('CONTINUOUS character. Please, confirm how to analyze it')
+  } else if (class(CharInput()[,which(colnames(CharInput()) == input$dataVar)]) == 'factor') {
+    c('DISCRETE character. Please, confirm how to analyze it')
   } else {
     c('You should select a Character')
   }
