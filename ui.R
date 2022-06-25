@@ -15,6 +15,7 @@ library(coda)
 library(corHMM)
 #devtools::install_github(repo = 'https://github.com/liamrevell/phytools',force = TRUE)
 library(phytools)
+library(shinyjs)
 library(rhandsontable)
 library(shinyWidgets)
 
@@ -97,7 +98,7 @@ shinyUI(
                                                                                                        sliderInput("PlotWidthDt", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
                                                                                                        sliderInput("PlotHeightDt", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800),
                                                                                                        selectInput("plotType", "Tree type",
-                                                                                                                   c("Phylogram" = "phylogram", "Cladogram" = "cladogram", "Fan" = "Fan", "Unrooted" = "unrooted", "Radial" = "radial", "Tidy" = "tidy" ), selected = "phylogram")
+                                                                                                                   c("Phylogram" = "phylogram", "Cladogram" = "cladogram", "Fan" = "fan", "Unrooted" = "unrooted", "Radial" = "radial", "tidy" = "Tidy" ), selected = "phylogram")
                                                                                                        )
                                                                                            )
                                                                                     ),hr(),

@@ -21,7 +21,7 @@ AncDiscreteBI$modelMatrixBI <- NULL
 AncDiscreteBI$QmatrixPar <- NULL
 AncDiscreteBI$PiprobBI <- NULL
 AncDiscreteBI$nsim <- NULL
-AncDiscreteBI$outputDisBI <- NULL
+#AncDiscreteBI$outputDisBI <- NULL
 AncDiscreteBI$sampleFreq <- NULL
 AncDiscreteBI$burnin <- NULL
 AncDiscreteBI$Priorpar <- NULL
@@ -446,6 +446,11 @@ observeEvent(!is.null(AncDiscreteBI$vQ),{
 
 observeEvent(input$RunAnalyDisBI > 0,{
   
+  withProgress(message = 'Calculation in progress',
+               detail = 'This may take a while...', value = 0, {
+
+                 incProgress(1/2)
+  
   if(input$mcmcParDisBI == 'costummcmcDisBI') {
     AncDiscreteBI$outputDisBI <- make.simmap(tree = treeDisBI(),
                                              x = AncDiscreteBI$setCharacter, 
@@ -463,15 +468,18 @@ observeEvent(input$RunAnalyDisBI > 0,{
                                              model = AncDiscreteBI$modelMatrixBI,
                                              nsim = AncDiscreteBI$nsim,
                                              Q = AncDiscreteBI$QmatrixPar,
-                                             pi = AncDiscreteBI$PiprobBI,
+                                             pi = "fitzjohn",#AncDiscreteBI$PiprobBI,
                                              samplefreq = AncDiscreteBI$sampleFreq,
                                              burnin = ceiling(AncDiscreteBI$burnin))
   }
   
   
-  
-  
-  
+
+                 incProgress(2/2)
+
+
+               })
+
   
 
 })
@@ -526,7 +534,7 @@ output$PhyloPlot10 <- renderPlot({
 
     }else{
       object <- summary(AncDiscreteBI$outputDisBI)
-      DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(AncDiscreteBI$setCharacter)))
+      DisColPal <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"))(length(levels(AncDiscreteBI$setCharacter)))
       DisCols <- setNames(DisColPal,levels(AncDiscreteBI$setCharacter))
       
       plot(object,colors = DisCols, fsize = 0.7,ftype = "i")
@@ -535,11 +543,11 @@ output$PhyloPlot10 <- renderPlot({
     
 
   }else {
-    DisColPal <- paletteer::paletteer_c("grDevices::Purple-Yellow", length(levels(DataDisBI())))
+    DisColPal <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"))(length(levels(DataDisBI())))
 
     DisCols <- setNames(DisColPal,levels(DataDisBI()))
 
-    plotTree.datamatrix(treeDisBI(),as.data.frame(AncDiscreteBI$setCharacter),colors=list(DisCols),header=FALSE,fsize=0.45)
+    plotTree.datamatrix(treeDisBI(),as.data.frame(AncDiscreteBI$setCharacter),colors = list(DisCols),header=FALSE,fsize=0.45)
 
     legend('topright',legend = levels(DataDisBI()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
   }
