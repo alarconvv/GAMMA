@@ -287,9 +287,12 @@ shinyUI(
                                                                                                                                  column(6,fluidRow(plotOutput(outputId = 'PhyloPlot11')),
                                                                                                                                         fluidRow(plotOutput(outputId = 'PhyloPlot12')))
                                                                                                                ),
-                                                                                                               wellPanel(fluidRow(column(4,selectInput('plotModelDisBI','Plot outcome',choices = NULL)),
-                                                                                                                                  column(4,selectInput('ploHPDDisBI','Plot transitions',choices = NULL)),
-                                                                                                                                  column(4,actionButton('PlotEditorDisBI', 'Plot Editor'))
+                                                                                                               wellPanel(fluidRow(column(4,selectInput('plotModelDisBI','Plot outcome',choices = NULL),
+                                                                                                                                         selectInput('ploHPDDisBI','Plot transitions',choices = NULL)),
+                                                                                                                                  column(4,sliderInput("PlotWidthDisBI", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                         sliderInput("PlotHeightDisBI", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                                  column(4,sliderInput("tipSizeDisBI", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7),
+                                                                                                                                         actionButton('PlotEditorDisBI', 'Plot Editor'))
                                                                                                                )
                                                                                                                ),hr(),
                                                                                                                fluidRow(column(12,verbatimTextOutput("infoPanelDiscreteBI")

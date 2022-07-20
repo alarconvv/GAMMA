@@ -515,9 +515,15 @@ observeEvent(input$RunAnalyDisBI,{
 # PLOTS
 # 
 
+
+# initial and output tree / phenogram if it is chosen
+
+heightDisBI <- reactive(input$PlotHeightDisBI[1])
+widthDisBI <- reactive(input$PlotWidthDisBI[1])
+
 #Plot: Phylogenies, initial and outcomes
 
-output$PhyloPlot10 <- renderPlot({
+output$PhyloPlot10 <- renderPlot(height = heightDisBI  , width = widthDisBI,{
  
   
   if (input$RunAnalyDisBI > 0) {
@@ -530,14 +536,14 @@ output$PhyloPlot10 <- renderPlot({
       
       densities <- density(merged, method = "densityMap",states = c(paste("not-",levelstab[wichPlotBI],sep = ''), as.character(levelstab[wichPlotBI])))
       
-       plot(densities,fsize = c(0.4,0.8),lwd = c(3,6))
+       plot(densities,fsize = c(0.4,input$tipSizeDisBI[1]),lwd = c(3,6))
 
     }else{
       object <- summary(AncDiscreteBI$outputDisBI)
       DisColPal <- colorRampPalette(c("#02b2ce","#ffd004",  "#e52920"))(length(levels(AncDiscreteBI$setCharacter)))
       DisCols <- setNames(DisColPal,levels(AncDiscreteBI$setCharacter))
       
-      plot(object,colors = DisCols, fsize = 0.7,ftype = "i")
+      plot(object,colors = DisCols, fsize = input$tipSizeDisBI[1],ftype = "i")
       legend('topright',legend = levels(DataDisBI()),pch = 22,pt.cex = 1.5, pt.bg = DisCols, bty='n',cex = 0.8)
     }
     
@@ -547,7 +553,7 @@ output$PhyloPlot10 <- renderPlot({
 
     DisCols <- setNames(DisColPal,levels(DataDisBI()))
 
-    plotTree.datamatrix(treeDisBI(),as.data.frame(AncDiscreteBI$setCharacter),colors = list(DisCols),header=FALSE,fsize=0.45)
+    plotTree.datamatrix(treeDisBI(),as.data.frame(AncDiscreteBI$setCharacter),colors = list(DisCols),header=FALSE,fsize=input$tipSizeDisBI[1])
 
     legend('topright',legend = levels(DataDisBI()),pch = 22,pt.cex=1.5, pt.bg = DisCols, bty='n',cex = 0.8)
   }
