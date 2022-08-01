@@ -305,7 +305,44 @@ shinyUI(
                                                        )
                                            )
                                  ),
-                        tabPanel("Basic Diversification Analysis"),
+                        tabPanel("Basic Diversification Analysis",
+                                 fluidPage(theme = theme,
+                                           tabsetPanel(type = "tabs",
+                                                       tabPanel("Data",
+                                                                fluidRow(column(3,wellPanel(selectInput("treeDiver", "Load tree",c("Select" = "select","Example" = "exampDiver", "Import tree" = "treeFileDiver")),
+                                                                                            conditionalPanel(condition = "input.treeDiver =='treeFileDiver'",
+                                                                                                             fileInput("fileTreeDiver", "Load file")),
+                                                                                            
+                                                                                            actionButton("importTreeDiver", "Import tree"),
+                                                                                            checkboxInput("ultrametricDiverDT", "Is ultrametric?"),
+                                                                                            uiOutput("forceultrDiverDT")
+                                                                                           )
+                                                                                ),
+                                                                         column(9,fluidRow(column(9,plotOutput(outputId = 'PhyloPlotDiver1', inline = T, click = 'plot_clickDiverDT') ),
+                                                                                           column(3, wellPanel(checkboxInput("tipLabelsDiverDT", "Tip labels"),
+                                                                                                               conditionalPanel(condition = "input.tipLabelsDiverDT == 1",
+                                                                                                                                sliderInput("tipSizeDiverDT", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
+                                                                                                               checkboxInput("branchLengthDiverDT", "Edge length"),
+                                                                                                               sliderInput("PlotWidthDiverDT", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                               sliderInput("PlotHeightDiverDT", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800),
+                                                                                                               selectInput("plotTypeDiverDT", "Tree type",
+                                                                                                                           c("Phylogram" = "phylogram", "Cladogram" = "cladogram", "Fan" = "fan", "Unrooted" = "unrooted", "Radial" = "radial", "tidy" = "Tidy" ), selected = "phylogram")
+                                                                                           )
+                                                                                                  )
+                                                                                           ), hr(),
+                                                                                fluidRow(column(12,verbatimTextOutput("infoPanelDiverData")))
+                                                                                )
+                                                                         )
+                                                                
+                                                                
+                                                                
+                                                                ),
+                                                       tabPanel("Analysis",
+                                                                
+                                                                
+                                                                )
+                                 ))),
+                        
                         tabPanel("SSE Models")
                         ),
              tabPanel("Plot Edition"),

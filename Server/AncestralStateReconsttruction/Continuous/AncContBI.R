@@ -76,7 +76,7 @@ observeEvent(phyloVCV(), {
 
 #Temporal object ro print in info panel
 #info: print setting matrix
-observeEvent(input$parametersBI != '"select', {
+observeEvent(input$parametersBI != 'select', {
   AncContBI$objectContinuousBI <- costmat$cost
   })
 
