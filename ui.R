@@ -323,7 +323,7 @@ shinyUI(
                                                                                                                conditionalPanel(condition = "input.tipLabelsDiverDT == 1",
                                                                                                                                 sliderInput("tipSizeDiverDT", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.5)),
                                                                                                                checkboxInput("branchLengthDiverDT", "Edge length"),
-                                                                                                               sliderInput("PlotWidthDiverDT", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                               sliderInput("PlotWidthDiverDT", "Tree width (px)",step = 100,min = 100, max = 1000, value = 500),
                                                                                                                sliderInput("PlotHeightDiverDT", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800),
                                                                                                                selectInput("plotTypeDiverDT", "Tree type",
                                                                                                                            c("Phylogram" = "phylogram", "Cladogram" = "cladogram", "Fan" = "fan", "Unrooted" = "unrooted", "Radial" = "radial", "tidy" = "Tidy" ), selected = "phylogram")
