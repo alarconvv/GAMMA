@@ -312,11 +312,19 @@ shinyUI(
                                                                 fluidRow(column(3,wellPanel(selectInput("treeDiver", "Load tree",c("Select" = "select","Example" = "exampDiver", "Import tree" = "treeFileDiver")),
                                                                                             conditionalPanel(condition = "input.treeDiver =='treeFileDiver'",
                                                                                                              fileInput("fileTreeDiver", "Load file")),
-                                                                                            
-                                                                                            actionButton("importTreeDiver", "Import tree"),
+                                                                                            actionButton("importTreeDiver", "Import tree"), hr(),
                                                                                             checkboxInput("ultrametricDiverDT", "Is ultrametric?"),
-                                                                                            uiOutput("forceultrDiverDT")
-                                                                                           )
+                                                                                            uiOutput("forceultrDiverDT"), hr(),
+                                                                                            checkboxInput("BinaryDiverDT", "Is binary?"),
+                                                                                            uiOutput("PoliDiverDT"),
+                                                                                            conditionalPanel("input.PoliDiverDT == 1",
+                                                                                                             selectInput("ResolveDiverDT", "How to resolve multichotomies", choices = c('Resolve randomly' = 'ramdom','how they appear in the tree' ))
+                                                                                                             ),
+                                                                                            hr(),
+                                                                                            radioButtons("exportDiverDT", "Export output",c("R object (RDS)" = "RDSdiverDT","TXT" = "TXTdiverDT")),
+                                                                                            downloadButton("downloadDiverDT", "Download"),hr(),
+                                                                                            numericInput(inputId = "seedDiverDT", label = "Set seed",value =  999, min = 1, max = 1000000)
+                                                                                            )
                                                                                 ),
                                                                          column(9,fluidRow(column(9,plotOutput(outputId = 'PhyloPlotDiver1', inline = T, click = 'plot_clickDiverDT') ),
                                                                                            column(3, wellPanel(checkboxInput("tipLabelsDiverDT", "Tip labels"),
@@ -338,6 +346,27 @@ shinyUI(
                                                                 
                                                                 ),
                                                        tabPanel("Analysis",
+                                                                tabsetPanel(id = 'BasicDiverification',
+                                                                            tabPanel("Lineage Throught of Time",
+                                                                                     fluidRow(column(3, wellPanel(
+                                                                                       p('Ltt plot'),
+                                                                                       checkboxInput('dropExtinct', 'Drop extinct tips from the tree',FALSE ),
+                                                                                       checkboxInput('logLineages', 'plot on log-linear', FALSE ),
+                                                                                       checkboxInput('GammaPybus', 'compute γ from Pybus & Harvey (2000;Proc.Roy.Soc.B)', FALSE ),
+                                                                                       actionButton("runDiverLtt", "Run"),
+                                                                                       hr(),
+                                                                                       p('MCCR test'),
+                                                                                       textInput(inputId = 'RhoMCCRdiverLtt', 'Rho: Sampling fraction', '0.9'),
+                                                                                       textInput(inputId = 'nsimMCCRdiverLtt', 'nsim', '1000'),
+                                                                                       actionButton("runMCCRDiverLtt", "Run"),
+                                                                                     )))
+                                                                                     
+                                                                                     
+                                                                                     
+                                                                                     ),
+                                                                            tabPanel("Speciation and Extinction Rates",
+                                                                            ),
+                                                                            )
                                                                 
                                                                 
                                                                 )
