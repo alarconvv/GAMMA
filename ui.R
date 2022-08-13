@@ -348,21 +348,34 @@ shinyUI(
                                                        tabPanel("Analysis",
                                                                 tabsetPanel(id = 'BasicDiverification',
                                                                             tabPanel("Lineage Throught of Time",
-                                                                                     fluidRow(column(3, wellPanel(
-                                                                                       p('Ltt plot'),
-                                                                                       checkboxInput('dropExtinct', 'Drop extinct tips from the tree',FALSE ),
-                                                                                       checkboxInput('logLineages', 'plot on log-linear', FALSE ),
-                                                                                       checkboxInput('GammaPybus', 'compute γ from Pybus & Harvey (2000;Proc.Roy.Soc.B)', FALSE ),
-                                                                                       actionButton("runDiverLtt", "Run"),
-                                                                                       hr(),
-                                                                                       p('MCCR test'),
-                                                                                       textInput(inputId = 'RhoMCCRdiverLtt', 'Rho: Sampling fraction', '0.9'),
-                                                                                       textInput(inputId = 'nsimMCCRdiverLtt', 'nsim', '1000'),
-                                                                                       actionButton("runMCCRDiverLtt", "Run"),
-                                                                                     )))
-                                                                                     
-                                                                                     
-                                                                                     
+                                                                                     fluidRow(
+                                                                                       column(3, wellPanel(p('Ltt plot'),
+                                                                                                           checkboxInput('dropExtinct', 'Drop extinct tips from the tree',FALSE ),
+                                                                                                           checkboxInput('logLineages', 'plot on log-linear', FALSE ),
+                                                                                                           checkboxInput('GammaPybus', 'compute γ from Pybus & Harvey (2000;Proc.Roy.Soc.B)', FALSE ),
+                                                                                                           actionButton("runDiverLtt", "Run"),hr(),
+                                                                                                           p('MCCR test'),
+                                                                                                           textInput(inputId = 'RhoMCCRdiverLtt', 'Rho: Sampling fraction', '0.9'),
+                                                                                                           textInput(inputId = 'nsimMCCRdiverLtt', 'nsim', '1000'),
+                                                                                                           actionButton("runMCCRDiverLtt", "Run"),
+                                                                                                           )
+                                                                                              ),
+                                                                                       column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlotDiver2', inline = T))),
+                                                                                                         column(6,fluidRow(plotOutput(outputId = 'PhyloPlotDiver3')),
+                                                                                                                fluidRow(plotOutput(outputId = 'PhyloPlotDiver4')))
+                                                                                       ),
+                                                                                       wellPanel(fluidRow(column(4,selectInput('plotLttTree','Plot LTT over tree',choices = NULL),
+                                                                                                                 selectInput('ploLttTreeLog','Plot log-lineage',choices = NULL)),
+                                                                                                          column(4,sliderInput("PlotWidthDiverLtt", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                 sliderInput("PlotHeightDiverLtt", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                          column(4,sliderInput("tipSizeDiverLtt", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7),
+                                                                                                                 actionButton('PlotEditorDiverLtt', 'Plot Editor'))
+                                                                                       )
+                                                                                       ),hr(),
+                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelDiverLtt")
+                                                                                       )
+                                                                                       ))
+                                                                                       )
                                                                                      ),
                                                                             tabPanel("Speciation and Extinction Rates",
                                                                             ),

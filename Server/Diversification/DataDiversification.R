@@ -67,14 +67,10 @@ ultrametricDiverDT <- eventReactive(input$ultrametricDiverDT,{
 
 
 observeEvent(ultrametricDiverDT() == F,{
-
     output$forceultrDiverDT <- renderUI({
-      
       selectInput(inputId = 'frcUltButtDiverDT', label = 'Force ultrametricity',
                     choices = c('Select' = 'selectDiverDT', 'Round decimals' = 'rounddiverDT', 'Chronos dating' = 'chronosDiverDt') )
     })
-  
-  
 })
 
 
@@ -115,7 +111,7 @@ output$PhyloPlotDiver1 <- renderPlot( height = heightDiverDT  , width = widthDiv
   
   rawPhylo <- plot.phylo(treeInputDiver(), show.tip.label = input$tipLabelsDiverDT[1],
                          cex = input$tipSizeDiverDT[1], use.edge.length = input$branchLengthDiverDT, 
-                         input$branchLengthDiverDT[1], type = input$plotTypeDiverDT,
+                          type = input$plotTypeDiverDT,
                          edge.width = 0.8,edge.color = 'grey40')
   return(rawPhylo)
   
