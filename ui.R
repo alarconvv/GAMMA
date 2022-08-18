@@ -357,7 +357,7 @@ shinyUI(
                                                                                                            p('MCCR test'),
                                                                                                            textInput(inputId = 'RhoMCCRdiverLtt', 'Rho: Sampling fraction', '0.9'),
                                                                                                            textInput(inputId = 'nsimMCCRdiverLtt', 'nsim', '1000'),
-                                                                                                           actionButton("runMCCRDiverLtt", "Run"),
+                                                                                                           actionButton("runMCCRDiverLtt", "Run")
                                                                                                            )
                                                                                               ),
                                                                                        column(9,fluidRow(column(6,fluidRow(plotOutput(outputId = 'PhyloPlotDiver2', inline = T))),
@@ -377,8 +377,27 @@ shinyUI(
                                                                                        ))
                                                                                        )
                                                                                      ),
-                                                                            tabPanel("Speciation and Extinction Rates",
-                                                                            ),
+                                                                            tabPanel("Diversification models: ML",
+                                                                                              fluidRow(
+                                                                                                column(3, wellPanel(p('Set models'),
+                                                                                                                    checkboxInput(inputId = 'yuleModML',label = 'Pure Birth'),
+                                                                                                                    checkboxInput(inputId = 'BDContModML',label = 'Birth-Death constant'),
+                                                                                                                    checkboxInput(inputId = 'BDvarSpeModML',label = 'Birth-Death variable: speciation'),
+                                                                                                                    checkboxInput(inputId = 'BDvarExtModML',label = 'Birth-Death variable: extinction'),
+                                                                                                                    checkboxInput(inputId = 'BDvarSpeExtModML',label = 'Birth-Death variable: Spec. & Exti.'),
+                                                                                                                    checkboxInput(inputId = 'CladoDepenModML',label = 'Clado-dependent model'),
+                                                                                                                    checkboxInput(inputId = 'DiverDepentModML',label = 'Diversity-dependent model'))),
+                                                                                                column(9,fluidRow(column(6, fluidRow(plotOutput(outputId = 'PhyloPlotDiver5', inline = T))),
+                                                                                                                  column(6, fluidRow(plotOutput(outputId = 'PhyloPlotDiver6')))),
+                                                                                                       wellPanel(fluidRow(column(6,sliderInput("PlotWidthDiverModML", "Tree width (px)",step = 100,min = 100, max = 1000, value = 400),
+                                                                                                                                 sliderInput("PlotHeightDiverModML", "Tree height (px)",step = 100,min = 100, max = 1000, value = 800)),
+                                                                                                                          column(6,sliderInput("tipSizeDiverModML", "Tip label size",step = 0.1,min = 0, max = 3, value = 0.7),
+                                                                                                                                 actionButton('PlotEditorDiverModML', 'Plot Editor'))),hr(),
+                                                                                                       fluidRow(column(12,verbatimTextOutput("infoPanelDiverModML")))))
+                                                                                                )
+                                                                                    
+                                                                                  
+                                                                            )
                                                                             )
                                                                 
                                                                 
