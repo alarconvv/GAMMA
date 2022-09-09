@@ -389,7 +389,7 @@ shinyUI(
                                                                                                                             textInput(inputId = 'BrateYuleModML',label = 'Speciation Rate',value = '0.1'),
                                                                                                                             checkboxInput(inputId = 'unresolYuModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addYuleModML', label = 'add'),
-                                                                                                                            selectInput(inputId = 'optiYuleModML',label = 'Metodo de optimización',choices = c( 'optim', 'subplex', 'nminb', 'nlm'),br()),
+                                                                                                                            selectInput(inputId = 'optiYuleModML',label = 'Metodo de optimización',choices = c( 'optim', 'subplex', 'nminb', 'nlm')),br()),
                                                                                                            checkboxInput(inputId = 'BDContModML',label = 'Birth-Death constant'),
                                                                                                            conditionalPanel(condition = 'input.BDContModML == 1',
                                                                                                                             textInput(inputId = 'fractBDContModML',label = 'Rho',value = '0.9'),

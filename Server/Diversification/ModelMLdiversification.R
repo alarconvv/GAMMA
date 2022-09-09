@@ -11,7 +11,8 @@ DiverModML$iterObjectDiver <- NULL
 #Render print in Info panel: Models: ML
 #
 output$infoPanelDiverModML <- renderPrint( {
-  print(DiverLtt$iterObjectDiver)
+  print(DiverModML$iterObjectDiver)
 })
 
 
+#
