@@ -87,6 +87,12 @@ shinyServer(function(input, output, session) {
   ##############################################################################
   
   source(file = 'Server/Diversification/LTTdiversification.R',local = T)
+  
+  ##############################################################################
+  #   Models - ML
+  ##############################################################################
+  
+  source(file = 'Server/Diversification/ModelMLdiversification.R',local = T)
 
 })
 
