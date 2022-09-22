@@ -6,7 +6,11 @@
 #
 DiverModML <- reactiveValues()
 DiverModML$iterObjectDiver <- NULL
+DiverModML$runObjModels <- NULL
+DiverModML$YuleList <-list()
+DiverModML$iteryule<-list()
 
+DiverModML$countyule <- 0
 
 #Render print in Info panel: Models: ML
 #
@@ -43,7 +47,40 @@ output$PhyloPlotDiver5 <- renderPlot( height = heightDiverModML  , width = width
 
 
 
+#models
 
+observeEvent(input$yuleModML,{
+  DiverModML$runObjModels$Yule <- NULL
+  
+  
+})
+
+observeEvent(input$addYuleModML,{
+ 
+  DiverModML$iteryule$rho <- as.numeric(input$fractYuleModML)
+  DiverModML$iteryule$rate <- as.numeric(input$BrateYuleModML)
+  DiverModML$YuleList$model <- DiverModML$iteryule
+    
+    DiverModML$countyule <- DiverModML$countyule + 1
+    
+    names(DiverModML$YuleList)[DiverModML$countyule] <- paste('Yule',DiverModML$countyule, sep = '')
+    
+    DiverModML$runObjModels$Yule <- DiverModML$YuleList
+    
+  
+  
+  
+  
+   
+
+})
+
+
+#Temporal object to print in info panel
+# info: tree
+observeEvent(input$addYuleModML, {
+  DiverModML$iterObjectDiver <- DiverModML$runObjModels
+})
 
 
 
