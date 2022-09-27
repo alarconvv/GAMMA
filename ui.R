@@ -403,8 +403,11 @@ shinyUI(
                                                                                                            checkboxInput(inputId = 'BDvarSpeModML',label = 'Birth-Death variable: speciation'),
                                                                                                            conditionalPanel(condition = 'input.BDvarSpeModML == 1',
                                                                                                                             textInput(inputId = 'fractBDvarSpeModML',label = 'Rho',value = '0.9'),
-                                                                                                                            selectInput(inputId = 'distBDvarSpeModML',label = 'Distribution',choices =  c('Select' = 'select','Contant' = 'ContantBDvarSpe', 'linear.t' = 'lineartBDvarSpe', 'stepf.t' = 'stepftBDvarSpe', 'spline.t' = 'splinetBDvarSpe', 'exp.t' = 'exptBDvarSpe'), selected = 'Select'),
+                                                                                                                            selectInput(inputId = 'distBDvarSpeModML',label = 'Distribution',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = 'Select'),
+                                                                                                                            
                                                                                                                             uiOutput('RateBDvarSpeModML'),
+                                                                                                                                             
+                                                                                                                            
                                                                                                                             checkboxInput(inputId = 'unresolBDvarSpeModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDvarSpeModML', label = 'add'), br()),
                                                                                                            checkboxInput(inputId = 'BDvarExtModML',label = 'Birth-Death variable: extinction'),

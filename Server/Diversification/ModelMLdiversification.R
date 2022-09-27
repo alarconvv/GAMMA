@@ -11,9 +11,12 @@ DiverModML$YuleList <-list()
 DiverModML$iteryule<-list()
 DiverModML$BDList <-list()
 DiverModML$iterBD<-list()
+DiverModML$BDvarSpeList <-list()
+DiverModML$iterBDvarSpe<-list()
 
 DiverModML$countyule <- 0
 DiverModML$countBD <- 0
+DiverModML$countBDvarSpe <- 0
 
 #Render print in Info panel: Models: ML
 #
@@ -90,10 +93,8 @@ observeEvent(input$BDContModML,{
 })
 
 observeEvent(input$addBDContModML,{
-  
   DiverModML$iterBD$rho <- as.numeric(input$fractBDContModML)
-  DiverModML$iterBD$Brate <- as.numeric(hot_to_r(input$BDrateModML)[1,1])
-  DiverModML$iterBD$Drate <- as.numeric(hot_to_r(input$BDrateModML)[1,2])
+  DiverModML$iterBD$Rates <- as.numeric(hot_to_r(input$BDrateModML))
   DiverModML$BDList$model <- DiverModML$iterBD
   
   DiverModML$countBD <- DiverModML$countBD + 1
@@ -114,30 +115,61 @@ observeEvent(input$addBDContModML, {
 
 # BDvarSp Model
 
-observeEvent(input$BDContModML,{
-  DiverModML$runObjModels$BD <- NULL
+observeEvent(input$distBDvarSpeModML != 'select',{
+  DiverModML$runObjModels$BDvarSpe <- NULL
   
+  if (input$distBDvarSpeModML == 'linear.t'){
+    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeTable) <- c('Sp.c', 'Sp.m','Ext')
+    row.names(ratesBDvarSpeTable) <- 'Rates'
+    
+  }
+
+  if (input$distBDvarSpeModML == 'spline.t'){
+    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeTable) <- c('Sp.Y0', 'Sp.Y1','Ext')
+    row.names(ratesBDvarSpeTable) <- 'Rates'
+    output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBBDvarSpeTable, readOnly = F)})
+    
+  }
   
+  if (input$distBDvarSpeModML == 'exp.t'){
+    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeTable) <- c('Sp.l', 'Sp.a','Ext')
+    row.names(ratesBDvarSpeTable) <- 'Rates'
+    output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBBDvarSpeTable, readOnly = F)})
+    
+  }
+  if (input$distBDvarSpeModML == 'sigmoid.t'){
+    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
+    colnames(ratesBDvarSpeTable) <- c('Sp.Y0', 'Sp.Y1','Sp.tmid', 'Sp.r','Ext')
+    row.names(ratesBDvarSpeTable) <- 'Rates'
+    output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBBDvarSpeTable, readOnly = F)})
+    
+  }
   
-  ratesBDTable <- matrix(data = c(0.1,0.1),nrow = 1,ncol = 2)
-  colnames(ratesBDTable) <- c('Sp', 'Ext')
-  row.names(ratesBDTable) <- 'Rates'
+  if (input$distBDvarSpeModML == 'stepf.t'){
+    
+  }
   
-  output$BDrateModML <- renderRHandsontable({rhandsontable(ratesBDTable, readOnly = F)})
+  output$RateBDvarSpeModML <- renderUI({
+    #no funcional
+    rHandsontableOutput(outputId = "RateBDvarSpeModML")
+  })
+
 })
 
-observeEvent(input$addBDContModML,{
+
+observeEvent(input$addBDvarSpeModML,{
+  DiverModML$iterBDvarSpe$rho <- as.numeric(input$fractBDContModML)
+  DiverModML$iterBDvarSpe$Rates <- as.numeric(hot_to_r(input$BDrateModML))
+  DiverModML$BDvarSpeList$model <- DiverModML$iterBDvarSpe
   
-  DiverModML$iterBD$rho <- as.numeric(input$fractBDContModML)
-  DiverModML$iterBD$Brate <- as.numeric(hot_to_r(input$BDrateModML)[1,1])
-  DiverModML$iterBD$Drate <- as.numeric(hot_to_r(input$BDrateModML)[1,2])
-  DiverModML$BDList$model <- DiverModML$iterBD
+  DiverModML$countBDvarSpe <- DiverModML$countBDvarSpe + 1
   
-  DiverModML$countBD <- DiverModML$countBD + 1
+  names(DiverModML$BDvarSpeList)[DiverModML$countBDvarSpe] <- paste('BDvarSpe',DiverModML$countBDvarSpe, sep = '')
   
-  names(DiverModML$BDList)[DiverModML$countBD] <- paste('BD',DiverModML$countBD, sep = '')
-  
-  DiverModML$runObjModels$BD <- DiverModML$BDList
+  DiverModML$runObjModels$BDvarSpe <- DiverModML$BDvarSpeList
 })
 
 
@@ -146,6 +178,17 @@ observeEvent(input$addBDContModML,{
 observeEvent(input$addBDContModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
 })
+
+
+
+
+
+
+
+
+
+
+
 
 ### models
 observeEvent(input$ModelRunModML,{
