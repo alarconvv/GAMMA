@@ -393,6 +393,7 @@ shinyUI(
                                                                                                                             textInput(inputId = 'BrateYuleModML',label = 'Speciation Rate',value = '0.1'),
                                                                                                                             checkboxInput(inputId = 'unresolYuModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addYuleModML', label = 'add')),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'BDContModML',label = 'Birth-Death constant'),
                                                                                                            conditionalPanel(condition = 'input.BDContModML == 1',
                                                                                                                             textInput(inputId = 'fractBDContModML',label = 'Rho',value = '0.9'),
@@ -400,30 +401,43 @@ shinyUI(
                                                                                                                             rHandsontableOutput("BDrateModML"),
                                                                                                                             checkboxInput(inputId = 'unresolBDContModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDContModML', label = 'add'), br()),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'BDvarSpeModML',label = 'Birth-Death variable: speciation'),
                                                                                                            conditionalPanel(condition = 'input.BDvarSpeModML == 1',
                                                                                                                             textInput(inputId = 'fractBDvarSpeModML',label = 'Rho',value = '0.9'),
-                                                                                                                            selectInput(inputId = 'distBDvarSpeModML',label = 'Distribution',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = 'Select'),
-                                                                                                                            
-                                                                                                                            uiOutput('RateBDvarSpeModML'),
-                                                                                                                                             
-                                                                                                                            
+                                                                                                                            selectInput(inputId = 'distBDvarSpeModML',label = 'Distribution: Speciation rate',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = NULL),
+                                                                                                                            conditionalPanel("input.distBDvarSpeModML != 'select'",
+                                                                                                                                             rHandsontableOutput(outputId = "RateBDvarSpeModML")),
+                                                                                                                            conditionalPanel("input.distBDvarSpeModML == 'spline.t'", fileInput("fileCSVSpeModML", "Load file ")),
                                                                                                                             checkboxInput(inputId = 'unresolBDvarSpeModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDvarSpeModML', label = 'add'), br()),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'BDvarExtModML',label = 'Birth-Death variable: extinction'),
                                                                                                            conditionalPanel(condition = 'input.BDvarExtModML == 1',
                                                                                                                             textInput(inputId = 'fractBDvarExtModML',label = 'Rho',value = '0.9'),
-                                                                                                                            selectInput(inputId = 'distBDvarExtModML',label = 'Distribution',choices =  c('Select' = 'select','Contant' = 'ContantBDvarExt', 'linear.t' = 'lineartBDvarExt', 'stepf.t' = 'stepftBDvarExt', 'spline.t' = 'splinetBDvarExt', 'exp.t' = 'exptBDvarExt'), selected = 'Select'),
-                                                                                                                            uiOutput('RateBDvarExtModML'),
+                                                                                                                            selectInput(inputId = 'distBDvarExtModML',label = 'Distribution: Extinction rate',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = NULL),
+                                                                                                                            conditionalPanel("input.distBDvarExtModML != 'select'",
+                                                                                                                                             rHandsontableOutput(outputId = "RateBDvarExtModML")),
+                                                                                                                            conditionalPanel("input.distBDvarExtModML == 'spline.t'", fileInput("fileCSVExtModML", "Load file ")),
                                                                                                                             checkboxInput(inputId = 'unresolBDvarExtModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDvarExtModML', label = 'add'), br()),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'BDvarSpeExtModML',label = 'Birth-Death variable: Spec. & Exti.'),
                                                                                                            conditionalPanel(condition = 'input.BDvarSpeExtModML == 1',
                                                                                                                             textInput(inputId = 'fractBDvarSpeExtModML',label = 'Rho',value = '0.9'),
-                                                                                                                            selectInput(inputId = 'distBDvarSpeExtModML',label = 'Distribution',choices =  c('Select' = 'select','Contant' = 'ContantBDvarExt', 'linear.t' = 'lineartBDvarExt', 'stepf.t' = 'stepftBDvarExt', 'spline.t' = 'splinetBDvarExt', 'exp.t' = 'exptBDvarExt'), selected = 'Select'),
-                                                                                                                            uiOutput('RateBDvarSpeExtModML'),
+                                                                                                                            selectInput(inputId = 'distBDvarSpeExtModMLsp',label = 'Distribution: speciation rate',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = NULL),
+                                                                                                                            conditionalPanel("input.distBDvarSpeExtModMLsp != 'select'",
+                                                                                                                                             rHandsontableOutput(outputId = "RateBDvarSpeExtModMLsp")),
+                                                                                                                            conditionalPanel("input.distBDvarSpeExtModMLsp == 'spline.t'", fileInput("fileCSVSpeExtModMLsp", "Load file ")),
+                                                                                                                            
+                                                                                                                            selectInput(inputId = 'distBDvarSpeExtModMLex',label = 'Distribution: speciation rate',choices =  c('Select' = 'select', 'linear.t' = 'linear.t', 'stepf.t' = 'stepf.t', 'spline.t' = 'spline.t', 'exp.t' = 'exp.t', 'sigmoid.t' = 'sigmoid.t' ), selected = NULL),
+                                                                                                                            conditionalPanel("input.distBDvarSpeExtModMLex != 'select'",
+                                                                                                                                             rHandsontableOutput(outputId = "RateBDvarSpeExtModMLex")),
+                                                                                                                            conditionalPanel("input.distBDvarSpeExtModMLex == 'spline.t'", fileInput("fileCSVSpeExtModMLsp", "Load file ")),
+                                                                                                                            
                                                                                                                             checkboxInput(inputId = 'unresolBDvarSpeExtModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDvarSpeExtModML', label = 'add'), br()),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'DiverDepentModML',label = 'Diversity-dependent model'),
                                                                                                            conditionalPanel(condition = 'input.DiverDepentModML == 1',
                                                                                                                             textInput(inputId = 'missnumDiverModML',label = 'Missing species',value = '1'),
