@@ -15,11 +15,14 @@ DiverModML$BDvarSpeList <-list()
 DiverModML$iterBDvarSpe<-list()
 DiverModML$BDvarExtList <-list()
 DiverModML$iterBDvarExt<-list()
+DiverModML$BDvarSpeExtList <-list()
+DiverModML$iterBDvarSpeExt<-list()
 
 DiverModML$countyule <- 0
 DiverModML$countBD <- 0
 DiverModML$countBDvarSpe <- 0
 DiverModML$countBDvarExt <- 0
+DiverModML$countBDvarSpeExt <- 0
 
 #Render print in Info panel: Models: ML
 #
@@ -219,7 +222,7 @@ observeEvent(input$distBDvarExtModML,{
 observeEvent(input$addBDvarExtModML,{
   DiverModML$iterBDvarExt$rho <- as.numeric(input$fractBDvarExtModML)
   DiverModML$iterBDvarExt$Distribution <- input$distBDvarExtModML
-  DiverModML$iterBDvarExt$Rates <- as.numeric(hot_to_r(input$RateBDvarEModML))
+  DiverModML$iterBDvarExt$Rates <- as.numeric(hot_to_r(input$RateBDvarExtModML))
   
   DiverModML$BDvarExtList$model <- DiverModML$iterBDvarExt
   
@@ -276,36 +279,46 @@ observeEvent(input$distBDvarSpeExtModMLsp,{
     
   }
   
+  
+  
+})
+
+
+
+# Extinction rates
+
+observeEvent(input$distBDvarSpeExtModMLex, {
+  
   #Extinction rates
-  if (input$distBDvarSpeExtModMLsp == 'linear.t'){
-    ratesBDvarSpeExtTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.c', 'Ext.m')
-    row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
-    output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
+  if (input$distBDvarSpeExtModMLex == 'linear.t'){
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.c', 'Ext.m')
+    row.names(ratesBDvarSpeExtTableex) <- 'Rates'
+    output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
-  if (input$distBDvarSpeExtModMLsp == 'stepf.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.Y0', 'Ext.Y1')
-    row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
-    output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
+  if (input$distBDvarSpeExtModMLex == 'stepf.t'){
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.Y0', 'Ext.Y1')
+    row.names(ratesBDvarSpeExtTableex) <- 'Rates'
+    output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
-  if (input$distBDvarSpeExtModMLsp == 'exp.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.l', 'Ext.a')
-    row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
-    output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
+  if (input$distBDvarSpeExtModMLex == 'exp.t'){
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.l', 'Ext.a')
+    row.names(ratesBDvarSpeExtTableex) <- 'Rates'
+    output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
-  if (input$distBDvarSpeExtModMLsp == 'sigmoid.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.Y0', 'Ext.Y1','Ext.tmid', 'Ext.r')
-    row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
-    output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarExtTablesp, readOnly = F)})
+  if (input$distBDvarSpeExtModMLex == 'sigmoid.t'){
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
+    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.Y0', 'Ext.Y1','Ext.tmid', 'Ext.r')
+    row.names(ratesBDvarSpeExtTableex) <- 'Rates'
+    output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarExtTableex, readOnly = F)})
   }
   
-  if (input$distBDvarSpeExtModMLsp == 'spline.t'){
+  if (input$distBDvarSpeExtModMLex == 'spline.t'){
     
   }
   
@@ -314,9 +327,13 @@ observeEvent(input$distBDvarSpeExtModMLsp,{
 
 
 observeEvent(input$addBDvarSpeExtModML,{
+  
   DiverModML$iterBDvarSpeExt$rho <- as.numeric(input$fractBDvarSpeExtModML)
-  DiverModML$iterBDvarSpeExt$Distribution <- input$distBDvarSpeExtModML
-  DiverModML$iterBDvarSpeExt$Rates <- as.numeric(hot_to_r(input$RateBDvarEModML))
+  DiverModML$iterBDvarSpeExt$Dist.Speciation <- input$distBDvarSpeExtModMLsp
+  DiverModML$iterBDvarSpeExt$Rates.Speciation <- as.numeric(hot_to_r(input$RateBDvarSpeExtModMLsp))
+  
+  DiverModML$iterBDvarSpeExt$Dist.Extiction <- input$distBDvarSpeExtModMLex
+  DiverModML$iterBDvarSpeExt$Rates.Extinction <- as.numeric(hot_to_r(input$RateBDvarSpeExtModMLex))
   
   DiverModML$BDvarSpeExtList$model <- DiverModML$iterBDvarSpeExt
   
@@ -330,20 +347,9 @@ observeEvent(input$addBDvarSpeExtModML,{
 
 #Temporal object to print in info panel
 # info:  models
-observeEvent(input$addBDvarExtModML, {
+observeEvent(input$addBDvarSpeExtModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
 })
-
-
-
-
-
-
-
-
-
-
-
 
 
 
