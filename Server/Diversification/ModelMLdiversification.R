@@ -17,12 +17,15 @@ DiverModML$BDvarExtList <-list()
 DiverModML$iterBDvarExt<-list()
 DiverModML$BDvarSpeExtList <-list()
 DiverModML$iterBDvarSpeExt<-list()
+DiverModML$DiverDepentModMLList <-list()
+DiverModML$iterDiverDepentModML<-list()
 
 DiverModML$countyule <- 0
 DiverModML$countBD <- 0
 DiverModML$countBDvarSpe <- 0
 DiverModML$countBDvarExt <- 0
 DiverModML$countBDvarSpeExt <- 0
+DiverModML$countDiverDepentModML <- 0
 
 #Render print in Info panel: Models: ML
 #
@@ -76,11 +79,14 @@ observeEvent(input$addYuleModML,{
     names(DiverModML$YuleList)[DiverModML$countyule] <- paste('Yule',DiverModML$countyule, sep = '')
     
     DiverModML$runObjModels$Yule <- DiverModML$YuleList
+    
+    updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('Yule',DiverModML$countyule, sep = '')))
 })
 
 #Temporal object to print in info panel
 # info:  models
 observeEvent(input$addYuleModML, {
+  
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
 })
 
@@ -108,6 +114,10 @@ observeEvent(input$addBDContModML,{
   names(DiverModML$BDList)[DiverModML$countBD] <- paste('BD',DiverModML$countBD, sep = '')
   
   DiverModML$runObjModels$BD <- DiverModML$BDList
+  
+  
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BD',DiverModML$countBD, sep = '')))
 })
 
 
@@ -170,6 +180,10 @@ observeEvent(input$addBDvarSpeModML,{
   names(DiverModML$BDvarSpeList)[DiverModML$countBDvarSpe] <- paste('BDvarSpe',DiverModML$countBDvarSpe, sep = '')
   
   DiverModML$runObjModels$BDvarSpe <- DiverModML$BDvarSpeList
+  
+  
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarSpe',DiverModML$countBDvarSpe, sep = '')))
 })
 
 
@@ -231,6 +245,9 @@ observeEvent(input$addBDvarExtModML,{
   names(DiverModML$BDvarExtList)[DiverModML$countBDvarExt] <- paste('BDvarExt',DiverModML$countBDvarExt, sep = '')
   
   DiverModML$runObjModels$BDvarExt <- DiverModML$BDvarExtList
+  
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarExt',DiverModML$countBDvarExt, sep = '')))
 })
 
 
@@ -342,17 +359,102 @@ observeEvent(input$addBDvarSpeExtModML,{
   names(DiverModML$BDvarSpeExtList)[DiverModML$countBDvarSpeExt] <- paste('BDvarSpeExt',DiverModML$countBDvarSpeExt, sep = '')
   
   DiverModML$runObjModels$BDvarSpeExt <- DiverModML$BDvarSpeExtList
+  
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarSpeExt',DiverModML$countBDvarSpeExt, sep = '')))
 })
 
 
 #Temporal object to print in info panel
 # info:  models
 observeEvent(input$addBDvarSpeExtModML, {
+  
+  
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
 })
 
 
+# Diver-dependent model
 
+observeEvent(input$addDiverDepentModML,{
+  
+  if (input$modelDiverModML == '1'){
+    
+    DiverModML$iterDiverDepentModML <- c("linear dependence in speciation rate with parameter K (= diversity where speciation = extinction)")
+    
+  }else if(input$modelDiverModML == '1.3'){
+    
+    DiverModML$iterDiverDepentModML <- c("linear dependence in speciation rate with parameter K' (= diversity where speciation = 0)")
+    
+  }else if(input$modelDiverModML == '1.4'){
+    
+    DiverModML$iterDiverDepentModML <- c(" positive diversity-dependence in speciation rate with parameter K' (= diversity where speciation rate reaches half its maximum); lambda = lambda0 * S/(S + K') where S is species richness")
+    
+  }else if(input$modelDiverModML == '1.5'){
+    
+    DiverModML$iterDiverDepentModML <- c("positive and negative dependence in speciation rate with parameter K' (= diversity where speciation = 0); lambda = lambda0 * S/K' * (1 - S/K') where S is species richness")
+    
+    
+  }else if(input$modelDiverModML == '2'){
+    
+    DiverModML$iterDiverDepentModML <- c("exponential dependence in speciation rate with parameter K (= diversity where speciation = extinction)")
+    
+  }else if(input$modelDiverModML == '2.1'){
+    
+    DiverModML$iterDiverDepentModML <- c("variant of exponential dependence in speciation rate with offset at infinity")
+    
+  }else if(input$modelDiverModML == '2.2'){
+    
+    DiverModML$iterDiverDepentModML <- c("1/n dependence in speciation rate")
+    
+  }else if(input$modelDiverModML == '2.3'){
+    
+    DiverModML$iterDiverDepentModML <- c("exponential dependence in speciation rate with parameter x (= exponent)")
+    
+  }else if(input$modelDiverModML == '3'){
+    
+    DiverModML$iterDiverDepentModML <- c("linear dependence in extinction rate ")
+    
+  }else if(input$modelDiverModML == '4'){
+    
+    DiverModML$iterDiverDepentModML <- c("exponential dependence in extinction rate")
+
+  }else if(input$modelDiverModML == '4.1'){
+    
+    DiverModML$iterDiverDepentModML <- c("variant of exponential dependence in extinction rate with offset at infinity")
+    
+  }else if(input$modelDiverModML == '4.2'){
+    
+    DiverModML$iterDiverDepentModML <- c("1/n dependence in extinction rate with offset at infinity ")
+
+  }else if(input$modelDiverModML == '5'){
+
+    DiverModML$iterDiverDepentModML <- c("linear dependence in speciation and extinction rate")
+
+  }
+  
+  DiverModML$DiverDepentModMLList$model <- DiverModML$iterDiverDepentModML
+  
+  DiverModML$countDiverDepentModML <- DiverModML$countDiverDepentModML + 1
+  
+  names(DiverModML$DiverDepentModMLList)[DiverModML$countDiverDepentModML] <- paste('DiverDepentModel',DiverModML$countDiverDepentModML, sep = '')
+  
+  DiverModML$runObjModels$DiverDepentModel <- DiverModML$DiverDepentModMLList
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('DiverDepentModel',DiverModML$countDiverDepentModML, sep = '')))
+  
+  
+  
+})
+
+
+
+
+#Temporal object to print in info panel
+# info:  models
+observeEvent(input$addDiverDepentModML, {
+  DiverModML$iterObjectDiver <- DiverModML$runObjModels
+})
 
 
 

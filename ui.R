@@ -18,6 +18,7 @@ library(phytools)
 library(shinyjs)
 library(rhandsontable)
 library(shinyWidgets)
+library(DDD)
 
 
 
@@ -456,7 +457,8 @@ shinyUI(
                                                                                                                                             '1/n: death rate & offset at infinity' = '4.2',
                                                                                                                                             'Linear: birth & death rate' = '5'
                                                                                                                                             )
-                                                                                                                                        )
+                                                                                                                                        ),
+                                                                                                                            actionButton(inputId = 'addDiverDepentModML', label = 'add'), br(),
                                                                                                                             ),
                                                                                                            checkboxInput(inputId = 'CladoDepenModML',label = 'Clado-dependent model'),
                                                                                                            selectInput(inputId = 'modelsFitModML', label = 'Models', choices = NULL, selected = NULL, multiple = T), hr(),
