@@ -19,6 +19,7 @@ DiverModML$BDvarSpeExtList <-list()
 DiverModML$iterBDvarSpeExt<-list()
 DiverModML$DiverDepentModMLList <-list()
 DiverModML$iterDiverDepentModML<-list()
+DiverModML$modelList <- NULL
 
 DiverModML$countyule <- 0
 DiverModML$countBD <- 0
@@ -78,9 +79,10 @@ observeEvent(input$addYuleModML,{
     
     names(DiverModML$YuleList)[DiverModML$countyule] <- paste('Yule',DiverModML$countyule, sep = '')
     
+    DiverModML$modelList <- c(DiverModML$modelList,paste('Yule',DiverModML$countyule, sep = ''))
+    
     DiverModML$runObjModels$Yule <- DiverModML$YuleList
     
-    updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('Yule',DiverModML$countyule, sep = '')))
 })
 
 #Temporal object to print in info panel
@@ -88,6 +90,8 @@ observeEvent(input$addYuleModML,{
 observeEvent(input$addYuleModML, {
   
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character( DiverModML$modelList),selected = as.character( DiverModML$modelList))
 })
 
 
@@ -113,11 +117,11 @@ observeEvent(input$addBDContModML,{
   
   names(DiverModML$BDList)[DiverModML$countBD] <- paste('BD',DiverModML$countBD, sep = '')
   
+  DiverModML$modelList <- c(DiverModML$modelList,paste('BD',DiverModML$countBD, sep = ''))
+  
   DiverModML$runObjModels$BD <- DiverModML$BDList
   
   
-  
-  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BD',DiverModML$countBD, sep = '')))
 })
 
 
@@ -125,6 +129,8 @@ observeEvent(input$addBDContModML,{
 # info:  models
 observeEvent(input$addBDContModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character(DiverModML$modelList),selected = as.character( DiverModML$modelList))
 })
 
 
@@ -179,11 +185,12 @@ observeEvent(input$addBDvarSpeModML,{
   
   names(DiverModML$BDvarSpeList)[DiverModML$countBDvarSpe] <- paste('BDvarSpe',DiverModML$countBDvarSpe, sep = '')
   
+  DiverModML$modelList <- c(DiverModML$modelList, paste('BDvarSpe',DiverModML$countBDvarSpe, sep = ''))
+  
   DiverModML$runObjModels$BDvarSpe <- DiverModML$BDvarSpeList
   
   
   
-  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarSpe',DiverModML$countBDvarSpe, sep = '')))
 })
 
 
@@ -191,6 +198,8 @@ observeEvent(input$addBDvarSpeModML,{
 # info:  models
 observeEvent(input$addBDvarSpeModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character(DiverModML$modelList),selected = as.character( DiverModML$modelList) )
 })
 
 
@@ -244,10 +253,11 @@ observeEvent(input$addBDvarExtModML,{
   
   names(DiverModML$BDvarExtList)[DiverModML$countBDvarExt] <- paste('BDvarExt',DiverModML$countBDvarExt, sep = '')
   
+  DiverModML$modelList <- c(DiverModML$modelList , paste('BDvarExt',DiverModML$countBDvarExt, sep = ''))
+  
   DiverModML$runObjModels$BDvarExt <- DiverModML$BDvarExtList
   
   
-  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarExt',DiverModML$countBDvarExt, sep = '')))
 })
 
 
@@ -255,6 +265,8 @@ observeEvent(input$addBDvarExtModML,{
 # info:  models
 observeEvent(input$addBDvarExtModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character(DiverModML$modelList),selected = as.character( DiverModML$modelList) )
 })
 
 
@@ -358,10 +370,11 @@ observeEvent(input$addBDvarSpeExtModML,{
   
   names(DiverModML$BDvarSpeExtList)[DiverModML$countBDvarSpeExt] <- paste('BDvarSpeExt',DiverModML$countBDvarSpeExt, sep = '')
   
+  DiverModML$modelList <- c(DiverModML$modelList,paste('BDvarSpeExt',DiverModML$countBDvarSpeExt, sep = ''))
+  
   DiverModML$runObjModels$BDvarSpeExt <- DiverModML$BDvarSpeExtList
   
   
-  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('BDvarSpeExt',DiverModML$countBDvarSpeExt, sep = '')))
 })
 
 
@@ -371,6 +384,8 @@ observeEvent(input$addBDvarSpeExtModML, {
   
   
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character(DiverModML$modelList),selected = as.character( DiverModML$modelList) )
 })
 
 
@@ -439,22 +454,27 @@ observeEvent(input$addDiverDepentModML,{
   
   names(DiverModML$DiverDepentModMLList)[DiverModML$countDiverDepentModML] <- paste('DiverDepentModel',DiverModML$countDiverDepentModML, sep = '')
   
+  DiverModML$modelList <- c(DiverModML$modelList,paste('DiverDepentModel',DiverModML$countDiverDepentModML, sep = ''))
+  
   DiverModML$runObjModels$DiverDepentModel <- DiverModML$DiverDepentModMLList
   
-  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = c(input$modelsFitModML,paste('DiverDepentModel',DiverModML$countDiverDepentModML, sep = '')))
+  
   
   
   
 })
-
-
 
 
 #Temporal object to print in info panel
 # info:  models
 observeEvent(input$addDiverDepentModML, {
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+  
+  updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character( DiverModML$modelList),selected = as.character( DiverModML$modelList))
 })
+
+
+
 
 
 
