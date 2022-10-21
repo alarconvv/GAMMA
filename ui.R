@@ -19,6 +19,7 @@ library(shinyjs)
 library(rhandsontable)
 library(shinyWidgets)
 library(DDD)
+library(diversitree)
 
 
 
