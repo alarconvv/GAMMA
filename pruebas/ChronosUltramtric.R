@@ -2,6 +2,8 @@ library(phytools)
 library(phangorn)
 data("Laurasiatherian")
 
+
+str(Laurasiatherian)
 mp.tree<-pratchet(Laurasiatherian)
 mp.tree$edge.length<-runif(n=nrow(mp.tree$edge))
 
@@ -33,7 +35,7 @@ calibration<-makeChronosCalib(ml.tree,node=nodes,
 calibration
 
 
-pl.tree<-chronos(ml.tree,calibration=calibration)
+pl.tree<-chronos(ml.tree,calibration=calibration,)
 
 
 pl.tree
@@ -65,9 +67,57 @@ min_tip <- min(scaled_root_to_tip)
 max_tip <- max(scaled_root_to_tip)
 (max_tip - min_tip) / max_tip
 
+
+
+ml.tree2 <-CollapseNode(ml.tree, c(90, 91))
+
+
+nodes<-c(findMRCA(ml.tree,c("Possum","Cat")),
+         findMRCA(ml.tree,c("Squirrel","Mouse")),
+         findMRCA(ml.tree,c("Pig","BlueWhale")),
+         findMRCA(ml.tree,c("Human","Baboon")),
+         findMRCA(ml.tree,c("Horse","Donkey")))
+age.min=c(159,66,59,27.95,6.2)
+age.max=c(166,75,66,31.35,10)
+plotTree(ladderize(ml.tree))
+obj<-get("last_plot.phylo",envir=.PlotPhyloEnv)
+points(obj$xx[nodes],obj$yy[nodes],pch=21,bg=palette()[1:5],cex=2)
+legend("bottomleft",paste("(",age.max,", ",age.min,") mya",sep=""),
+       pch=21,pt.bg=palette()[1:5],pt.cex=2,bty="n")
+
+
+calibration<-makeChronosCalib(ml.tree,node=nodes,
+                              age.min=age.min,age.max=age.max)
+calibration
+
+
+pl.tree<-chronos(ml.tree,calibration=calibration,)
+
+
+
+
+
+
+
+plot(pl.tree)
+
 is.ultrametric(pl.tree)
 
-is.binary(pl.tree)
+write.tree( pl.tree,'Example.Ultrametric.phy')
+
+saveRDS(pl.tree, 'Documents/Guane/data/Example.Ultrametric.RDS')
+
+
+
+is.ultrametric(ml.tree2)
+
+write.tree( ml.tree2,'Example.noUltrametric.phy')
+saveRDS(ml.tree2, 'Documents/Guane/data/Example.noUltrametric.RDS')
+
+is.binary(ml.tree2)
+
+
+
 
 
 
