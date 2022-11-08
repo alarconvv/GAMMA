@@ -37,7 +37,16 @@ output$infoPanelDiverModML <- renderPrint( {
 
 ## Tree 
 
-treeModML <- reactive(treeInputDiver())
+
+  #Get tree from DT
+  
+treeModML <-reactive({
+    validate(need(try(treeInputDiver3()),"Please, upload a tree ")
+    )
+    treeInputDiver3()
+  }
+  )
+
 
 
 
@@ -53,7 +62,7 @@ output$PhyloPlotDiver5 <- renderPlot( height = heightDiverModML  , width = width
   req(treeModML())
   
   
-  plot.phylo(treeInputDiver(), show.tip.label = T,
+  plot.phylo(treeModML(), show.tip.label = T,
              cex = input$tipSizeDiverModML[1], use.edge.length = T,
              edge.width = 0.8,edge.color = 'grey40')
 })
@@ -485,7 +494,7 @@ observeEvent(input$ModelRunModML,{
   
  
   if (input$yuleModML){
-    #unresolve
+ 
     if (input$optModML == 'optim'){
       yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
       fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='optim', control = list(optim.method= input$optimModML))
@@ -499,6 +508,22 @@ observeEvent(input$ModelRunModML,{
   }
   
   
+
+  
+  
+  
   
   
 })
+
+
+
+# #Temporal object to print in info panel
+# # info:  models
+# observeEvent(input$addBDvarSpeExtModML, {
+#   
+#   
+#   DiverModML$iterObjectDiver <- DiverModML$runObjModels
+#   
+# })
+

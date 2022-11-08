@@ -74,6 +74,8 @@ observeEvent(input$ultrametricDiverDT1, {
   if (ultrametricDiverDT() == T){
     DiverData$iterObjectDiver <- paste('Is an ultrametric tree? ',ultrametricDiverDT())
     
+    treeInputDiver2 <- reactive(treeInputDiver())
+    
   } else if (ultrametricDiverDT() == F) {
     
     h <- diag(vcv(treeInputDiver()))
@@ -94,6 +96,24 @@ observeEvent(input$ultrametricDiverDT1, {
 })
 
 
+#Chronos table
+
+ageTableDiverDT <- eventReactive(input$importAgeCSV,{
+  
+  read.csv(file = input$fileageDiverDT$datapath,header = T)
+  
+})
+
+#Temporal object to print in info panel
+# info: tree
+observeEvent(input$importAgeCSV, {
+  DiverData$iterObjectDiver <- ageTableDiverDT()
+})
+
+
+
+
+
 #Round branches
 
 treeInputDiver2 <- eventReactive(input$ButtonUltra,{
@@ -101,7 +121,28 @@ treeInputDiver2 <- eventReactive(input$ButtonUltra,{
 
       force.ultrametric(tree = treeInputDiver(),method = 'nnls' )
   
+  }else if (input$frcUltButtDiverDT == 'chronosDiverDt'){
+    validate(
+      need(try(ageTableDiverDT()),"Please, insert ages ")
+    )
+    
+    calibration<-makeChronosCalib(treeInputDiver(),node=ageTableDiverDT()[,1],
+                                  age.min=ageTableDiverDT()[,2],age.max=ageTableDiverDT()[,3])
+    
+    
+    
+    chronos(treeInputDiver(),calibration=calibration,)
+    
   }
+  
+
+})
+
+
+#Temporal object to print in info panel
+# info: tree
+observeEvent(input$ButtonUltra, {
+  DiverData$iterObjectDiver <- treeInputDiver2()
 })
 
 
@@ -140,6 +181,8 @@ observeEvent(input$BinaryDiverDT, {
   if (binaryDiverDT() == T){
     DiverData$iterObjectDiver <- paste('Is a binary tree? ', binaryDiverDT())
     
+    treeInputDiver3 <- reactive(treeInputDiver2())
+    
   } else if (binaryDiverDT() == F) {
     DiverData$iterObjectDiver <- paste('Is a binary tree? ', binaryDiverDT(), '-', 'Please, solve the polytomic nodes' )
     
@@ -157,7 +200,7 @@ observeEvent(input$BinaryDiverDT, {
 
 
 
-#RSolving polytomies
+#Solving polytomies
 
 treeInputDiver3 <- eventReactive(input$ButtonPoliDiverDT,{
   if (input$ResolveDiverDT == 'ramdom'){
@@ -185,12 +228,20 @@ observeEvent(input$ButtonPoliDiverDT, {
 
 
 
+
+
+
+
+
+
 #Plot tree
 #
 heightDiverDT <- reactive(input$PlotHeightDiverDT[1])
 widthDiverDT <- reactive(input$PlotWidthDiverDT[1])
 
 output$PhyloPlotDiver1 <- renderPlot( height = heightDiverDT  , width = widthDiverDT,{
+  
+  
   req(treeInputDiver())
   
   

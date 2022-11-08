@@ -119,8 +119,54 @@ is.binary(ml.tree2)
 
 
 
+#########################################################################################
 
 
 
+diver <- list()
+diver$object <- list()
 
+diver$object$yule <- list()
+
+diver$object$yule$yule1 <- list()
+
+diver$object$yule$yule1$Rho <- 0.1
+
+diver$object$yule$yule1$Rate <- 0.2
+
+
+
+diver$object$yule$yule2 <- list()
+
+diver$object$yule$yule2$Rho <- 0.1
+
+diver$object$yule$yule2$Rate <- 0.1
+
+
+diver$object$yule$yule3 <- list()
+
+diver$object$yule$yule3$Rho <- 0.1
+
+diver$object$yule$yule3$Rate <- 0.3
+
+
+models <- c('yule1', 'yule3')
+
+diver$object$yule[[1]]$Rho
+
+
+ yulemodels <- which(names(diver$object$yule) %in%  models)
+
+
+ for (i in 1:length(yulemodels)){
+   
+yule <-make.yule(tree = pl.tree, sampling.f = as.numeric(diver$object$yule[[yulemodels[i]]]$Rho), unresolved = NULL)
+
+fityule <- find.mle(func = yule, x.init= as.numeric(diver$object$yule[[yulemodels[i]]]$Rate))
+
+print(diver$object$yule[i])
+print(fityule)
+
+
+}
 
