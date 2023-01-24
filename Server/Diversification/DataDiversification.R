@@ -61,7 +61,7 @@ observeEvent(input$importTree, {
 
 
 
-# Is ultrametric
+# Is ultrametric?
 
 ultrametricDiverDT <- eventReactive(input$ultrametricDiverDT1,{
   is.ultrametric(treeInputDiver())
@@ -69,14 +69,14 @@ ultrametricDiverDT <- eventReactive(input$ultrametricDiverDT1,{
 
 #Temporal object to print in info panel
 # info: tree
+
 observeEvent(input$ultrametricDiverDT1, {
   
   if (ultrametricDiverDT() == T){
     DiverData$iterObjectDiver <- paste('Is an ultrametric tree? ',ultrametricDiverDT())
-    
-    treeInputDiver2 <- reactive(treeInputDiver())
-    
-  } else if (ultrametricDiverDT() == F) {
+
+
+  } else  {
     
     h <- diag(vcv(treeInputDiver()))
     cvBranch <- round(sd(h)/mean(h),digits = 2)*100
@@ -94,6 +94,8 @@ observeEvent(input$ultrametricDiverDT1, {
   }
 
 })
+
+
 
 
 #Chronos table
@@ -139,26 +141,30 @@ treeInputDiver2 <- eventReactive(input$ButtonUltra,{
 })
 
 
-#Temporal object to print in info panel
-# info: tree
-observeEvent(input$ButtonUltra, {
-  DiverData$iterObjectDiver <- treeInputDiver2()
+treeInputDiver3 <- reactive({
+  if (ultrametricDiverDT() == T){
+    return(treeInputDiver())
+  }else{
+    return(treeInputDiver2())
+  }
 })
 
 
 
-
 #Temporal object to print in info panel
 # info: tree
 observeEvent(input$ButtonUltra, {
-  try(treeInputDiver2())
-  h <- diag(vcv(treeInputDiver2()))
+  try(treeInputDiver3())
+  h <- diag(vcv(treeInputDiver3()))
   cvBranch <- round(sd(h)/mean(h),digits = 2)*100
   
-  isUltra <- is.ultrametric(treeInputDiver2())
+  isUltra <- is.ultrametric(treeInputDiver3())
   
   DiverData$iterObjectDiver <- paste('Is an ultrametric tree? ',isUltra, '-', 'Coeffient of variation among branches:', cvBranch, '%' )
-})
+
+  
+  
+  })
 
 
 
@@ -169,7 +175,7 @@ observeEvent(input$ButtonUltra, {
 # 
 
 binaryDiverDT <- eventReactive(input$BinaryDiverDT,{
-  is.binary(treeInputDiver2())
+  is.binary(treeInputDiver3())
 })
 
 
@@ -181,9 +187,8 @@ observeEvent(input$BinaryDiverDT, {
   if (binaryDiverDT() == T){
     DiverData$iterObjectDiver <- paste('Is a binary tree? ', binaryDiverDT())
     
-    treeInputDiver3 <- reactive(treeInputDiver2())
-    
-  } else if (binaryDiverDT() == F) {
+
+  } else  {
     DiverData$iterObjectDiver <- paste('Is a binary tree? ', binaryDiverDT(), '-', 'Please, solve the polytomic nodes' )
     
     output$PoliDiverDT <- renderUI({
@@ -200,32 +205,37 @@ observeEvent(input$BinaryDiverDT, {
 
 
 
+
+
 #Solving polytomies
 
-treeInputDiver3 <- eventReactive(input$ButtonPoliDiverDT,{
+treeInputDiver4 <- eventReactive(input$ButtonPoliDiverDT,{
   if (input$ResolveDiverDT == 'ramdom'){
-    multi2di(treeInputDiver2(), random = T)
+    multi2di(treeInputDiver3(), random = T)
   } else if (input$ResolveDiverDT == 'order' ){
-    multi2di(treeInputDiver2(), random = F)
+    multi2di(treeInputDiver3(), random = F)
   }
 })
 
 
+treeInputDiver5 <- reactive({
+  if (binaryDiverDT() == T){
+    return(treeInputDiver3())
+  }else{
+    return(treeInputDiver4())
+  }
+})
 
 
 #Temporal object to print in info panel
 # info: tree
 observeEvent(input$ButtonPoliDiverDT, {
-  try(treeInputDiver3())
+  try(treeInputDiver4())
  
-  isBinary <- is.binary(treeInputDiver3())
+  isBinary <- is.binary(treeInputDiver4())
   
   DiverData$iterObjectDiver <- paste('Is a binary tree? ',isBinary )
 })
-
-
-
-
 
 
 

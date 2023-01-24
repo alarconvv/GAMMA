@@ -168,5 +168,35 @@ print(diver$object$yule[i])
 print(fityule)
 
 
-}
+ }nn
+ 
+ 
+ 
+ 
+ 
+ 
+ ####
+ 
+ treeModML <- readRDS('Documents/Guane/data/Example.noUltrametric.RDS')
+ 
+ treeModML$edge.length[which(treeModML$edge.length < 0)]
+ treeModML <- force.ultrametric(treeModML)
+
+yule <-make.yule(tree = treeModML, sampling.f = 0.5, unresolved = NULL)
+
+fityule <- find.mle(func = yule, x.init= 0.1) 
+
+
+ageTableDiverDT <- read.csv(file = 'Documents/Guane/data/Example.ages.Chrons.csv')
+
+calibration<-makeChronosCalib(treeModML,node=ageTableDiverDT[,1],
+                              age.min=ageTableDiverDT[,2],age.max=ageTableDiverDT[,3])
+
+
+
+treeCal <- chronos(treeModML,calibration=calibration)
+ 
+ 
+ 
+ 
 

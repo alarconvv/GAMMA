@@ -40,13 +40,13 @@ output$infoPanelDiverModML <- renderPrint( {
 
   #Get tree from DT
   
-treeModML <-reactive({
-    validate(need(try(treeInputDiver3()),"Please, upload a tree ")
-    )
-    treeInputDiver3()
-  }
+treeModML <- reactive({
+  
+  validate(need(try(treeInputDiver5()),"Please, your tree must be ultrametric and binary ")
   )
-
+  treeInputDiver5()
+}
+)
 
 
 
@@ -509,7 +509,7 @@ observeEvent(input$ModelRunModML,{
   
   
 
-  
+  DiverModML$iterObjectDiver <- fityule
   
   
   
@@ -520,7 +520,7 @@ observeEvent(input$ModelRunModML,{
 
 # #Temporal object to print in info panel
 # # info:  models
-# observeEvent(input$addBDvarSpeExtModML, {
+# observeEvent(input$ModelRunModML, {
 #   
 #   
 #   DiverModML$iterObjectDiver <- DiverModML$runObjModels

@@ -18,9 +18,10 @@ output$infoPanelDiverLtt <- renderPrint( {
 #Get tree from DT
 
 treeDiverLTT <- reactive({
-  validate(need(try(treeInputDiver3()),"Please, upload a tree ")
+ 
+  validate(need(try(treeInputDiver5()),"Please, your tree must be ultrametric and binary ")
   )
-  treeInputDiver3()
+  treeInputDiver5()
 }
 )
 
