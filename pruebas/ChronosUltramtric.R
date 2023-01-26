@@ -150,6 +150,15 @@ diver$object$yule$yule3$Rho <- 0.1
 diver$object$yule$yule3$Rate <- 0.3
 
 
+diver$object$BD <- list()
+
+diver$object$yule$yule3 <- list()
+
+diver$object$yule$yule3$Rho <- 0.1
+
+diver$object$yule$yule3$Rate <- 0.3
+
+
 models <- c('yule1', 'yule3')
 
 diver$object$yule[[1]]$Rho
@@ -168,7 +177,7 @@ print(diver$object$yule[i])
 print(fityule)
 
 
- }nn
+ }
  
  
  

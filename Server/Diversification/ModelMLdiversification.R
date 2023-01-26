@@ -28,6 +28,16 @@ DiverModML$countBDvarExt <- 0
 DiverModML$countBDvarSpeExt <- 0
 DiverModML$countDiverDepentModML <- 0
 
+
+DiverModML$Result <- NULL
+DiverModML$iterYuleResult <- NULL
+DiverModML$ResultYuleList  <- NULL
+DiverModML$countYuleResult <- 0
+
+
+
+
+
 #Render print in Info panel: Models: ML
 #
 output$infoPanelDiverModML <- renderPrint( {
@@ -206,6 +216,7 @@ observeEvent(input$addBDvarSpeModML,{
 #Temporal object to print in info panel
 # info:  models
 observeEvent(input$addBDvarSpeModML, {
+  
   DiverModML$iterObjectDiver <- DiverModML$runObjModels
   
   updateSelectInput(session = session,inputId = 'modelsFitModML',label = 'Models', choices = as.character(DiverModML$modelList),selected = as.character( DiverModML$modelList) )
@@ -489,32 +500,84 @@ observeEvent(input$addDiverDepentModML, {
 
 
 
-### models
+### Runing models
 observeEvent(input$ModelRunModML,{
-  
- 
-  if (input$yuleModML){
- 
-    if (input$optModML == 'optim'){
-      yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
-      fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='optim', control = list(optim.method= input$optimModML))
-    } else if ( input$optModML == 'minqa'){
-      yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
-      fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='minqa', control = list(minqa.method= input$minqaModML))
-    } else {
-      yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
-      fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method= input$optModML)
-    }
-  }
-  
-  
 
-  DiverModML$iterObjectDiver <- fityule
+  
+  ##### Fitting Yule models
   
   
-  
+  yulemodels <- which(names(DiverModML$runObjModels$Yule) %in%  input$modelsFitModML)
+                                      
+  if (!is.null(yulemodels)){
+    if (input$optModML == 'optim'){
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='optim', control = list(optim.method= input$optimModML))
+      #
+      for (i in 1:length(yulemodels)){
+        yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rho[1]), unresolved = NULL)
+        fityule <- find.mle(func = yule, x.init= as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rate[1]),method='optim', control = list(optim.method= input$optimModML))
+      
+        DiverModML$iterYuleResult <- fityule
+        
+        DiverModML$ResultYuleList$result <- DiverModML$iterYuleResult
+        
+        DiverModML$countYuleResult <- DiverModML$countYuleReult + 1
+        
+        names(DiverModML$ResultYuleList)[DiverModML$countYuleResult] <- names(DiverModML$runObjModels$Yule)[yulemodels[i]]
+        
+        DiverModML$Result$YuleResults  <- DiverModML$ResultYuleList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+        }
+    } else if ( input$optModML == 'minqa'){
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='minqa', control = list(minqa.method= input$minqaModML))
+      #
+      for (i in 1:length(yulemodels)){
+        yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rho[1]), unresolved = NULL)
+        fityule <- find.mle(func = yule, x.init= as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rate[1]),method='minqa', control = list(minqa.method= input$minqaModML))
+      
+        DiverModML$iterYuleResult <- fityule
+        
+        DiverModML$ResultYuleList$result <- DiverModML$iterYuleResult
+        
+        DiverModML$countYuleResult <- DiverModML$countYuleReult + 1
+        
+        names(DiverModML$ResultYuleList)[DiverModML$countYuleResult] <- names(DiverModML$runObjModels$Yule)[yulemodels[i]]
+        
+        DiverModML$Result$YuleResults <- DiverModML$ResultYuleList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+        }
+    } else {
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method= input$optModML)
+      #
+      for (i in 1:length(yulemodels)){
+        yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rho[1]), unresolved = NULL)
+        fityule <- find.mle(func = yule, x.init= as.numeric(DiverModML$runObjModels$Yule[[yulemodels[i]]]$rate[1]),method= input$optModML)
+      
+        DiverModML$iterYuleResult <- fityule
+        
+        DiverModML$ResultYuleList$result <- DiverModML$iterYuleResult
+        
+        DiverModML$countYuleResult <- DiverModML$countYuleResult + 1
+        
+        names(DiverModML$ResultYuleList)[DiverModML$countYuleResult] <- names(DiverModML$runObjModels$Yule)[yulemodels[i]]
+        
+        DiverModML$Result$YuleResults  <- DiverModML$ResultYuleList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+        }
+    }
+    
+  }
+
   
 })
+
+
 
 
 
