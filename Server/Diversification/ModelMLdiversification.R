@@ -35,6 +35,9 @@ DiverModML$ResultYuleList  <- NULL
 DiverModML$countYuleResult <- 0
 
 
+DiverModML$iterBDResult <- NULL
+DiverModML$ResultBDList  <- NULL
+DiverModML$countBDResult <- 0
 
 
 
@@ -522,7 +525,7 @@ observeEvent(input$ModelRunModML,{
         
         DiverModML$ResultYuleList$result <- DiverModML$iterYuleResult
         
-        DiverModML$countYuleResult <- DiverModML$countYuleReult + 1
+        DiverModML$countYuleResult <- DiverModML$countYuleResult + 1
         
         names(DiverModML$ResultYuleList)[DiverModML$countYuleResult] <- names(DiverModML$runObjModels$Yule)[yulemodels[i]]
         
@@ -542,11 +545,11 @@ observeEvent(input$ModelRunModML,{
         
         DiverModML$ResultYuleList$result <- DiverModML$iterYuleResult
         
-        DiverModML$countYuleResult <- DiverModML$countYuleReult + 1
+        DiverModML$countYuleResult <- DiverModML$countYuleResult + 1
         
         names(DiverModML$ResultYuleList)[DiverModML$countYuleResult] <- names(DiverModML$runObjModels$Yule)[yulemodels[i]]
         
-        DiverModML$Result$YuleResults <- DiverModML$ResultYuleList
+        DiverModML$Result$YuleResults  <- DiverModML$ResultYuleList
         
         DiverModML$iterObjectDiver <- DiverModML$Result
         }
@@ -574,6 +577,82 @@ observeEvent(input$ModelRunModML,{
     
   }
 
+  
+  
+  ##### Fitting BD models
+  
+  
+  BDmodels <- which(names(DiverModML$runObjModels$BD) %in%  input$modelsFitModML)
+  
+  if (!is.null(BDmodels)){
+    if (input$optModML == 'optim'){
+      for (i in 1:length(BDmodels)){
+        BD <-make.bd(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$BD[[BDmodels[i]]]$rho[1]), unresolved = NULL)
+        fitBD <- find.mle(func = BD, x.init= as.numeric(c(DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[1],DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[2])),method='optim', control = list(optim.method= input$optimModML))
+        
+        DiverModML$iterBDResult <- fitBD
+        
+        DiverModML$ResultBDList$result <- DiverModML$iterBDResult
+        
+        DiverModML$countBDResult <- DiverModML$countBDResult + 1
+        
+        names(DiverModML$ResultBDList)[DiverModML$countBDResult] <- names(DiverModML$runObjModels$BD)[BDmodels[i]]
+        
+        DiverModML$Result$BDResults  <- DiverModML$ResultBDList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else if ( input$optModML == 'minqa'){
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='minqa', control = list(minqa.method= input$minqaModML))
+      #
+      for (i in 1:length(BDmodels)){
+        BD <-make.bd(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$BD[[BDmodels[i]]]$rho[1]), unresolved = NULL)
+        fitBD <- find.mle(func = BD, x.init= as.numeric(c(DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[1],DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[2])), method='minqa', control = list(minqa.method= input$minqaModML))
+        
+        DiverModML$iterBDResult <- fitBD
+        
+        DiverModML$ResultBDList$result <- DiverModML$iterBDResult
+        
+        DiverModML$countBDResult <- DiverModML$countBDResult + 1
+        
+        names(DiverModML$ResultBDList)[DiverModML$countBDResult] <- names(DiverModML$runObjModels$BD)[BDmodels[i]]
+        
+        DiverModML$Result$BDResults  <- DiverModML$ResultBDList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else {
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method= input$optModML)
+      #
+      for (i in 1:length(BDmodels)){
+        BD <-make.bd(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$BD[[BDmodels[i]]]$rho[1]), unresolved = NULL)
+        fitBD <- find.mle(func = BD, x.init= as.numeric(c(DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[1],DiverModML$runObjModels$BD[[BDmodels[i]]]$Rates[2])),method= input$optModML)
+        
+        DiverModML$iterBDResult <- fitBD
+        
+        DiverModML$ResultBDList$result <- DiverModML$iterBDResult
+        
+        DiverModML$countBDResult <- DiverModML$countBDResult + 1
+        
+        names(DiverModML$ResultBDList)[DiverModML$countBDResult] <- names(DiverModML$runObjModels$BD)[BDmodels[i]]
+        
+        DiverModML$Result$BDResults  <- DiverModML$ResultBDList
+        
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    }
+    
+  }
+  
+  
+  
+  
+  
+  
+  
+  
   
 })
 
