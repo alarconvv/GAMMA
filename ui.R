@@ -24,7 +24,7 @@ library(diversitree)
 
 
 theme <- bs_theme(version = 5, bootswatch =  "minty", primary = "#0BB48C",secondary = "#C1D9DB",
-  "font-size-base" = "0.9rem", "enable-rounded" = T
+  "font-size-base" = "1.0rem", "enable-rounded" = T
 ) %>%
    bs_add_rules(
      '.navbar:not(.fixed-bottom):not(.navbar-fixed-bottom):not(.navbar-fixed-bottom) {
@@ -71,7 +71,8 @@ shinyUI(
                       includeHTML("www/home.html"),
                       ),
              navbarMenu("Methods",
-                        tabPanel("Independent Contrats"),
+                        tabPanel("Independent Contrats", imageOutput("home_img")
+                                 ),
                         tabPanel("Ancestral character estimation",
                                  fluidPage(theme = theme,
                                    tabsetPanel(type = "tabs",
