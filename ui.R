@@ -468,8 +468,11 @@ shinyUI(
                                                                                                                             checkboxInput(inputId = 'unresolBDvarSpeExtModML', label = 'Unresolve tips?'),
                                                                                                                             actionButton(inputId = 'addBDvarSpeExtModML', label = 'add'), br()),
                                                                                                            
+                                                                                                           checkboxInput(inputId = 'CladoDepenModML',label = 'Clado-dependent model'),
+                                                                                                           
                                                                                                            checkboxInput(inputId = 'DiverDepentModML',label = 'Diversity-dependent model'),
                                                                                                            conditionalPanel(condition = 'input.DiverDepentModML == 1',
+                                                                                                                            selectInput(inputId = 'optModMLDDD',label = 'Optimization method',choices = c('subplex', 'simplex'),br()),
                                                                                                                             textInput(inputId = 'missnumDiverModML',label = 'Missing species',value = '1'),
                                                                                                                             selectInput(inputId = 'modelDiverModML', label = 'model of diversity-dependence', choices = 
                                                                                                                                           c('Linear: birth rate & K parameter' = '1',
@@ -489,12 +492,12 @@ shinyUI(
                                                                                                                                         ),
                                                                                                                             actionButton(inputId = 'addDiverDepentModML', label = 'add'), br(),
                                                                                                                             ),
-                                                                                                           checkboxInput(inputId = 'CladoDepenModML',label = 'Clado-dependent model'),
+                                                                                                           
                                                                                                            selectInput(inputId = 'modelsFitModML', label = 'Models', choices = NULL, selected = NULL, multiple = T), hr(),
                                                                                                            actionButton(inputId = 'ModelRunModML', label = 'RUN'), hr(),
                                                                                                            checkboxInput(inputId = 'AICModML',label = 'AIC'), hr(),
                                                                                                            radioButtons("exportModML", "Export output",c("R object (RDS)" = "RDSModML","TXT" = "TXTModML")),
-                                                                                                           downloadButton("downloadModML", "Download"),
+                                                                                                           downloadButton("downloadModML", "Download")
                                                                                                            )
                                                                                               ),
                                                                                                 column(9,fluidRow(column(6, fluidRow(plotOutput(outputId = 'PhyloPlotDiver5', inline = T))),

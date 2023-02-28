@@ -44,6 +44,18 @@ DiverModML$ResultBDvarSpeList  <- NULL
 DiverModML$countBDvarSpeResult <- 0
 
 
+DiverModML$iterBDvarExtResult <- NULL
+DiverModML$ResultBDvarExtList  <- NULL
+DiverModML$countBDvarExtResult <- 0
+
+DiverModML$iterBDvarSpeExtResult <- NULL
+DiverModML$ResultBDvarSpeExtList  <- NULL
+DiverModML$countBDvarSpeExtResult <- 0
+
+DiverModML$iterDiverDepentModelResult <- NULL
+DiverModML$ResultDiverDepentModelList  <- NULL
+DiverModML$countDiverDepentModelResult <- 0
+
 
 #Render print in Info panel: Models: ML
 #
@@ -167,28 +179,28 @@ observeEvent(input$distBDvarSpeModML,{
   DiverModML$runObjModels$BDvarSpe <- NULL
   
   if (input$distBDvarSpeModML == 'linear.t'){
-    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    ratesBDvarSpeTable <- matrix(data = c(0.01,0.01,0.1),nrow = 1,ncol = 3)
     colnames(ratesBDvarSpeTable) <- c('Sp.c', 'Sp.m','Ext')
     row.names(ratesBDvarSpeTable) <- 'Rates'
     output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBDvarSpeTable, readOnly = F)})
   }
 
   if (input$distBDvarSpeModML == 'stepf.t'){
-    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeTable) <- c('Sp.Y0', 'Sp.Y1','Ext')
+    ratesBDvarSpeTable <- matrix(data = c(0.01,0.01,0.01,0.1),nrow = 1,ncol = 4)
+    colnames(ratesBDvarSpeTable) <- c('Sp.Y0', 'Sp.Y1', 'Sp.tc','Ext')
     row.names(ratesBDvarSpeTable) <- 'Rates'
     output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBDvarSpeTable, readOnly = F)})
   }
   
   if (input$distBDvarSpeModML == 'exp.t'){
-    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
+    ratesBDvarSpeTable <- matrix(data = c(0.01,0.01,0.1),nrow = 1,ncol = 3)
     colnames(ratesBDvarSpeTable) <- c('Sp.l', 'Sp.a','Ext')
     row.names(ratesBDvarSpeTable) <- 'Rates'
     output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBDvarSpeTable, readOnly = F)})
   }
   
   if (input$distBDvarSpeModML == 'sigmoid.t'){
-    ratesBDvarSpeTable <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
+    ratesBDvarSpeTable <- matrix(data = c(0.01,0.01,0.01,0.01,0.1),nrow = 1,ncol = 5)
     colnames(ratesBDvarSpeTable) <- c('Sp.Y0', 'Sp.Y1','Sp.tmid', 'Sp.r','Ext')
     row.names(ratesBDvarSpeTable) <- 'Rates'
     output$RateBDvarSpeModML <- renderRHandsontable({rhandsontable(ratesBDvarSpeTable, readOnly = F)})
@@ -243,8 +255,8 @@ observeEvent(input$distBDvarExtModML,{
   }
   
   if (input$distBDvarExtModML == 'stepf.t'){
-    ratesBDvarExtTable <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarExtTable) <- c('Sp','Ext.Y0', 'Ext.Y1')
+    ratesBDvarExtTable <- matrix(data = c(0.1,0.01,0.01,0.01),nrow = 1,ncol = 4)
+    colnames(ratesBDvarExtTable) <- c('Sp','Ext.Y0','Ext.Y1','Ext.tc')
     row.names(ratesBDvarExtTable) <- 'Rates'
     output$RateBDvarExtModML <- renderRHandsontable({rhandsontable(ratesBDvarExtTable, readOnly = F)})
   }
@@ -304,29 +316,29 @@ observeEvent(input$distBDvarSpeExtModMLsp,{
   
   #Speciation rate
   if (input$distBDvarSpeExtModMLsp == 'linear.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.c', 'Ext.m')
+    ratesBDvarSpeExtTablesp <- matrix(data = c(0.01,0.01),nrow = 1,ncol = 2)
+    colnames(ratesBDvarSpeExtTablesp) <- c('Sp.c', 'Sp.m')
     row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
     output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLsp == 'stepf.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.Y0', 'Ext.Y1')
+    ratesBDvarSpeExtTablesp <- matrix(data = c(0.01,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeExtTablesp) <- c('Sp.Y0', 'Sp.Y1', 'Sp.tc')
     row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
     output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLsp == 'exp.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.l', 'Ext.a')
+    ratesBDvarSpeExtTablesp <- matrix(data = c(0.01,0.01),nrow = 1,ncol = 2)
+    colnames(ratesBDvarSpeExtTablesp) <- c('Sp.l', 'Sp.a')
     row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
     output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLsp == 'sigmoid.t'){
-    ratesBDvarSpeExtTablesp <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
-    colnames(ratesBDvarSpeExtTablesp) <- c('Sp','Ext.Y0', 'Ext.Y1','Ext.tmid', 'Ext.r')
+    ratesBDvarSpeExtTablesp <- matrix(data = c(0.01,0.01,0.01,0.01),nrow = 1,ncol = 4)
+    colnames(ratesBDvarSpeExtTablesp) <- c('Sp.Y0', 'Sp.Y1','Sp.tmid', 'Sp.r')
     row.names(ratesBDvarSpeExtTablesp) <- 'Rates'
     output$RateBDvarSpeExtModMLsp <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTablesp, readOnly = F)})
   }
@@ -347,29 +359,29 @@ observeEvent(input$distBDvarSpeExtModMLex, {
   
   #Extinction rates
   if (input$distBDvarSpeExtModMLex == 'linear.t'){
-    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.c', 'Ext.m')
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.01,0.01),nrow = 1,ncol = 2)
+    colnames(ratesBDvarSpeExtTableex) <- c('Ext.c', 'Ext.m')
     row.names(ratesBDvarSpeExtTableex) <- 'Rates'
     output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLex == 'stepf.t'){
-    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.Y0', 'Ext.Y1')
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.01,0.01,0.01),nrow = 1,ncol = 3)
+    colnames(ratesBDvarSpeExtTableex) <- c('Ext.Y0', 'Ext.Y1', 'Ext.tc')
     row.names(ratesBDvarSpeExtTableex) <- 'Rates'
     output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLex == 'exp.t'){
-    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01),nrow = 1,ncol = 3)
-    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.l', 'Ext.a')
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.01,0.01),nrow = 1,ncol = 2)
+    colnames(ratesBDvarSpeExtTableex) <- c('Ext.l', 'Ext.a')
     row.names(ratesBDvarSpeExtTableex) <- 'Rates'
     output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarSpeExtTableex, readOnly = F)})
   }
   
   if (input$distBDvarSpeExtModMLex == 'sigmoid.t'){
-    ratesBDvarSpeExtTableex <- matrix(data = c(0.1,0.01,0.01,0.01,0.01),nrow = 1,ncol = 5)
-    colnames(ratesBDvarSpeExtTableex) <- c('Sp','Ext.Y0', 'Ext.Y1','Ext.tmid', 'Ext.r')
+    ratesBDvarSpeExtTableex <- matrix(data = c(0.01,0.01,0.01,0.01),nrow = 1,ncol = 4)
+    colnames(ratesBDvarSpeExtTableex) <- c('Ext.Y0', 'Ext.Y1','Ext.tmid', 'Ext.r')
     row.names(ratesBDvarSpeExtTableex) <- 'Rates'
     output$RateBDvarSpeExtModMLex <- renderRHandsontable({rhandsontable(ratesBDvarExtTableex, readOnly = F)})
   }
@@ -510,13 +522,14 @@ observeEvent(input$addDiverDepentModML, {
 ### Running models
 observeEvent(input$ModelRunModML,{
 
-  
+
   # ##### Fitting Yule models
 
 
   yulemodels <- which(names(DiverModML$runObjModels$Yule) %in%  input$modelsFitModML)
+ 
 
-  if (!is.null(yulemodels)){
+  if (!length(yulemodels) == 0){
     if (input$optModML == 'optim'){
       # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
       # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='optim', control = list(optim.method= input$optimModML))
@@ -588,7 +601,7 @@ observeEvent(input$ModelRunModML,{
 
   BDmodels <- which(names(DiverModML$runObjModels$BD) %in%  input$modelsFitModML)
 
-  if (!is.null(BDmodels)){
+  if (!length(BDmodels) == 0){
     if (input$optModML == 'optim'){
       for (i in 1:length(BDmodels)){
         BD <-make.bd(tree = treeModML(), sampling.f = as.numeric(DiverModML$runObjModels$BD[[BDmodels[i]]]$rho[1]), unresolved = NULL)
@@ -651,13 +664,13 @@ observeEvent(input$ModelRunModML,{
   }
 
 
-  
+
   #### Fitting BDvarSp models
 
 
   BDvarSpemodels <- which(names(DiverModML$runObjModels$BDvarSpe) %in%  input$modelsFitModML)
 
-  if (!is.null(BDvarSpemodels)){
+  if (!length(BDvarSpemodels) == 0){
 
     if (input$optModML == 'optim'){
       for (i in 1:length(BDvarSpemodels)){
@@ -740,14 +753,212 @@ observeEvent(input$ModelRunModML,{
 
 
 
+  #### Fitting BDvarExt models
+
+
+  BDvarExtmodels <- which(names(DiverModML$runObjModels$BDvarExt) %in%  input$modelsFitModML)
+
+  if (!length(BDvarExtmodels) == 0){
+
+    if (input$optModML == 'optim'){
+      for (i in 1:length(BDvarExtmodels)){
+        BDvarExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c('constant.t', DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Distribution[1]))
+
+
+        fitBDvarExt <- find.mle(func = BDvarExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Rates)),method='optim', control = list(optim.method= input$optimModML))
+
+        DiverModML$iterBDvarExtResult <- fitBDvarExt
+
+        DiverModML$ResultBDvarExtList$result <- DiverModML$iterBDvarExtResult
+
+        DiverModML$countBDvarExtResult <- DiverModML$countBDvarExtResult + 1
+
+        names(DiverModML$ResultBDvarExtList)[DiverModML$countBDvarExtResult] <- names(DiverModML$runObjModels$BDvarExt)[BDvarExtmodels[i]]
+
+        DiverModML$Result$BDvarExtResults  <- DiverModML$ResultBDvarExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else if ( input$optModML == 'minqa'){
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='minqa', control = list(minqa.method= input$minqaModML))
+      #
+      for (i in 1:length(BDvarExtmodels)){
+        BDvarExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c('constant.t', DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Distribution[1]))
+
+
+        fitBDvarExt <- find.mle(func = BDvarExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Rates)),method='minqa', control = list(minqa.method= input$minqaModML))
+
+        DiverModML$iterBDvarExtResult <- fitBDvarExt
+
+        DiverModML$ResultBDvarExtList$result <- DiverModML$iterBDvarExtResult
+
+        DiverModML$countBDvarExtResult <- DiverModML$countBDvarExtResult + 1
+
+        names(DiverModML$ResultBDvarExtList)[DiverModML$countBDvarExtResult] <- names(DiverModML$runObjModels$BDvarExt)[BDvarExtmodels[i]]
+
+        DiverModML$Result$BDvarExtResults  <- DiverModML$ResultBDvarExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else {
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method= input$optModML)
+      #
+      for (i in 1:length(BDvarExtmodels)){
+        BDvarExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c('constant.t', DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Distribution[1]))
+
+
+        fitBDvarExt <- find.mle(func = BDvarExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarExt[[BDvarExtmodels[i]]]$Rates)),method= input$optModML)
+
+        DiverModML$iterBDvarExtResult <- fitBDvarExt
+
+        DiverModML$ResultBDvarExtList$result <- DiverModML$iterBDvarExtResult
+
+        DiverModML$countBDvarExtResult <- DiverModML$countBDvarExtResult + 1
+
+        names(DiverModML$ResultBDvarExtList)[DiverModML$countBDvarExtResult] <- names(DiverModML$runObjModels$BDvarExt)[BDvarExtmodels[i]]
+
+        DiverModML$Result$BDvarExtResults  <- DiverModML$ResultBDvarExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    }
+
+  }
 
 
 
+  #### Fitting BDvarSpeExt models
 
 
+  BDvarSpeExtmodels <- which(names(DiverModML$runObjModels$BDvarSpeExt) %in%  input$modelsFitModML)
 
-  
+  if (!length(BDvarSpeExtmodels) == 0){
+
+    if (input$optModML == 'optim'){
+      for (i in 1:length(BDvarSpeExtmodels)){
+        BDvarSpeExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Speciation[1], DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Extinction[1]))
+
+
+        fitBDvarSpeExt <- find.mle(func = BDvarSpeExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Speciation,DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Extinction)),method='optim', control = list(optim.method= input$optimModML))
+
+        DiverModML$iterBDvarSpeExtResult <- fitBDvarSpeExt
+
+        DiverModML$ResultBDvarSpeExtList$result <- DiverModML$iterBDvarSpeExtResult
+
+        DiverModML$countBDvarSpeExtResult <- DiverModML$countBDvarSpeExtResult + 1
+
+        names(DiverModML$ResultBDvarSpeExtList)[DiverModML$countBDvarSpeExtResult] <- names(DiverModML$runObjModels$BDvarSpeExt)[BDvarSpeExtmodels[i]]
+
+        DiverModML$Result$BDvarSpeExtResults  <- DiverModML$ResultBDvarSpeExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else if ( input$optModML == 'minqa'){
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method='minqa', control = list(minqa.method= input$minqaModML))
+      #
+      for (i in 1:length(BDvarSpeExtmodels)){
+        BDvarSpeExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Speciation[1], DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Extinction[1]))
+
+
+        fitBDvarSpeExt <- find.mle(func = BDvarSpeExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Speciation,DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Extinction)),method='minqa', control = list(minqa.method= input$minqaModML))
+
+        DiverModML$iterBDvarSpeExtResult <- fitBDvarSpeExt
+
+        DiverModML$ResultBDvarSpeExtList$result <- DiverModML$iterBDvarSpeExtResult
+
+        DiverModML$countBDvarSpeExtResult <- DiverModML$countBDvarSpeExtResult + 1
+
+        names(DiverModML$ResultBDvarSpeExtList)[DiverModML$countBDvarSpeExtResult] <- names(DiverModML$runObjModels$BDvarSpeExt)[BDvarSpeExtmodels[i]]
+
+        DiverModML$Result$BDvarSpeExtResults  <- DiverModML$ResultBDvarSpeExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    } else {
+      # yule <-make.yule(tree = treeModML(), sampling.f = as.numeric(input$fractYuleModML), unresolved = NULL)
+      # fityule <- find.mle(func = yule, x.init= as.numeric(input$BrateYuleModML), method= input$optModML)
+      #
+      for (i in 1:length(BDvarSpeExtmodels)){
+        BDvarSpeExt <-make.bd.t(tree = treeModML(),
+                             sampling.f = as.numeric(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$rho[1]),
+                             unresolved = NULL,
+                             functions = c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Speciation[1], DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Dist.Extinction[1]))
+
+
+        fitBDvarSpeExt <- find.mle(func = BDvarSpeExt,
+                                x.init= as.numeric(c(DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Speciation,DiverModML$runObjModels$BDvarSpeExt[[BDvarSpeExtmodels[i]]]$Rates.Extinction)),method= input$optModML)
+
+        DiverModML$iterBDvarSpeExtResult <- fitBDvarSpeExt
+
+        DiverModML$ResultBDvarSpeExtList$result <- DiverModML$iterBDvarSpeExtResult
+
+        DiverModML$countBDvarSpeExtResult <- DiverModML$countBDvarSpeExtResult + 1
+
+        names(DiverModML$ResultBDvarSpeExtList)[DiverModML$countBDvarSpeExtResult] <- names(DiverModML$runObjModels$BDvarSpeExt)[BDvarSpeExtmodels[i]]
+
+        DiverModML$Result$BDvarSpeExtResults  <- DiverModML$ResultBDvarSpeExtList
+
+        DiverModML$iterObjectDiver <- DiverModML$Result
+      }
+    }
+
+  }
+
+  #### Fit DiverDepentModel
+
+  DiverDepentModelmodels <- which(names(DiverModML$runObjModels$DiverDepentModel) %in%  input$modelsFitModML)
+
+  if (!length(DiverDepentModelmodels) == 0){
+
+    branchingTime <- branching.times(treeModML())
+
+    for (i in 1:length(DiverDepentModelmodels)){
+
+      bd_res_ddd <- bd_ML(brts = branchingTime, missnumspec = as.numeric(input$missnumDiverModML), cond = as.numeric(input$modelDiverModML), btorph = 0,optimmethod = input$optModMLDDD)
+      
+      DiverModML$iterDiverDepentModelResult <- bd_res_ddd
+       
+       DiverModML$ResultDiverDepentModelList$result <- DiverModML$iterDiverDepentModelResult
+       
+       DiverModML$countDiverDepentModelResult <- DiverModML$countDiverDepentModelResult + 1
+       
+      names(DiverModML$ResultDiverDepentModelList)[DiverModML$countDiverDepentModelResult] <- names(DiverModML$runObjModels$DiverDepentModel)[DiverDepentModelmodels[i]]
+      
+      DiverModML$Result$DiverDepentModelResults  <- DiverModML$ResultDiverDepentModelList 
+      
+      DiverModML$iterObjectDiver <- DiverModML$Result
+    }
+
+  #DiverModML$runObjModels$DiverDepentModel
+
+
+  }
 })
+
+
 
 
 
